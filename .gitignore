@@ -50,4 +50,4 @@ pgdata/
 # ML data and artifacts (Phase 2)
 data/raw/
 backend/ml_artifacts/*.joblib
-models/
+/models/
