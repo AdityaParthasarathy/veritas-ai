@@ -16,9 +16,11 @@ class VeritasException(Exception):
         code: str = "INTERNAL_SERVER_ERROR",
         details: Optional[Dict[str, Any]] = None,
         status_code: int = status.HTTP_400_BAD_REQUEST,
+        headers: Optional[Dict[str, str]] = None,
     ):
         super().__init__(message)
         self.status_code = status_code
+        self.headers = headers
         self.message = message
         self.code = code
         self.details = details or {}
@@ -64,4 +66,35 @@ class ModelUnavailableException(VeritasException):
             message=message,
             code="MODEL_UNAVAILABLE",
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+
+class AuthenticationException(VeritasException):
+    """Missing, invalid or expired credentials."""
+
+    def __init__(self, message: str = "Could not validate credentials") -> None:
+        super().__init__(
+            message=message,
+            code="UNAUTHORIZED",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+class ConflictException(VeritasException):
+    """The request conflicts with existing data (e.g. duplicate email)."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message=message, code="CONFLICT", status_code=status.HTTP_409_CONFLICT)
+
+
+class TooManyRequestsException(VeritasException):
+    """Raised when a client exceeds an attempt limit."""
+
+    def __init__(self, retry_after_seconds: int) -> None:
+        super().__init__(
+            message="Too many attempts. Please try again later.",
+            code="TOO_MANY_REQUESTS",
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            headers={"Retry-After": str(retry_after_seconds)},
         )

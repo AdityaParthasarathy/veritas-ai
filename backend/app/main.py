@@ -63,6 +63,7 @@ async def veritas_exception_handler(request: Request, exc: VeritasException) -> 
     logger.warning("Application error [%s]: %s", exc.code, exc.message)
     return JSONResponse(
         status_code=exc.status_code,
+        headers=exc.headers,
         content={
             "error": {
                 "code": exc.code,

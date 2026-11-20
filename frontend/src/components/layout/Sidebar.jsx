@@ -1,8 +1,12 @@
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 import Logo from '../common/Logo'
 import { NAV_ITEMS } from './navigation'
 
 export default function Sidebar({ open, onNavigate }) {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-veritas-border-subtle bg-veritas-secondary/95 backdrop-blur transition-transform duration-200 lg:translate-x-0 ${
@@ -38,8 +42,28 @@ export default function Sidebar({ open, onNavigate }) {
         ))}
       </nav>
       <div className="border-t border-veritas-border-subtle p-4 text-xs leading-relaxed text-veritas-dim">
-        Phase 3 · Analysis API
-        <br />
+        {user ? (
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-veritas-muted" title={user.email}>{user.full_name || user.email}</span>
+            <button
+              type="button"
+              aria-label="Sign out"
+              onClick={() => {
+                logout()
+                onNavigate?.()
+                navigate('/login')
+              }}
+              className="rounded-md p-1.5 text-veritas-muted transition-colors hover:bg-white/5 hover:text-veritas-text"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="mb-3 flex gap-3 text-sm">
+            <Link to="/login" onClick={onNavigate} className="font-medium text-veritas-cyan hover:underline">Sign in</Link>
+            <Link to="/register" onClick={onNavigate} className="text-veritas-muted hover:text-veritas-text">Create account</Link>
+          </div>
+        )}
         Model outputs are signals, not proof of truth.
       </div>
     </aside>

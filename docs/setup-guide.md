@@ -53,6 +53,7 @@ py -3 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install -r backend\requirements.txt
 cd backend
+python -m alembic upgrade head
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
@@ -87,7 +88,7 @@ npm run lint
 npm run build
 ```
 
-Backend tests query the real database, so the container must be running.
+Backend tests use a separate `veritas_test` database on the same server (created and migrated automatically), so the container must be running.
 
 ## 7. Troubleshooting
 

@@ -4,6 +4,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
+from app.api.deps import DbSession, OptionalUser
+from app.services import history_service
 from app.schemas.analysis import (
     AnalysisRequest,
     AnalysisResponse,
@@ -24,11 +26,15 @@ Service = Annotated[AnalysisService, Depends(get_analysis_service)]
     summary="Analyze submitted text",
     description=(
         "Returns, as separate sections: a machine-learning style classification, linguistic signals, "
-        "retrieved reference passages and an uncertainty assessment. It does not verify factual claims."
+        "retrieved reference passages and an uncertainty assessment. It does not verify factual claims. "
+        "Anonymous requests are analysed but not stored; with a valid bearer token the analysis is saved to the user's history."
     ),
 )
-def analyze_text(payload: AnalysisRequest, service: Service) -> AnalysisResponse:
-    return service.analyze(payload)
+def analyze_text(payload: AnalysisRequest, service: Service, db: DbSession, user: OptionalUser) -> AnalysisResponse:
+    result = service.analyze(payload)
+    if user is not None:
+        result.analysis_id = history_service.save(db, user, payload, result)
+    return result
 
 
 @evidence_router.get("/passages", response_model=EvidenceListResponse, summary="List the reference collection")

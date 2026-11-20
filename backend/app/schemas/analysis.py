@@ -1,5 +1,6 @@
 """Schemas for the content-analysis and evidence endpoints."""
 
+import uuid
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -69,6 +70,7 @@ class UncertaintyOut(BaseModel):
 
 
 class AnalysisResponse(BaseModel):
+    analysis_id: uuid.UUID | None = Field(default=None, description="Set when the analysis was saved to the signed-in user's history")
     word_count: int
     classification: ClassificationResult
     linguistic_signals: list[SignalOut]

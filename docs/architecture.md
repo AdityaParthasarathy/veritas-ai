@@ -14,7 +14,8 @@ React (Vite)  --HTTP/JSON-->  FastAPI  -->  services  -->  SQLAlchemy  -->  Post
 | Services | `backend/app/services` | Business logic (e.g. `HealthService`). Routes never touch the database directly. |
 | Database | `backend/app/database` | Engine, session factory, declarative base, connectivity check. |
 | Core | `backend/app/core` | Settings (Pydantic Settings), security helpers (bcrypt, JWT), exception types. |
-| Migrations | `backend/alembic` | Alembic environment; no migrations yet because there are no tables. |
+| Repositories | `backend/app/repositories` | All SQL for users and analyses, scoped by owner. |
+| Migrations | `backend/alembic` | Alembic environment and migrations (`users`, `analyses`). |
 | Database server | `docker-compose.yml` | PostgreSQL 16 with health check and a named volume. |
 
 ## Request flow (status check)
@@ -34,3 +35,7 @@ React (Vite)  --HTTP/JSON-->  FastAPI  -->  services  -->  SQLAlchemy  -->  Post
 ## Planned integration (later phases)
 
 FastAPI will gain NLP preprocessing (spaCy), ML classification, linguistic signal analysis, semantic evidence retrieval (sentence embeddings + FAISS) and uncertainty assessment. Classifier output and retrieved evidence stay separate in the API and UI: a prediction is a statistical signal and is never presented as proof of truth.
+
+## Accounts and history (Phase 4)
+
+See [auth.md](auth.md): JWT bearer authentication, optional-auth analysis endpoint that saves results for signed-in users, ownership-scoped history, and the model-performance endpoint.

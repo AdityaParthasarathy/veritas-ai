@@ -1,7 +1,7 @@
 """VERITAS AI - API v1 Router Aggregator."""
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import analysis, health, system
+from app.api.v1.endpoints import analysis, auth, health, history, performance, system
 
 api_router = APIRouter()
 
@@ -10,3 +10,6 @@ api_router.include_router(health.router)
 api_router.include_router(system.router)
 api_router.include_router(analysis.analysis_router)
 api_router.include_router(analysis.evidence_router)
+api_router.include_router(auth.router)
+api_router.include_router(history.router)
+api_router.include_router(performance.router)

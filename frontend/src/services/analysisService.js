@@ -14,6 +14,9 @@ export function describeError(error) {
   if (!error.response) return 'Cannot reach the backend. Make sure it is running, then try again.'
   const { status, data } = error.response
   const apiError = data?.error
+  if (status === 401) return apiError?.message === 'Incorrect email or password' ? apiError.message : 'Your session has expired. Please sign in again.'
+  if (status === 409 || status === 429) return apiError?.message || 'The request could not be completed.'
+  if (status === 404) return 'That item was not found.'
   if (status === 422) {
     const first = apiError?.details?.[0]
     return first ? `Invalid input: ${first.message}` : 'The input was not accepted.'

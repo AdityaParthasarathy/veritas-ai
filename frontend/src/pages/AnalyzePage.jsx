@@ -1,14 +1,17 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Loader2, ScanSearch } from 'lucide-react'
 import AnalysisResults from '../components/analysis/AnalysisResults'
 import Card from '../components/common/Card'
 import PageHeader from '../components/common/PageHeader'
+import { useAuth } from '../context/AuthContext'
 import { analyzeText, describeError } from '../services/analysisService'
 
 const MAX_CHARS = 20000
 const MIN_CHARS = 20
 
 export default function AnalyzePage() {
+  const { user } = useAuth()
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(false)
@@ -82,6 +85,7 @@ export default function AnalyzePage() {
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScanSearch className="h-4 w-4" />}
             {loading ? 'Analyzing…' : 'Analyze'}
           </button>
+          <p className="text-xs text-veritas-dim">{user ? 'Signed in: this analysis will be saved to your history.' : 'Not signed in: this analysis will not be saved.'}</p>
         </form>
       </Card>
 
@@ -89,6 +93,15 @@ export default function AnalyzePage() {
         <div role="alert" className="mt-5 rounded-lg border border-veritas-error/30 bg-veritas-error-light p-3.5 text-sm text-veritas-error">
           {error}
         </div>
+      )}
+      {result && (
+        <p className="mt-5 text-xs text-veritas-muted">
+          {result.analysis_id ? (
+            <>Saved to your <Link to={`/history/${result.analysis_id}`} className="text-veritas-cyan hover:underline">history</Link>.</>
+          ) : (
+            <>Not saved. <Link to="/login" state={{ from: '/analyze' }} className="text-veritas-cyan hover:underline">Sign in</Link> to keep your analyses.</>
+          )}
+        </p>
       )}
       {result && <AnalysisResults result={result} />}
     </>
