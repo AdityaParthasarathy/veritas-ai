@@ -98,6 +98,8 @@ Frontend tests: `cd frontend; npm test`. Backend tests need the database contain
 
 ## 8. Troubleshooting
 
+- `pip` fails while installing PyTorch with `OSError: [Errno 2] No such file or directory` and a hint about long paths: the repository folder is too deeply nested for Windows' 260-character path limit. Clone into a short path (for example `C:\dev\veritas-ai`) or enable long paths. This was found by the clean-clone test.
+- `scripts\setup-ml.ps1` must be run with Windows PowerShell or PowerShell 7 from any folder; it needs the virtual environment at `.venv` with `backend\requirements-ml.txt` installed first.
 - `password authentication failed`: the password in `DATABASE_URL` differs from the one the volume was first created with. Align them, or reset the role password inside the container: `docker exec veritas_postgres psql -U veritas_user -d veritas_db -c "ALTER USER veritas_user PASSWORD 'new-password'"`.
 - Backend reaches the wrong database: another PostgreSQL owns port 5432. Find it with `Get-NetTCPConnection -LocalPort 5432 -State Listen` and set `POSTGRES_PORT` as above.
 - Dashboard shows "Backend unavailable": start the backend, then press Retry.

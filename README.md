@@ -36,7 +36,7 @@ Details: [docs/architecture.md](docs/architecture.md).
 
 ## Quick start with Docker (recommended)
 
-Prerequisites: Docker Desktop (running), Git, and the ML files (see "ML files" below).
+Prerequisites: Docker Desktop (running), Git, and the ML files (see "ML files" below). **Clone into a short path** such as `C:\dev\veritas-ai`: in a deeply nested folder, pip can hit Windows' 260-character path limit while unpacking PyTorch and fail with `OSError: No such file or directory` (or enable long paths as pip's hint describes).
 
 ```powershell
 Copy-Item .env.example .env
