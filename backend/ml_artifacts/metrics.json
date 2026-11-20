@@ -1,0 +1,388 @@
+{
+  "generated_at": "2026-11-20T16:13:31+00:00",
+  "dataset": {
+    "name": "WELFake",
+    "source": "https://zenodo.org/records/4561253",
+    "license": "CC-BY-4.0"
+  },
+  "label_convention": "is_fake: 1 = fake/unreliable, 0 = real (as found in the distributed CSV)",
+  "cleaning": {
+    "raw_rows": 72134,
+    "missing_title": 558,
+    "missing_text": 39,
+    "dropped_empty_content": 1128,
+    "dropped_exact_duplicates": 8178,
+    "dropped_duplicate_text": 391,
+    "dropped_conflicting_label_groups": 0,
+    "dropped_conflicting_label_rows": 0,
+    "final_rows": 62437,
+    "class_counts_raw": {
+      "1": 37106,
+      "0": 35028
+    },
+    "class_counts_clean": {
+      "0": 34615,
+      "1": 27822
+    }
+  },
+  "split": {
+    "strategy": "stratified 70/15/15",
+    "seed": 42,
+    "sizes": {
+      "train": {
+        "rows": 43705,
+        "fake": 19475,
+        "real": 24230
+      },
+      "validation": {
+        "rows": 9366,
+        "fake": 4174,
+        "real": 5192
+      },
+      "test": {
+        "rows": 9366,
+        "fake": 4173,
+        "real": 5193
+      }
+    },
+    "leakage_check": "passed (content, body text and serial number disjoint across splits)"
+  },
+  "library_versions": {
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.5"
+  },
+  "variants": [
+    {
+      "variant": "baseline",
+      "vectorizer": {
+        "vocabulary_size": 200000,
+        "max_df": "0.9",
+        "max_features": "200000",
+        "min_df": "5",
+        "ngram_range": "(1, 2)",
+        "stop_words": "english",
+        "sublinear_tf": "True"
+      },
+      "model": {
+        "type": "LogisticRegression",
+        "selected_C": 128.0,
+        "class_weight": "balanced",
+        "c_search": [
+          {
+            "C": 0.5,
+            "validation_macro_f1": 0.9514726197782468
+          },
+          {
+            "C": 2.0,
+            "validation_macro_f1": 0.9615339623114287
+          },
+          {
+            "C": 8.0,
+            "validation_macro_f1": 0.9671401265755293
+          },
+          {
+            "C": 32.0,
+            "validation_macro_f1": 0.9682179976268795
+          },
+          {
+            "C": 128.0,
+            "validation_macro_f1": 0.9687652274296512
+          }
+        ]
+      },
+      "validation": {
+        "accuracy": 0.9691437112961777,
+        "per_class": {
+          "real": {
+            "precision": 0.9709894332372718,
+            "recall": 0.9734206471494607,
+            "f1": 0.9722035202462249,
+            "support": 5192
+          },
+          "fake": {
+            "precision": 0.9668348954578226,
+            "recall": 0.9638236703402012,
+            "f1": 0.9653269346130774,
+            "support": 4174
+          }
+        },
+        "macro_avg": {
+          "precision": 0.9689121643475472,
+          "recall": 0.9686221587448309,
+          "f1": 0.9687652274296512
+        },
+        "confusion_matrix": {
+          "labels": [
+            "real",
+            "fake"
+          ],
+          "rows_are": "true class",
+          "columns_are": "predicted class",
+          "matrix": [
+            [
+              5054,
+              138
+            ],
+            [
+              151,
+              4023
+            ]
+          ]
+        }
+      },
+      "test": {
+        "accuracy": 0.9705317104420244,
+        "per_class": {
+          "real": {
+            "precision": 0.9741562198649952,
+            "recall": 0.9726554977854804,
+            "f1": 0.973405280400848,
+            "support": 5193
+          },
+          "fake": {
+            "precision": 0.9660368332934705,
+            "recall": 0.9678888090103044,
+            "f1": 0.9669619344026813,
+            "support": 4173
+          }
+        },
+        "macro_avg": {
+          "precision": 0.9700965265792328,
+          "recall": 0.9702721533978924,
+          "f1": 0.9701836074017647
+        },
+        "confusion_matrix": {
+          "labels": [
+            "real",
+            "fake"
+          ],
+          "rows_are": "true class",
+          "columns_are": "predicted class",
+          "matrix": [
+            [
+              5051,
+              142
+            ],
+            [
+              134,
+              4039
+            ]
+          ]
+        }
+      },
+      "top_features": {
+        "most_real": [
+          "reuters",
+          "breitbart",
+          "said",
+          "washington reuters",
+          "york times",
+          "president donald",
+          "twitter",
+          "follow",
+          "2017",
+          "friday",
+          "thursday",
+          "ms",
+          "monday",
+          "new york",
+          "reuters president",
+          "tuesday",
+          "york",
+          "wednesday",
+          "follow twitter",
+          "sunday"
+        ],
+        "most_fake": [
+          "featured image",
+          "video",
+          "featured",
+          "image",
+          "twitter com",
+          "getty",
+          "read",
+          "getty images",
+          "breaking",
+          "hillary",
+          "october",
+          "com",
+          "entire story",
+          "november 2016",
+          "2016",
+          "just",
+          "november",
+          "photo",
+          "watch",
+          "anti"
+        ]
+      },
+      "train_seconds": 136.0
+    },
+    {
+      "variant": "source_masked",
+      "vectorizer": {
+        "vocabulary_size": 200000,
+        "max_df": "0.9",
+        "max_features": "200000",
+        "min_df": "5",
+        "ngram_range": "(1, 2)",
+        "stop_words": "english",
+        "sublinear_tf": "True"
+      },
+      "model": {
+        "type": "LogisticRegression",
+        "selected_C": 128.0,
+        "class_weight": "balanced",
+        "c_search": [
+          {
+            "C": 0.5,
+            "validation_macro_f1": 0.9411054388907447
+          },
+          {
+            "C": 2.0,
+            "validation_macro_f1": 0.9530678306137417
+          },
+          {
+            "C": 8.0,
+            "validation_macro_f1": 0.9570595140633509
+          },
+          {
+            "C": 32.0,
+            "validation_macro_f1": 0.9584707118234983
+          },
+          {
+            "C": 128.0,
+            "validation_macro_f1": 0.9594350963100149
+          }
+        ]
+      },
+      "validation": {
+        "accuracy": 0.9599615631005766,
+        "per_class": {
+          "real": {
+            "precision": 0.9595497042549131,
+            "recall": 0.9686055469953775,
+            "f1": 0.9640563596281031,
+            "support": 5192
+          },
+          "fake": {
+            "precision": 0.9604848484848485,
+            "recall": 0.949209391471011,
+            "f1": 0.9548138329919268,
+            "support": 4174
+          }
+        },
+        "macro_avg": {
+          "precision": 0.9600172763698809,
+          "recall": 0.9589074692331943,
+          "f1": 0.9594350963100149
+        },
+        "confusion_matrix": {
+          "labels": [
+            "real",
+            "fake"
+          ],
+          "rows_are": "true class",
+          "columns_are": "predicted class",
+          "matrix": [
+            [
+              5029,
+              163
+            ],
+            [
+              212,
+              3962
+            ]
+          ]
+        }
+      },
+      "test": {
+        "accuracy": 0.9636984838778561,
+        "per_class": {
+          "real": {
+            "precision": 0.9654709380395166,
+            "recall": 0.9691892932794146,
+            "f1": 0.9673265423793965,
+            "support": 5193
+          },
+          "fake": {
+            "precision": 0.9614736335179388,
+            "recall": 0.9568655643421998,
+            "f1": 0.9591640643766515,
+            "support": 4173
+          }
+        },
+        "macro_avg": {
+          "precision": 0.9634722857787277,
+          "recall": 0.9630274288108072,
+          "f1": 0.9632453033780239
+        },
+        "confusion_matrix": {
+          "labels": [
+            "real",
+            "fake"
+          ],
+          "rows_are": "true class",
+          "columns_are": "predicted class",
+          "matrix": [
+            [
+              5033,
+              160
+            ],
+            [
+              180,
+              3993
+            ]
+          ]
+        }
+      },
+      "top_features": {
+        "most_real": [
+          "said",
+          "follow",
+          "president donald",
+          "pic",
+          "washington",
+          "friday",
+          "thursday",
+          "tuesday",
+          "wednesday",
+          "monday",
+          "ms",
+          "milo",
+          "sunday",
+          "saturday",
+          "said statement",
+          "2017",
+          "percent",
+          "london",
+          "washington president",
+          "islamic state"
+        ],
+        "most_fake": [
+          "featured image",
+          "video",
+          "featured",
+          "image",
+          "getty",
+          "read",
+          "getty images",
+          "breaking",
+          "hillary",
+          "october",
+          "entire story",
+          "november 2016",
+          "2016",
+          "just",
+          "watch",
+          "obama",
+          "november",
+          "nyp",
+          "flickr",
+          "photo"
+        ]
+      },
+      "train_seconds": 182.1
+    }
+  ]
+}

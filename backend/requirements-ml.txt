@@ -1,0 +1,5 @@
+# VERITAS AI - ML dependencies (Phase 2). Install after requirements.txt.
+-r requirements.txt
+pandas>=2.2
+scikit-learn>=1.5
+joblib>=1.4

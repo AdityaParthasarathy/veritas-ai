@@ -2,7 +2,7 @@
 
 AI-powered misinformation intelligence platform. It will analyze news text and URLs with NLP and machine learning, show model predictions separately from independently retrieved evidence, and report uncertainty. A model prediction is never presented as proof that content is true or false.
 
-**Status: Phase 1 (infrastructure) complete. No analysis, model or authentication features exist yet.**
+**Status: Phase 1 (infrastructure) and Phase 2 (dataset and baseline model) complete. The model is not yet exposed through the API or UI; no authentication exists yet.**
 
 ## Stack
 
@@ -92,10 +92,12 @@ Backend tests use the real database, so start it first. Other database commands:
 
 Done: repository structure, FastAPI app with health and system endpoints, SQLAlchemy engine/session, Alembic setup (no migrations yet), PostgreSQL container, React shell with a live status dashboard, security foundations (env config, CORS, safe errors, hashing and JWT helpers), backend tests, documentation.
 
-Not implemented: authentication, data models, NLP, classification, evidence retrieval, analytics.
+Phase 2 done: WELFake downloaded and documented, cleaning and leakage-safe split, TF-IDF + Logistic Regression baseline (test accuracy 0.9705, with a source-masked variant at 0.9637), saved artifacts. These scores reflect agreement with dataset labels, not factual verification; see [docs/dataset-and-model.md](docs/dataset-and-model.md).
+
+Not implemented: authentication, serving the model through the API, spaCy preprocessing, evidence retrieval, analytics.
 
 ## Roadmap
 
-1. Phase 2: ML environment, dataset, preprocessing, classifier training and evaluation.
+1. Phase 2 (done): dataset, cleaning, baseline classifier and evaluation. Train with `cd backend; python -m pip install -r requirements-ml.txt; python -m app.ml.train`.
 2. Phase 3: analysis API, linguistic signals, semantic evidence retrieval, uncertainty.
 3. Phase 4: authentication, stored analyses and history, performance and limitations pages.
