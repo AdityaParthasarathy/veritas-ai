@@ -94,7 +94,9 @@ Done: repository structure, FastAPI app with health and system endpoints, SQLAlc
 
 Phase 2 done: WELFake downloaded and documented, cleaning and leakage-safe split, TF-IDF + Logistic Regression baseline (test accuracy 0.9705, with a source-masked variant at 0.9637), saved artifacts. These scores reflect agreement with dataset labels, not factual verification; see [docs/dataset-and-model.md](docs/dataset-and-model.md).
 
-Not implemented: authentication, serving the model through the API, spaCy preprocessing, evidence retrieval, analytics.
+Phase 3 foundation done: CPU-only PyTorch, sentence-transformers, spaCy and FAISS installed with exact pins; MiniLM embeddings and FAISS similarity search verified by tests (see [docs/ml-setup.md](docs/ml-setup.md)).
+
+Not implemented: authentication, serving the model through the API, the curated evidence collection and analysis endpoint, analytics.
 
 ## Roadmap
 
