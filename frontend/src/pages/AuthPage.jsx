@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
-import Card from '../components/common/Card'
+import { Eye, EyeOff } from 'lucide-react'
+import SignalField from '../components/signal/SignalField'
+import Button from '../components/ui/Button'
+import { Input } from '../components/ui/Field'
 import { useAuth } from '../context/AuthContext'
 import { describeError } from '../services/analysisService'
 
-const INPUT =
-  'w-full rounded-lg border border-veritas-border-subtle bg-veritas-bg/60 px-3 py-2 text-sm text-veritas-text outline-none transition-colors placeholder:text-veritas-dim focus:border-veritas-primary'
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-/** Shared sign-in / create-account form. */
+/** Sign-in and account creation share one composition: the instrument on one side, the form on the other. */
 export default function AuthPage({ mode }) {
   const isRegister = mode === 'register'
   const { user, login, register, sessionExpired } = useAuth()
@@ -17,14 +18,21 @@ export default function AuthPage({ mode }) {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [reveal, setReveal] = useState(false)
+  const [attempted, setAttempted] = useState(false)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
 
   const destination = location.state?.from || '/analyze'
   if (user) return <Navigate to={destination} replace />
 
+  const emailError = attempted && !EMAIL.test(email.trim()) ? 'Enter a valid email address.' : null
+  const passwordError = attempted && (isRegister ? password.length < 10 : password.length === 0) ? (isRegister ? 'Use at least 10 characters.' : 'Enter your password.') : null
+
   async function handleSubmit(event) {
     event.preventDefault()
+    setAttempted(true)
+    if (!EMAIL.test(email.trim()) || (isRegister ? password.length < 10 : password.length === 0)) return
     setBusy(true)
     setError(null)
     try {
@@ -39,75 +47,65 @@ export default function AuthPage({ mode }) {
   }
 
   return (
-    <div className="mx-auto max-w-md pt-4">
-      <h1 className="mb-1.5 text-2xl font-semibold tracking-tight text-veritas-text">
-        {isRegister ? 'Create your account' : 'Sign in'}
-      </h1>
-      <p className="mb-6 text-sm text-veritas-muted">
-        {isRegister ? 'Save your analyses and revisit them later.' : 'Sign in to save and review your analyses.'}
-      </p>
-
-      {sessionExpired && !isRegister && (
-        <div role="status" className="mb-4 rounded-lg border border-veritas-warning/30 bg-veritas-warning-light p-3 text-sm text-veritas-warning">
-          Your session expired. Please sign in again.
+    <div className="grid min-h-[calc(100vh-3.5rem)] lg:grid-cols-2">
+      <aside className="flex flex-col border-b border-line bg-ink-1 lg:border-b-0 lg:border-r">
+        {/* The instrument and the statement share the panel without overlapping. */}
+        <SignalField variant="quiet" className="relative h-44 w-full lg:h-auto lg:flex-1" />
+        <div className="border-t border-line px-6 py-6 sm:px-10 sm:py-8">
+          <p className="font-display text-[clamp(1.75rem,3vw,2.75rem)] leading-[1.08] tracking-[-0.02em] text-paper" style={{ fontVariationSettings: "'opsz' 60" }}>
+            Confidence is not truth.
+          </p>
+          <p className="t-caption mt-3 max-w-sm">A model can be certain and wrong. Veritas reports how sure the model is separately from how far the analysis can be trusted.</p>
         </div>
-      )}
+      </aside>
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate={false}>
-          {isRegister && (
-            <div>
-              <label htmlFor="full_name" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-                Name <span className="text-veritas-dim">(optional)</span>
-              </label>
-              <input id="full_name" value={fullName} onChange={(e) => setFullName(e.target.value)} maxLength={120} autoComplete="name" className={INPUT} />
+      <div className="flex items-center px-4 py-12 sm:px-10 lg:px-16">
+        <div key={mode} className="page-enter w-full max-w-md">
+          <h1 className="t-h1">{isRegister ? 'Create an account' : 'Sign in'}</h1>
+          <p className="t-body mt-3">{isRegister ? 'Keep your investigations in a private Casebook. Anonymous use stays available.' : 'Return to your Casebook of saved investigations.'}</p>
+
+          {sessionExpired && !isRegister && (
+            <div role="status" className="mt-6 rounded-md border border-caution/40 bg-caution/10 px-4 py-3 text-sm text-caution">
+              Your session expired. Please sign in again.
             </div>
           )}
-          <div>
-            <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-              Email
-            </label>
-            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className={INPUT} />
-          </div>
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              minLength={isRegister ? 10 : 1}
-              maxLength={72}
+
+          <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
+            {isRegister && <Input label="Name" optional value={fullName} onChange={(e) => setFullName(e.target.value)} maxLength={120} autoComplete="name" />}
+            <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" error={emailError} />
+            <Input
+              label="Password"
+              type={reveal ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              maxLength={72}
               autoComplete={isRegister ? 'new-password' : 'current-password'}
-              className={INPUT}
+              hint={isRegister ? 'At least 10 characters.' : undefined}
+              error={passwordError}
+              suffix={
+                <button type="button" onClick={() => setReveal((v) => !v)} aria-pressed={reveal} aria-label={reveal ? 'Hide password' : 'Show password'} className="press rounded-md p-2 text-dim hover:text-paper">
+                  {reveal ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                </button>
+              }
             />
-            {isRegister && <p className="mt-1.5 text-xs text-veritas-dim">At least 10 characters.</p>}
-          </div>
-          {error && (
-            <div role="alert" className="rounded-lg border border-veritas-error/30 bg-veritas-error-light p-3 text-sm text-veritas-error">
-              {error}
-            </div>
-          )}
-          <button
-            type="submit"
-            disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-veritas-primary-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-solid-hover disabled:opacity-50"
-          >
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isRegister ? 'Create account' : 'Sign in'}
-          </button>
-        </form>
-      </Card>
+            {error && (
+              <div role="alert" className="rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
+                {error}
+              </div>
+            )}
+            <Button type="submit" size="lg" className="w-full" loading={busy}>
+              {isRegister ? 'Create account' : 'Sign in'}
+            </Button>
+          </form>
 
-      <p className="mt-4 text-center text-sm text-veritas-muted">
-        {isRegister ? 'Already have an account?' : 'New here?'}{' '}
-        <Link to={isRegister ? '/login' : '/register'} state={location.state} className="text-veritas-cyan hover:underline">
-          {isRegister ? 'Sign in' : 'Create an account'}
-        </Link>
-      </p>
+          <p className="t-body mt-6">
+            {isRegister ? 'Already have an account?' : 'New to Veritas?'}{' '}
+            <Link to={isRegister ? '/login' : '/register'} state={location.state} className="text-signal underline decoration-signal/30 hover:decoration-signal">
+              {isRegister ? 'Sign in' : 'Create an account'}
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import config from '../../tailwind.config.js'
-
-const colors = config.theme.extend.colors.veritas
+import { colors } from '../design/tokens'
 
 function luminance(hex) {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
@@ -13,19 +11,24 @@ const ratio = (a, b) => {
 }
 
 describe('design tokens meet WCAG AA (4.5:1 for normal text)', () => {
-  const backgrounds = { bg: colors.bg, secondary: colors.secondary, card: colors.card }
-  const textTokens = ['text', 'muted', 'dim', 'primary', 'cyan', 'success', 'warning', 'error']
+  const grounds = { 'ink-0': colors.ink[0], 'ink-1': colors.ink[1], 'ink-2': colors.ink[2], 'ink-3': colors.ink[3] }
+  const text = { paper: colors.paper, steel: colors.steel, dim: colors.dim, signal: colors.signal.DEFAULT, 'signal-strong': colors.signal.strong, caution: colors.caution, support: colors.support, contra: colors.contra }
 
-  for (const [bgName, bg] of Object.entries(backgrounds)) {
-    for (const token of textTokens) {
-      it(`${token} on ${bgName}`, () => {
-        expect(ratio(colors[token], bg)).toBeGreaterThanOrEqual(4.5)
+  for (const [groundName, ground] of Object.entries(grounds)) {
+    for (const [name, value] of Object.entries(text)) {
+      it(`${name} on ${groundName}`, () => {
+        expect(ratio(value, ground)).toBeGreaterThanOrEqual(4.5)
       })
     }
   }
 
-  it('white text on primary buttons', () => {
-    expect(ratio('#FFFFFF', colors['primary-solid'])).toBeGreaterThanOrEqual(4.5)
-    expect(ratio('#FFFFFF', colors['primary-solid-hover'])).toBeGreaterThanOrEqual(4.5)
+  it('dark text on filled controls (primary button, danger hover)', () => {
+    expect(ratio(colors.ink[0], colors.signal.DEFAULT)).toBeGreaterThanOrEqual(4.5)
+    expect(ratio(colors.ink[0], colors.signal.strong)).toBeGreaterThanOrEqual(4.5)
+    expect(ratio(colors.ink[0], colors.contra)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('component borders that must stay perceivable reach 1.5:1 against the page', () => {
+    expect(ratio(colors.line.strong, colors.ink[0])).toBeGreaterThanOrEqual(1.5)
   })
 })

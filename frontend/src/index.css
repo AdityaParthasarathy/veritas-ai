@@ -2,39 +2,201 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------- Base: the parts the browser draws are themed from the palette ---------- */
 @layer base {
+  html {
+    background: var(--c-ink-0);
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-veritas-bg text-veritas-text font-sans antialiased selection:bg-veritas-primary/30 selection:text-white min-h-screen overflow-x-hidden;
+    @apply bg-ink-0 font-sans text-paper antialiased;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgb(87 216 230 / 0.28);
+    color: var(--c-paper);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--c-signal);
+  }
+
+  ::placeholder {
+    color: var(--c-dim);
+    opacity: 1;
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Focus ring: draws in by easing its offset, never a hard jump. */
+  :focus-visible {
+    outline: 2px solid var(--c-signal);
+    outline-offset: 3px;
+    border-radius: 4px;
+    transition: outline-offset var(--dur-fast) var(--ease-out);
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Thin, palette-coloured scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-line-strong) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--c-line);
+    border-radius: 999px;
+    border: 3px solid var(--c-ink-0);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--c-line-strong);
+  }
+
+  /* Numbers in data always align. */
+  table,
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
   }
 }
 
-/* Custom subtle scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* ---------- Type scale ---------- */
+@layer components {
+  /* Display: editorial serif, used sparingly for headings that carry the voice. */
+  .t-display {
+    @apply font-display font-normal text-paper;
+    font-size: clamp(2.6rem, 6.2vw, 5.25rem);
+    line-height: 1.01;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+    font-variation-settings: 'opsz' 96;
+  }
+  .t-h1 {
+    @apply font-display font-normal text-paper;
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    font-variation-settings: 'opsz' 72;
+  }
+  .t-h2 {
+    @apply font-sans font-semibold text-paper;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .t-h3 {
+    @apply font-sans font-semibold text-paper;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  .t-lead {
+    @apply text-steel;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    max-width: 62ch;
+    text-wrap: pretty;
+  }
+  .t-body {
+    @apply text-steel;
+    max-width: 68ch;
+    text-wrap: pretty;
+  }
+  .t-caption {
+    @apply text-dim;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  /* Technical metadata: evidence ids, timestamps, measurements. */
+  .t-meta {
+    @apply font-mono text-dim;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .t-data {
+    @apply font-mono text-paper;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Galley text: the submitted document, set like a proof. */
+  .t-galley {
+    @apply font-display text-paper;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    font-variation-settings: 'opsz' 14;
+    text-wrap: pretty;
+    max-width: 68ch;
+  }
+
+  .hairline {
+    border-color: var(--c-line);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #090D18;
+/* ---------- Motion ---------- */
+.page-enter {
+  animation: page-enter var(--dur-base) var(--ease-out) both;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #1F2C44;
-  border-radius: 9999px;
+/* Scroll reveal: content is visible by default; only .is-pending hides it, and only when JS has marked it. */
+.reveal.is-pending {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.reveal {
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+}
+/* A wipe reveal for statements: the line is uncovered from the left, like a proof being uncovered. */
+.reveal-wipe {
+  transition: clip-path var(--dur-cinematic) var(--ease-out);
+}
+.reveal-wipe.is-pending {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 100% 0 0);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #2D3E5D;
+/* Press feedback shared by buttons. */
+.press {
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
-
-/* Accessibility: visible keyboard focus, reduced motion */
-:focus-visible {
-  outline: 2px solid #42d9e8;
-  outline-offset: 2px;
-  border-radius: 4px;
+.press:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
@@ -42,5 +204,18 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .reveal.is-pending {
+    transform: none;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
   }
 }

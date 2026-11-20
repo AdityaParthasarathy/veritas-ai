@@ -1,6 +1,6 @@
 import { Component } from 'react'
 
-/** Catches render errors so a bug in one page shows a recovery message instead of a blank screen. */
+/** Catches render errors so a bug in one screen shows a recovery message instead of a blank page. */
 export default class ErrorBoundary extends Component {
   state = { failed: false }
 
@@ -16,15 +16,15 @@ export default class ErrorBoundary extends Component {
   render() {
     if (!this.state.failed) return this.props.children
     return (
-      <div role="alert" className="mx-auto mt-16 max-w-md rounded-xl border border-veritas-error/30 bg-veritas-error-light p-6 text-center">
-        <h1 className="text-lg font-semibold text-veritas-text">Something went wrong</h1>
-        <p className="mt-2 text-sm text-veritas-muted">An unexpected error occurred in the interface. Your data on the server is unaffected.</p>
+      <div role="alert" className="mx-auto mt-24 max-w-lg px-4">
+        <h1 className="t-h1">Something went wrong</h1>
+        <p className="t-body mt-4">An unexpected error occurred in the interface. Nothing you saved on the server is affected.</p>
         <button
           type="button"
           onClick={() => window.location.assign('/')}
-          className="mt-4 rounded-lg bg-veritas-primary-solid px-4 py-2 text-sm font-medium text-white hover:bg-veritas-primary-solid-hover"
+          className="press mt-6 inline-flex h-10 items-center rounded-md bg-signal px-4 text-sm font-medium text-ink-0 hover:bg-signal-strong"
         >
-          Back to overview
+          Back to the overview
         </button>
       </div>
     )

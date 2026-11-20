@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -15,7 +15,7 @@ vi.mock('../services/authService', () => ({
   changePasswordRequest: vi.fn(),
   deleteAccountRequest: vi.fn(),
 }))
-import { changePasswordRequest, deleteAccountRequest, fetchCurrentUser, loginUser } from '../services/authService'
+import { changePasswordRequest, deleteAccountRequest, fetchCurrentUser, loginUser, registerUser } from '../services/authService'
 
 const session = { access_token: 'tok', token_type: 'bearer', expires_in: 1800, user }
 
@@ -30,7 +30,7 @@ function Shell() {
   )
 }
 
-describe('authentication UI', () => {
+describe('authentication', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('signs in and leaves the login page', async () => {
@@ -54,6 +54,36 @@ describe('authentication UI', () => {
     expect(sessionStorage.getItem('veritas.token')).toBeNull()
   })
 
+  it('validates inline without calling the API', async () => {
+    renderWithProviders(<Shell />, { route: '/register' })
+    await userEvent.type(screen.getByLabelText('Email'), 'not-an-email')
+    await userEvent.type(screen.getByLabelText('Password'), 'short')
+    await userEvent.click(screen.getByRole('button', { name: 'Create account' }))
+    expect(await screen.findByText('Enter a valid email address.')).toBeInTheDocument()
+    expect(screen.getByText('Use at least 10 characters.', { selector: 'p[role="alert"]' })).toBeInTheDocument()
+    expect(registerUser).not.toHaveBeenCalled()
+  })
+
+  it('creates an account with an optional name', async () => {
+    registerUser.mockResolvedValue(session)
+    renderWithProviders(<Shell />, { route: '/register' })
+    await userEvent.type(screen.getByLabelText(/Name/), 'Ada')
+    await userEvent.type(screen.getByLabelText('Email'), 'ada@example.com')
+    await userEvent.type(screen.getByLabelText('Password'), 'a-long-test-password')
+    await userEvent.click(screen.getByRole('button', { name: 'Create account' }))
+    expect(await screen.findByText('Analyze page')).toBeInTheDocument()
+    expect(registerUser).toHaveBeenCalledWith({ email: 'ada@example.com', password: 'a-long-test-password', full_name: 'Ada' })
+  })
+
+  it('toggles password visibility with an accessible control', async () => {
+    renderWithProviders(<Shell />, { route: '/login' })
+    const field = screen.getByLabelText('Password')
+    expect(field).toHaveAttribute('type', 'password')
+    await userEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(field).toHaveAttribute('type', 'text')
+    expect(screen.getByRole('button', { name: 'Hide password' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('redirects anonymous visitors from a protected page to login', async () => {
     renderWithProviders(<Shell />, { route: '/settings' })
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
@@ -62,7 +92,6 @@ describe('authentication UI', () => {
   it('restores a stored session on load by asking the API who it belongs to', async () => {
     sessionStorage.setItem('veritas.token', 'stored-token')
     fetchCurrentUser.mockResolvedValue(user)
-    // tokenStore reads sessionStorage once at import, so reload the module graph for this case.
     vi.resetModules()
     const { renderWithProviders: render2 } = await import('../test/renderApp')
     const { default: Settings2 } = await import('./SettingsPage')
@@ -72,7 +101,7 @@ describe('authentication UI', () => {
   })
 })
 
-describe('Settings account actions', () => {
+describe('settings', () => {
   async function signedInSettings() {
     sessionStorage.setItem('veritas.token', 'tok')
     fetchCurrentUser.mockResolvedValue(user)
@@ -88,7 +117,7 @@ describe('Settings account actions', () => {
       </Routes>,
       { route: '/settings' },
     )
-    await screen.findByRole('heading', { name: 'Change password' })
+    await screen.findByRole('heading', { name: 'Password' })
   }
 
   beforeEach(() => vi.clearAllMocks())
@@ -103,27 +132,28 @@ describe('Settings account actions', () => {
     expect(changePasswordRequest).not.toHaveBeenCalled()
   })
 
-  it('changes the password and swaps in the new token', async () => {
+  it('changes the password, swaps in the new token and confirms with a toast', async () => {
     changePasswordRequest.mockResolvedValue({ ...session, access_token: 'fresh-token' })
     await signedInSettings()
     await userEvent.type(screen.getByLabelText('Current password'), 'old-password-123')
     await userEvent.type(screen.getByLabelText('New password'), 'brand-new-password')
     await userEvent.type(screen.getByLabelText('Confirm new password'), 'brand-new-password')
     await userEvent.click(screen.getByRole('button', { name: 'Change password' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Password changed')
+    expect(await screen.findByText('Password changed')).toBeInTheDocument()
     expect(changePasswordRequest).toHaveBeenCalledWith('old-password-123', 'brand-new-password')
     expect(sessionStorage.getItem('veritas.token')).toBe('fresh-token')
   })
 
-  it('requires password and explicit confirmation before deleting the account', async () => {
+  it('asks for the password and an explicit confirmation in a dialog before deleting the account', async () => {
     deleteAccountRequest.mockResolvedValue({})
     await signedInSettings()
-    await userEvent.click(screen.getByRole('button', { name: 'Delete my account…' }))
-    const confirm = screen.getByRole('button', { name: 'Permanently delete' })
+    await userEvent.click(screen.getByRole('button', { name: 'Delete my account' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Delete your account?' })
+    const confirm = within(dialog).getByRole('button', { name: 'Permanently delete' })
     expect(confirm).toBeDisabled()
-    await userEvent.type(screen.getByLabelText('Confirm with your password'), 'old-password-123')
+    await userEvent.type(within(dialog).getByLabelText('Confirm with your password'), 'old-password-123')
     expect(confirm).toBeDisabled()
-    await userEvent.click(screen.getByRole('checkbox'))
+    await userEvent.click(within(dialog).getByRole('checkbox'))
     expect(confirm).toBeEnabled()
     await userEvent.click(confirm)
     await waitFor(() => expect(deleteAccountRequest).toHaveBeenCalledWith('old-password-123'))
@@ -131,14 +161,24 @@ describe('Settings account actions', () => {
     expect(sessionStorage.getItem('veritas.token')).toBeNull()
   })
 
-  it('shows an error and keeps the account when the delete password is wrong', async () => {
+  it('keeps the account and shows the error when the delete password is wrong', async () => {
     deleteAccountRequest.mockRejectedValue({ response: { status: 401, data: { error: { code: 'UNAUTHORIZED', message: 'Incorrect password' } } } })
     await signedInSettings()
-    await userEvent.click(screen.getByRole('button', { name: 'Delete my account…' }))
-    await userEvent.type(screen.getByLabelText('Confirm with your password'), 'wrong-password')
-    await userEvent.click(screen.getByRole('checkbox'))
-    await userEvent.click(screen.getByRole('button', { name: 'Permanently delete' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Incorrect password')
+    await userEvent.click(screen.getByRole('button', { name: 'Delete my account' }))
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.type(within(dialog).getByLabelText('Confirm with your password'), 'wrong-password')
+    await userEvent.click(within(dialog).getByRole('checkbox'))
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Permanently delete' }))
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Incorrect password')
     expect(sessionStorage.getItem('veritas.token')).toBe('tok')
+  })
+
+  it('closes the delete dialog with Escape without deleting', async () => {
+    await signedInSettings()
+    await userEvent.click(screen.getByRole('button', { name: 'Delete my account' }))
+    await screen.findByRole('dialog')
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(deleteAccountRequest).not.toHaveBeenCalled()
   })
 })

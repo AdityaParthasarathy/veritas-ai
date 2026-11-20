@@ -1,189 +1,315 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Loader2, ScanSearch } from 'lucide-react'
-import AnalysisResults from '../components/analysis/AnalysisResults'
-import Card from '../components/common/Card'
-import PageHeader from '../components/common/PageHeader'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { ArrowRight, FileText } from 'lucide-react'
+import AnalysisScan from '../components/analysis/AnalysisScan'
+import Report from '../components/report/Report'
+import Badge from '../components/ui/Badge'
+import Button from '../components/ui/Button'
+import Kbd from '../components/ui/Kbd'
+import Tabs from '../components/ui/Tabs'
 import { useAuth } from '../context/AuthContext'
+import { EXAMPLES } from '../data/examples'
+import { useHotkey } from '../hooks/useHotkey'
 import { analyzeText, analyzeUrl, describeError } from '../services/analysisService'
 
 const MAX_CHARS = 20000
 const MIN_CHARS = 20
-const INPUT =
-  'w-full rounded-lg border border-veritas-border-subtle bg-veritas-bg/60 px-3 py-2 text-sm text-veritas-text outline-none transition-colors placeholder:text-veritas-dim focus:border-veritas-primary'
-
+const URL_PATTERN = /^https?:\/\/\S+$/i
 const MODES = [
   { id: 'text', label: 'Paste text' },
   { id: 'url', label: 'Article URL' },
 ]
+const isCancel = (error) => error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
 
 export default function AnalyzePage() {
   const { user } = useAuth()
+  const location = useLocation()
   const [mode, setMode] = useState('text')
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [url, setUrl] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [touched, setTouched] = useState(false)
+  const [phase, setPhase] = useState('idle') // idle | running | done
   const [error, setError] = useState(null)
   const [result, setResult] = useState(null)
-  const resultsRef = useRef(null)
+  const [submitted, setSubmitted] = useState(null)
+  const [stamp, setStamp] = useState(null)
+  const [flash, setFlash] = useState(0)
+  const controller = useRef(null)
+  const headingRef = useRef(null)
+  const textRef = useRef(null)
 
-  const invalid = mode === 'text' ? text.trim().length < MIN_CHARS : !/^https?:\/\/\S+$/i.test(url.trim())
+  const trimmedLength = text.trim().length
+  const problem = mode === 'text' ? (trimmedLength < MIN_CHARS ? `Add at least ${MIN_CHARS} characters. ${Math.max(0, MIN_CHARS - trimmedLength)} to go.` : null) : URL_PATTERN.test(url.trim()) ? null : 'Enter a full address starting with http:// or https://.'
+  const showProblem = touched && problem
 
-  // Move focus to the results so keyboard and screen-reader users land on them.
-  useEffect(() => {
-    if (result) resultsRef.current?.focus()
-  }, [result])
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-    if (invalid || loading) return
-    setLoading(true)
+  const loadExample = useCallback((example) => {
+    setMode('text')
+    setTitle('')
+    setText(example.text)
+    setTouched(false)
     setError(null)
+    setResult(null)
+    setPhase('idle')
+    setFlash((n) => n + 1)
+  }, [])
+
+  // A demo input chosen from the overview or the command palette.
+  const requested = location.state?.example
+  useEffect(() => {
+    const example = EXAMPLES.find((e) => e.id === requested)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (example) loadExample(example)
+  }, [requested, loadExample])
+
+  const submit = async () => {
+    setTouched(true)
+    if (problem || phase === 'running') return
+    controller.current = new AbortController()
+    setPhase('running')
+    setError(null)
+    setResult(null)
+    const snapshot = { mode, title: title.trim(), text, url: url.trim() }
+    setSubmitted(snapshot)
+    setStamp(new Date().toLocaleString())
     try {
-      setResult(mode === 'text' ? await analyzeText({ title: title.trim() || null, text }) : await analyzeUrl(url.trim()))
+      const data =
+        mode === 'text'
+          ? await analyzeText({ title: snapshot.title || null, text }, { signal: controller.current.signal })
+          : await analyzeUrl(snapshot.url, { signal: controller.current.signal })
+      setResult(data)
+      setPhase('done')
+      requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: false }))
     } catch (err) {
-      setResult(null)
+      if (isCancel(err)) return
       setError(describeError(err))
-    } finally {
-      setLoading(false)
+      setPhase('idle')
     }
   }
 
-  function onTabKeyDown(event) {
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
-    const next = mode === 'text' ? 'url' : 'text'
-    setMode(next)
-    document.getElementById(`tab-${next}`)?.focus()
+  const cancel = () => {
+    controller.current?.abort()
+    setPhase('idle')
+  }
+  const reset = () => {
+    setPhase('idle')
+    setResult(null)
+    setError(null)
+    requestAnimationFrame(() => (mode === 'text' ? textRef.current : document.getElementById('url'))?.focus())
   }
 
+  useHotkey('mod+enter', submit, { allowInInputs: true, enabled: phase !== 'running' })
+  useEffect(() => () => controller.current?.abort(), [])
+
+  const sheetDisabled = phase === 'running'
+
   return (
-    <>
-      <PageHeader
-        title="Analyze Content"
-        description="Paste a headline or article, or give a public article URL. You get a machine-learning classification, linguistic measurements and related reference passages, shown separately, with an uncertainty assessment. Nothing here verifies whether claims are true."
-      />
-
-      <Card>
-        <div role="tablist" aria-label="Input type" className="mb-4 inline-flex rounded-lg bg-white/5 p-1" onKeyDown={onTabKeyDown}>
-          {MODES.map((m) => (
-            <button
-              key={m.id}
-              id={`tab-${m.id}`}
-              type="button"
-              role="tab"
-              aria-selected={mode === m.id}
-              aria-controls="analyze-panel"
-              tabIndex={mode === m.id ? 0 : -1}
-              onClick={() => setMode(m.id)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === m.id ? 'bg-veritas-card text-veritas-text' : 'text-veritas-muted hover:text-veritas-text'}`}
-            >
-              {m.label}
-            </button>
-          ))}
+    <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
+      {phase === 'done' ? (
+        <h1 className="sr-only">Investigation report</h1>
+      ) : (
+        <div className="mb-10 max-w-3xl">
+          <h1 className="t-h1">Open an investigation</h1>
+          <p className="t-lead mt-4">Submit text or an article address. You get four separate readings and an honest account of how far to trust them. None of them says whether the text is true.</p>
         </div>
+      )}
 
-        <div id="analyze-panel" role="tabpanel" aria-labelledby={`tab-${mode}`}>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'text' ? (
-            <>
-              <div>
-                <label htmlFor="title" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-                  Headline <span className="text-veritas-dim">(optional)</span>
-                </label>
-                <input id="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className={INPUT} placeholder="Article headline" />
-              </div>
-              <div>
-                <label htmlFor="text" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-                  Article text
-                </label>
-                <textarea
-                  id="text"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  maxLength={MAX_CHARS}
-                  rows={9}
-                  aria-describedby="text-hint"
-                  className={`${INPUT} resize-y leading-relaxed`}
-                  placeholder="Paste the article body here. Longer, full articles give more meaningful results than a single headline."
-                />
-                <div id="text-hint" className="mt-1.5 flex justify-between text-xs text-veritas-dim">
-                  <span>At least {MIN_CHARS} characters.</span>
-                  <span>
-                    {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div>
-              <label htmlFor="url" className="mb-1.5 block text-xs font-medium text-veritas-muted">
-                Article URL
-              </label>
-              <input
-                id="url"
-                type="url"
-                inputMode="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                maxLength={2048}
-                aria-describedby="url-hint"
-                className={INPUT}
-                placeholder="https://example.com/news/article"
-              />
-              <p id="url-hint" className="mt-1.5 text-xs leading-relaxed text-veritas-dim">
-                The server fetches the page and extracts the article text. Only public http(s) pages are allowed: local, private and non-web addresses are blocked. Paywalled or script-rendered pages may not work.
-              </p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={invalid || loading}
-            className="inline-flex items-center gap-2 rounded-lg bg-veritas-primary-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-solid-hover disabled:cursor-not-allowed disabled:opacity-40"
+      {phase === 'running' && submitted ? (
+        <AnalysisScan mode={submitted.mode} title={submitted.title} text={submitted.text} url={submitted.url} onCancel={cancel} />
+      ) : phase === 'done' ? null : (
+        <div className="grid gap-10 lg:grid-cols-12">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              submit()
+            }}
+            noValidate
+            className="lg:col-span-8"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ScanSearch className="h-4 w-4" aria-hidden="true" />}
-            {loading ? (mode === 'url' ? 'Fetching and analyzing…' : 'Analyzing…') : 'Analyze'}
-          </button>
-          <p className="text-xs text-veritas-dim">{user ? 'Signed in: this analysis will be saved to your history.' : 'Not signed in: this analysis will not be saved.'}</p>
-        </form>
-        </div>
-      </Card>
+            <div className="overflow-hidden rounded-lg border border-line bg-ink-1">
+              <Tabs tabs={MODES} value={mode} onChange={setMode} label="Input type" idPrefix="mode" className="px-2" />
+              <div id="mode-panel" role="tabpanel" aria-labelledby={`mode-tab-${mode}`} className="p-5 sm:p-7">
+                {mode === 'text' ? (
+                  <>
+                    <label htmlFor="title" className="sr-only">
+                      Headline (optional)
+                    </label>
+                    <input
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      maxLength={300}
+                      disabled={sheetDisabled}
+                      placeholder="Headline (optional)"
+                      className="font-display w-full border-b border-line bg-transparent pb-3 text-[1.625rem] leading-tight tracking-[-0.01em] text-paper outline-none transition-colors duration-base placeholder:text-dim focus:border-signal"
+                      style={{ fontVariationSettings: "'opsz' 36" }}
+                    />
+                    <div key={flash} className="animate-fade-in mt-5">
+                      <label htmlFor="text" className="sr-only">
+                        Article text
+                      </label>
+                      <textarea
+                        id="text"
+                        ref={textRef}
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onBlur={() => setTouched(true)}
+                        maxLength={MAX_CHARS}
+                        rows={13}
+                        disabled={sheetDisabled}
+                        aria-invalid={Boolean(showProblem) || undefined}
+                        aria-describedby="text-status"
+                        placeholder="Paste the article here. Full articles give more meaningful readings than a single headline, and text unlike news will be flagged."
+                        className="t-galley min-h-[22rem] w-full max-w-none resize-y border-0 bg-transparent p-0 outline-none placeholder:text-dim"
+                      />
+                    </div>
+                    <div id="text-status" className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+                      <p role={showProblem ? 'alert' : undefined} className={`text-[0.8125rem] ${showProblem ? 'text-contra' : 'text-dim'}`}>
+                        {showProblem ? problem : `At least ${MIN_CHARS} characters.`}
+                      </p>
+                      <p className="t-meta flex items-center gap-3">
+                        <span className="hidden h-px w-24 bg-line sm:block" aria-hidden="true">
+                          <span className="block h-px bg-signal transition-[width] duration-base ease-out" style={{ width: `${Math.min(100, (text.length / MAX_CHARS) * 100)}%` }} />
+                        </span>
+                        {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <label htmlFor="url" className="mb-2 block text-[0.8125rem] font-medium text-steel">
+                      Article address
+                    </label>
+                    <input
+                      id="url"
+                      type="url"
+                      inputMode="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      onBlur={() => setTouched(true)}
+                      maxLength={2048}
+                      aria-invalid={Boolean(showProblem) || undefined}
+                      aria-describedby="url-status"
+                      placeholder="https://example.com/news/article"
+                      className="t-data w-full border-b border-line bg-transparent pb-3 text-xl outline-none transition-colors duration-base placeholder:text-dim focus:border-signal"
+                    />
+                    <p id="url-status" role={showProblem ? 'alert' : undefined} className={`mt-3 text-[0.8125rem] ${showProblem ? 'text-contra' : 'text-dim'}`}>
+                      {showProblem ? problem : 'A public web page. The server fetches it, extracts the article and analyses the text.'}
+                    </p>
+                    <ul className="t-caption mt-6 max-w-2xl list-disc space-y-1 pl-5">
+                      <li>Only public http(s) pages on the standard ports. Local, private and internal addresses are blocked.</li>
+                      <li>Paywalled, script-rendered or bot-blocking sites may fail; the error will say why.</li>
+                      <li>Extracted metadata (title, author, date) is automatic and can be wrong.</li>
+                    </ul>
+                  </>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-3 border-t border-line bg-ink-2/60 px-5 py-4 sm:px-7">
+                <Button type="submit" size="lg" magnetic>
+                  Begin analysis
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                {text || title ? (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setText('')
+                      setTitle('')
+                      setUrl('')
+                      setTouched(false)
+                      reset()
+                    }}
+                  >
+                    Clear
+                  </Button>
+                ) : null}
+                <span className="t-caption ml-auto hidden items-center gap-1.5 sm:flex">
+                  <Kbd>Ctrl</Kbd>
+                  <Kbd>Enter</Kbd> to submit
+                </span>
+              </div>
+            </div>
 
-      <div aria-live="polite" className="sr-only">
-        {loading ? 'Analysis in progress.' : result ? 'Analysis complete. Results are shown below.' : ''}
-      </div>
-
-      {error && (
-        <div role="alert" className="mt-5 rounded-lg border border-veritas-error/30 bg-veritas-error-light p-3.5 text-sm text-veritas-error">
-          {error}
-        </div>
-      )}
-
-      {result && (
-        <div ref={resultsRef} tabIndex={-1} className="outline-none">
-          <p className="mt-5 text-xs text-veritas-muted">
-            {result.analysis_id ? (
-              <>
-                Saved to your{' '}
-                <Link to={`/history/${result.analysis_id}`} className="text-veritas-cyan hover:underline">
-                  history
-                </Link>
-                .
-              </>
-            ) : (
-              <>
-                Not saved.{' '}
-                <Link to="/login" state={{ from: '/analyze' }} className="text-veritas-cyan hover:underline">
-                  Sign in
-                </Link>{' '}
-                to keep your analyses.
-              </>
+            <p className="t-caption mt-3">
+              {user ? 'Signed in: this investigation will be saved to your Casebook.' : (
+                <>
+                  Not signed in: this investigation will not be saved.{' '}
+                  <Link to="/login" state={{ from: '/analyze' }} className="text-signal underline decoration-signal/30 hover:decoration-signal">
+                    Sign in to keep it.
+                  </Link>
+                </>
+              )}
+            </p>
+            {error && (
+              <div role="alert" className="mt-5 rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
+                {error}
+              </div>
             )}
-          </p>
-          <AnalysisResults result={result} />
+          </form>
+
+          <aside aria-label="Demo inputs" className="lg:col-span-4">
+            <div className="lg:sticky lg:top-24">
+              <h2 className="t-h3">Demo inputs</h2>
+              <p className="t-caption mt-1 max-w-xs">Six invented texts covering the cases that matter. They load into the sheet; the readings come from the live analysis.</p>
+              <ul className="mt-4 divide-y divide-line border-y border-line">
+                {EXAMPLES.map((example) => (
+                  <li key={example.id}>
+                    <button type="button" onClick={() => loadExample(example)} className="press group flex w-full items-start gap-3 py-3 text-left hover:bg-ink-1">
+                      <FileText className="mt-0.5 h-4 w-4 shrink-0 text-dim transition-colors group-hover:text-signal" aria-hidden="true" />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-paper">
+                          {example.title}
+                          <Badge>{example.kind}</Badge>
+                        </span>
+                        <span className="t-caption mt-0.5 block">{example.note}</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
         </div>
       )}
-    </>
+
+      {phase === 'done' && result && (
+        <div>
+          <div className="no-print mb-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-line pb-5">
+            <p className="t-caption max-w-2xl">
+              {result.analysis_id ? (
+                <>
+                  Saved to your{' '}
+                  <Link to={`/history/${result.analysis_id}`} className="text-signal underline decoration-signal/30 hover:decoration-signal">
+                    Casebook
+                  </Link>
+                  .
+                </>
+              ) : (
+                'Not saved. Sign in before analysing to keep an investigation.'
+              )}
+            </p>
+            <div className="flex gap-2">
+              <Button variant="secondary" size="sm" onClick={reset}>
+                Edit and re-run
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setText('')
+                  setTitle('')
+                  setUrl('')
+                  setTouched(false)
+                  reset()
+                }}
+              >
+                New investigation
+              </Button>
+            </div>
+          </div>
+          <Report result={result} text={submitted?.mode === 'text' ? submitted.text : undefined} title={submitted?.title} stamp={stamp} headingRef={headingRef} />
+        </div>
+      )}
+    </div>
   )
 }

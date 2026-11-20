@@ -3,8 +3,8 @@ import { apiClient } from './api'
 // Model loading on the first request, or fetching a remote page, can take several seconds.
 const SLOW = { timeout: 60000 }
 
-export const analyzeText = (payload) => apiClient.post('/analysis', payload, SLOW).then((r) => r.data)
-export const analyzeUrl = (url) => apiClient.post('/analysis/url', { url }, SLOW).then((r) => r.data)
+export const analyzeText = (payload, options = {}) => apiClient.post('/analysis', payload, { ...SLOW, ...options }).then((r) => r.data)
+export const analyzeUrl = (url, options = {}) => apiClient.post('/analysis/url', { url }, { ...SLOW, ...options }).then((r) => r.data)
 export const listPassages = (topic) =>
   apiClient.get('/evidence/passages', { ...SLOW, params: topic ? { topic } : {} }).then((r) => r.data)
 export const searchPassages = (q, topK = 5) =>

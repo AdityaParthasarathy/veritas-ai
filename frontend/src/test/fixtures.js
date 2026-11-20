@@ -26,7 +26,7 @@ export const analysisResult = {
         id: 'climate-co2', score: 0.74, relevant: true, topic: 'Climate',
         passage: 'Atmospheric carbon dioxide has been measured continuously at Mauna Loa Observatory since 1958.',
         source_org: 'NOAA', source_title: 'Trends in atmospheric carbon dioxide', source_url: 'https://gml.noaa.gov/ccgg/trends/',
-        matched_text: 'carbon dioxide concentrations measured at Mauna Loa',
+        matched_text: 'Carbon dioxide concentrations measured at Mauna Loa remain far above pre-industrial levels.',
       },
     ],
     disclaimer: 'Passages are retrieved by semantic similarity. They show related reference material only.',

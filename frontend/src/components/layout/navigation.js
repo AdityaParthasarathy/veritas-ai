@@ -1,10 +1,9 @@
-import { BarChart3, FileSearch, History, LayoutDashboard, Library, Settings } from 'lucide-react'
+import { BarChart3, BookOpen, FolderClock, ScanSearch } from 'lucide-react'
 
+/** Primary destinations. Paths are the application's routes and must not change. */
 export const NAV_ITEMS = [
-  { to: '/', label: 'Overview', icon: LayoutDashboard, implemented: true },
-  { to: '/analyze', label: 'Analyze Content', icon: FileSearch, implemented: true },
-  { to: '/history', label: 'Analysis History', icon: History, implemented: true },
-  { to: '/evidence', label: 'Evidence Explorer', icon: Library, implemented: true },
-  { to: '/performance', label: 'Model Performance', icon: BarChart3, implemented: true },
-  { to: '/settings', label: 'Settings', icon: Settings, implemented: true },
+  { to: '/analyze', label: 'Investigate', hint: 'Analyze text or an article URL', icon: ScanSearch },
+  { to: '/history', label: 'Casebook', hint: 'Your saved investigations', icon: FolderClock },
+  { to: '/evidence', label: 'Library', hint: 'The reference passages and their sources', icon: BookOpen },
+  { to: '/performance', label: 'Method', hint: 'Model metrics and what they do not mean', icon: BarChart3 },
 ]

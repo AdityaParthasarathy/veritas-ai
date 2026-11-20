@@ -1,18 +1,21 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { axe } from 'vitest-axe'
-import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import AnalysisResults from '../components/analysis/AnalysisResults'
-import { AuthProvider } from '../context/AuthContext'
 import ErrorBoundary from '../components/common/ErrorBoundary'
+import CommandPalette from '../components/layout/CommandPalette'
+import Report from '../components/report/Report'
+import { ToastProvider } from '../components/ui/Toast'
+import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../layouts/AppLayout'
 import AnalyzePage from '../pages/AnalyzePage'
 import AuthPage from '../pages/AuthPage'
 import EvidenceExplorerPage from '../pages/EvidenceExplorerPage'
+import LandingPage from '../pages/LandingPage'
 import ModelPerformancePage from '../pages/ModelPerformancePage'
 import NotFoundPage from '../pages/NotFoundPage'
-import OverviewPage from '../pages/OverviewPage'
-import { analysisResult } from './fixtures'
+import { analysisResult, performance } from './fixtures'
 import { renderWithProviders } from './renderApp'
 
 vi.mock('../services/performanceService', async () => {
@@ -24,6 +27,10 @@ vi.mock('../services/systemService', () => ({
   getReadyStatus: vi.fn().mockResolvedValue({ status: 'ready', database: 'connected' }),
   getSystemInfo: vi.fn().mockResolvedValue({ version: '1.0.0', environment: 'test' }),
 }))
+vi.mock('../services/api', async (importOriginal) => {
+  const original = await importOriginal()
+  return { ...original, apiClient: { ...original.apiClient, get: vi.fn().mockResolvedValue({ data: { status: 'ready', load_seconds: 11.3 } }) } }
+})
 vi.mock('../services/analysisService', async (importOriginal) => {
   const { analysisResult } = await import('./fixtures')
   return {
@@ -36,56 +43,85 @@ vi.mock('../services/analysisService', async (importOriginal) => {
 })
 
 async function expectNoViolations(container) {
-  const results = await axe(container)
-  expect(results).toHaveNoViolations()
+  expect(await axe(container)).toHaveNoViolations()
+}
+
+const sourceResult = { ...analysisResult, source: { url: 'https://a.example/x', final_url: 'https://a.example/x', domain: 'a.example', title: 'T', author: null, published: null, extracted_chars: 500, truncated: false } }
+const outOfDomainResult = {
+  ...analysisResult,
+  evidence: { ...analysisResult.evidence, hits: [{ ...analysisResult.evidence.hits[0], relevant: false, score: 0.2 }] },
+  uncertainty: { ...analysisResult.uncertainty, level: 'very_high', domain_check: { available: true, in_domain: false, similarity: 0.03, threshold: 0.06 } },
 }
 
 describe('automated accessibility checks (axe)', () => {
-  it('app shell: skip link, landmarks and navigation', async () => {
+  it('application shell: skip link, landmarks, navigation, readout', async () => {
     const { container } = render(
-      <MemoryRouter>
-        <AppShellWithAuth />
+      <MemoryRouter initialEntries={['/']}>
+        <AuthProvider>
+          <ToastProvider>
+            <Routes>
+              <Route element={<AppLayout />}>
+                <Route index element={<LandingPage />} />
+              </Route>
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
       </MemoryRouter>,
     )
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main')
     expect(screen.getByRole('main')).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
     await expectNoViolations(container)
   })
 
   it.each([
     ['sign in', <AuthPage key="a" mode="login" />],
     ['create account', <AuthPage key="b" mode="register" />],
-    ['analyze (text mode)', <AnalyzePage key="c" />],
+    ['investigation workspace (text)', <AnalyzePage key="c" />],
     ['not found', <NotFoundPage key="d" />],
-  ])('%s page has no violations', async (_name, ui) => {
+  ])('%s has no violations', async (_name, ui) => {
     const { container } = renderWithProviders(ui)
     await expectNoViolations(container)
   })
 
-  it('overview with live status has no violations', async () => {
-    const { container } = renderWithProviders(<OverviewPage />)
-    await screen.findByText('Connected')
+  it('workspace with the URL tab open has no violations', async () => {
+    const { container } = renderWithProviders(<AnalyzePage />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Article URL' }))
     await expectNoViolations(container)
   })
 
-  it('analysis results (with source card) have no violations', async () => {
-    const withSource = { ...analysisResult, source: { url: 'https://a.example/x', final_url: 'https://a.example/x', domain: 'a.example', title: 'T', author: null, published: null, extracted_chars: 500, truncated: false } }
-    const { container } = renderWithProviders(<AnalysisResults result={withSource} />)
+  it('report with source, evidence and the document proof has no violations', async () => {
+    const { container } = renderWithProviders(
+      <Report result={sourceResult} text="Researchers reported warming. Carbon dioxide concentrations measured at Mauna Loa remain far above pre-industrial levels." title="Warming" stamp="today" />,
+    )
     await expectNoViolations(container)
   })
 
-  it('evidence explorer and model performance pages have no violations', async () => {
-    const evidence = renderWithProviders(<EvidenceExplorerPage />)
+  it('out-of-domain report with weak matches has no violations', async () => {
+    const { container } = renderWithProviders(<Report result={outOfDomainResult} title="Sourdough" />)
+    await expectNoViolations(container)
+  })
+
+  it('reference library and method pages have no violations', async () => {
+    const library = renderWithProviders(<EvidenceExplorerPage />)
     await screen.findByText(/Atmospheric carbon dioxide/)
-    await expectNoViolations(evidence.container)
-    evidence.unmount()
-    const perf = renderWithProviders(<ModelPerformancePage />)
+    await expectNoViolations(library.container)
+    library.unmount()
+    const method = renderWithProviders(<ModelPerformancePage />)
     await screen.findByText('Limitations')
-    await expectNoViolations(perf.container)
+    expect(performance.variants.length).toBeGreaterThan(0)
+    await expectNoViolations(method.container)
   })
 
-  it('error boundary fallback is announced as an alert', async () => {
+  it('command palette dialog has no violations', async () => {
+    renderWithProviders(<CommandPalette open onClose={() => {}} />)
+    await expectNoViolations(screen.getByRole('dialog'))
+  })
+
+  it('error boundary fallback is announced as an alert and hides internals', async () => {
     const Boom = () => {
       throw new Error('boom')
     }
@@ -97,16 +133,7 @@ describe('automated accessibility checks (axe)', () => {
     )
     spy.mockRestore()
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong')
-    expect(screen.queryByText('boom')).not.toBeInTheDocument() // internal details are not shown
+    expect(screen.queryByText('boom')).not.toBeInTheDocument()
     await expectNoViolations(container)
   })
 })
-
-// AppLayout renders an <Outlet/>, which is empty outside routes; the shell itself is what is checked here.
-function AppShellWithAuth() {
-  return (
-    <AuthProvider>
-      <AppLayout />
-    </AuthProvider>
-  )
-}

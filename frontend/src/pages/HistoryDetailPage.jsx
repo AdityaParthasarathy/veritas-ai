@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import AnalysisResults from '../components/analysis/AnalysisResults'
-import Card from '../components/common/Card'
-import PageHeader from '../components/common/PageHeader'
+import Report from '../components/report/Report'
+import Skeleton from '../components/ui/Skeleton'
 import { describeError } from '../services/analysisService'
 import { getAnalysis } from '../services/historyService'
 
@@ -23,27 +22,29 @@ export default function HistoryDetailPage() {
   }, [id])
 
   return (
-    <>
-      <Link to="/history" className="mb-4 inline-flex items-center gap-1.5 text-xs text-veritas-muted hover:text-veritas-text">
-        <ArrowLeft className="h-3.5 w-3.5" /> Back to history
+    <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
+      <Link to="/history" className="mb-8 inline-flex items-center gap-1.5 text-[0.8125rem] text-dim transition-colors duration-fast hover:text-paper">
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        Back to Casebook
       </Link>
       {error && (
-        <div role="alert" className="rounded-lg border border-veritas-error/30 bg-veritas-error-light p-3.5 text-sm text-veritas-error">
+        <div role="alert" className="rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
           {error}
         </div>
       )}
-      {!stored && !error && <p className="text-sm text-veritas-muted">Loading…</p>}
+      {!stored && !error && (
+        <div role="status" aria-label="Loading the saved investigation" className="space-y-5">
+          <Skeleton className="h-12 w-2/3" />
+          <Skeleton className="h-40" />
+          <Skeleton className="h-64" />
+        </div>
+      )}
       {stored && (
         <>
-          <PageHeader title={stored.title || 'Untitled text'} description={`Analyzed ${new Date(stored.created_at).toLocaleString()}`} />
-          <Card>
-            <h2 className="mb-2 text-xs font-medium text-veritas-muted">Submitted text</h2>
-            <p className="max-h-60 overflow-auto whitespace-pre-wrap text-sm leading-relaxed text-veritas-muted">{stored.text}</p>
-          </Card>
-          <p className="mt-3 text-xs text-veritas-dim">Results below are the stored output from when the analysis was run; they are not recomputed.</p>
-          <AnalysisResults result={stored.result} />
+          <p className="t-caption mb-6">Saved result as it was produced on {new Date(stored.created_at).toLocaleString()}. It is not recomputed when you open it.</p>
+          <Report result={stored.result} text={stored.text} title={stored.title} stamp={new Date(stored.created_at).toLocaleString()} />
         </>
       )}
-    </>
+    </div>
   )
 }

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AlertTriangle } from 'lucide-react'
-import Card from '../components/common/Card'
-import PageHeader from '../components/common/PageHeader'
-import StatusBadge from '../components/common/StatusBadge'
+import Skeleton from '../components/ui/Skeleton'
+import Tabs from '../components/ui/Tabs'
+import { colors } from '../design/tokens'
 import { describeError } from '../services/analysisService'
 import { getPerformance } from '../services/performanceService'
 
@@ -14,30 +13,33 @@ function ConfusionMatrix({ matrix }) {
   const { labels, matrix: m } = matrix
   const max = Math.max(...m.flat())
   return (
-    <div>
-      <div className="mb-1 text-center text-xs text-veritas-dim">Predicted</div>
-      <div className="grid grid-cols-[auto_1fr_1fr] gap-1 text-sm">
-        <div />
-        {labels.map((l) => (
-          <div key={l} className="text-center text-xs capitalize text-veritas-muted">{l}</div>
-        ))}
+    <table className="w-full max-w-md border-separate border-spacing-1 text-sm">
+      <caption className="t-caption pb-2 text-left">Rows are the true label, columns the predicted label. Test split.</caption>
+      <thead>
+        <tr>
+          <td />
+          {labels.map((l) => (
+            <th key={l} scope="col" className="pb-1 text-center text-[0.8125rem] font-medium capitalize text-steel">
+              Predicted {l}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
         {m.map((row, i) => (
-          <div key={labels[i]} className="contents">
-            <div className="flex items-center pr-2 text-xs capitalize text-veritas-muted [writing-mode:horizontal-tb]">True {labels[i]}</div>
+          <tr key={labels[i]}>
+            <th scope="row" className="pr-2 text-left text-[0.8125rem] font-medium capitalize text-steel">
+              True {labels[i]}
+            </th>
             {row.map((value, j) => (
-              <div
-                key={j}
-                className="rounded-md py-4 text-center font-mono text-veritas-text"
-                style={{ background: `rgba(139, 124, 255, ${(0.08 + 0.5 * (value / max)).toFixed(2)})` }}
-                title={`${value} articles`}
-              >
+              <td key={j} className="rounded-sm py-5 text-center font-mono text-paper" style={{ background: `rgba(87, 216, 230, ${(0.07 + 0.38 * (value / max)).toFixed(2)})` }}>
                 {value.toLocaleString()}
-              </div>
+              </td>
             ))}
-          </div>
+          </tr>
         ))}
-      </div>
-    </div>
+      </tbody>
+    </table>
   )
 }
 
@@ -56,15 +58,27 @@ export default function ModelPerformancePage() {
     }
   }, [])
 
+  const shell = (children) => <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">{children}</div>
+
   if (error) {
-    return (
+    return shell(
       <>
-        <PageHeader title="Model Performance" />
-        <div role="alert" className="rounded-lg border border-veritas-error/30 bg-veritas-error-light p-3.5 text-sm text-veritas-error">{error}</div>
-      </>
+        <h1 className="t-h1">Method</h1>
+        <div role="alert" className="mt-6 rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
+          {error}
+        </div>
+      </>,
     )
   }
-  if (!data) return <p className="text-sm text-veritas-muted">Loading…</p>
+  if (!data) {
+    return shell(
+      <div role="status" aria-label="Loading model metrics" className="space-y-5">
+        <Skeleton className="h-14 w-1/2" />
+        <Skeleton className="h-24" />
+        <Skeleton className="h-72" />
+      </div>,
+    )
+  }
 
   const variant = data.variants.find((v) => v.variant === variantKey) ?? data.variants[0]
   const test = variant.test
@@ -74,112 +88,134 @@ export default function ModelPerformancePage() {
     Fake: test.per_class.fake[metric],
   }))
   const c = data.cleaning
+  const tabs = data.variants.map((v) => ({ id: v.variant, label: VARIANT_NAMES[v.variant] ?? v.variant }))
 
-  return (
+  return shell(
     <>
-      <PageHeader
-        title="Model Performance"
-        description="How the TF-IDF + Logistic Regression classifier performs on held-out articles from its own dataset, and what that does and does not tell you."
-        action={<StatusBadge tone="warning">Agreement with dataset labels</StatusBadge>}
-      />
-
-      <div role="note" className="mb-6 flex gap-3 rounded-lg border border-veritas-warning/30 bg-veritas-warning-light p-4 text-sm leading-relaxed text-veritas-warning">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        <p>{data.interpretation}</p>
-      </div>
-
-      <div className="mb-4 flex flex-wrap gap-2">
-        {data.variants.map((v) => (
-          <button
-            key={v.variant}
-            type="button"
-            onClick={() => setVariantKey(v.variant)}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              v.variant === variant.variant ? 'bg-veritas-primary-light text-veritas-text' : 'bg-white/5 text-veritas-muted hover:text-veritas-text'
-            }`}
-          >
-            {VARIANT_NAMES[v.variant] ?? v.variant}
-          </button>
-        ))}
-      </div>
-      <p className="mb-5 max-w-3xl text-xs text-veritas-dim">{variant.description}</p>
-
-      <div className="grid gap-5 lg:grid-cols-3">
-        <Card>
-          <h2 className="mb-3 text-sm font-semibold text-veritas-text">Test set (held-out)</h2>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-veritas-muted">Accuracy</dt><dd className="font-mono text-veritas-text">{pct(test.accuracy)}</dd></div>
-            <div className="flex justify-between"><dt className="text-veritas-muted">Macro precision</dt><dd className="font-mono text-veritas-text">{pct(test.macro_avg.precision)}</dd></div>
-            <div className="flex justify-between"><dt className="text-veritas-muted">Macro recall</dt><dd className="font-mono text-veritas-text">{pct(test.macro_avg.recall)}</dd></div>
-            <div className="flex justify-between"><dt className="text-veritas-muted">Macro F1</dt><dd className="font-mono text-veritas-text">{pct(test.macro_avg.f1)}</dd></div>
-            <div className="flex justify-between border-t border-veritas-border-subtle pt-2"><dt className="text-veritas-muted">Validation accuracy</dt><dd className="font-mono text-veritas-text">{pct(variant.validation.accuracy)}</dd></div>
-          </dl>
-          <p className="mt-3 text-xs text-veritas-dim">Regularisation C = {variant.selected_C}, chosen on the validation split only. {variant.vocabulary_size.toLocaleString()} n-gram features.</p>
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <h2 className="mb-1 text-sm font-semibold text-veritas-text">Precision, recall and F1 by class</h2>
-          <p className="mb-3 text-xs text-veritas-dim">Vertical axis starts at 0.90 to make differences visible.</p>
-          <div className="h-56" role="img" aria-label="Grouped bar chart of precision, recall and F1 for the real and fake classes">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
-                <CartesianGrid stroke="rgba(154,168,188,0.12)" vertical={false} />
-                <XAxis dataKey="metric" stroke="#9AA8BC" tick={{ fontSize: 12 }} />
-                <YAxis domain={[0.9, 1]} stroke="#9AA8BC" tick={{ fontSize: 12 }} tickFormatter={(v) => v.toFixed(2)} />
-                <Tooltip formatter={(v) => v.toFixed(4)} contentStyle={{ background: '#141E30', border: '1px solid #1F2C44', borderRadius: 8, fontSize: 12 }} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="Real" fill="#42D9E8" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="Fake" fill="#8B7CFF" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        <Card>
-          <h2 className="mb-3 text-sm font-semibold text-veritas-text">Confusion matrix (test)</h2>
-          <ConfusionMatrix matrix={test.confusion_matrix} />
-        </Card>
-
-        <Card className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold text-veritas-text">Highest-weight features</h2>
-          <p className="mb-3 text-xs text-veritas-dim">Words and phrases that push predictions most strongly. Many are publisher or formatting cues, not claims.</p>
-          <div className="grid gap-4 sm:grid-cols-2 text-xs">
-            <div><div className="mb-1.5 font-medium text-veritas-muted">Towards “fake” label</div><p className="font-mono leading-relaxed text-veritas-text">{variant.top_features.most_fake.slice(0, 12).join(' · ')}</p></div>
-            <div><div className="mb-1.5 font-medium text-veritas-muted">Towards “real” label</div><p className="font-mono leading-relaxed text-veritas-text">{variant.top_features.most_real.slice(0, 12).join(' · ')}</p></div>
-          </div>
-        </Card>
-      </div>
-
-      <h2 className="mb-3 mt-10 text-lg font-semibold tracking-tight text-veritas-text">Dataset</h2>
-      <Card>
-        <p className="text-sm text-veritas-muted">
-          {data.dataset_name} ({data.dataset_license}) ·{' '}
-          <a href={data.dataset_source} target="_blank" rel="noopener noreferrer" className="text-veritas-cyan hover:underline">{data.dataset_source}</a>
+      <div className="mb-12 max-w-4xl">
+        <h1 className="t-h1">Method, measured and limited</h1>
+        <p className="font-display mt-6 text-[clamp(1.375rem,2.2vw,1.75rem)] leading-snug text-paper" style={{ fontVariationSettings: "'opsz' 40" }}>
+          {data.interpretation}
         </p>
-        <div className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <div><div className="text-xs text-veritas-dim">Raw rows</div><div className="font-mono text-veritas-text">{c.raw_rows.toLocaleString()}</div></div>
-          <div><div className="text-xs text-veritas-dim">Removed: empty/very short text</div><div className="font-mono text-veritas-text">{c.dropped_empty_content.toLocaleString()}</div></div>
-          <div><div className="text-xs text-veritas-dim">Removed: duplicates</div><div className="font-mono text-veritas-text">{(c.dropped_exact_duplicates + c.dropped_duplicate_text).toLocaleString()}</div></div>
-          <div><div className="text-xs text-veritas-dim">Used</div><div className="font-mono text-veritas-text">{c.final_rows.toLocaleString()}</div></div>
+      </div>
+
+      <Tabs tabs={tabs} value={variant.variant} onChange={setVariantKey} label="Model variant" idPrefix="variant" />
+      <div id="variant-panel" role="tabpanel" aria-labelledby={`variant-tab-${variant.variant}`}>
+        <p className="t-body mb-10 mt-4">{variant.description}</p>
+
+        <div className="grid gap-x-16 gap-y-12 lg:grid-cols-12">
+          <section aria-labelledby="h-test" className="lg:col-span-4">
+            <h2 id="h-test" className="t-h2">
+              Held-out test set
+            </h2>
+            <dl className="mt-4 divide-y divide-line border-y border-line">
+              {[
+                ['Agreement with labels (accuracy)', pct(test.accuracy)],
+                ['Macro precision', pct(test.macro_avg.precision)],
+                ['Macro recall', pct(test.macro_avg.recall)],
+                ['Macro F1', pct(test.macro_avg.f1)],
+                ['Validation accuracy', pct(variant.validation.accuracy)],
+              ].map(([k, v]) => (
+                <div key={k} className="flex items-baseline justify-between gap-4 py-3">
+                  <dt className="text-[0.875rem] text-steel">{k}</dt>
+                  <dd className="t-data text-lg">{v}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="t-caption mt-3">
+              Regularisation C = {variant.selected_C}, chosen on the validation split only. {variant.vocabulary_size.toLocaleString()} n-gram features.
+            </p>
+          </section>
+
+          <section aria-labelledby="h-chart" className="lg:col-span-8">
+            <h2 id="h-chart" className="t-h2">
+              Precision, recall and F1 by class
+            </h2>
+            <p className="t-caption mb-4 mt-1">The vertical axis starts at 0.90 so the differences are visible. Numbers are exact in the tooltip.</p>
+            <div className="h-64" role="img" aria-label="Grouped bar chart of precision, recall and F1 for the real and fake classes">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
+                  <CartesianGrid stroke={colors.line.DEFAULT} vertical={false} />
+                  <XAxis dataKey="metric" stroke={colors.dim} tick={{ fontSize: 12, fill: colors.steel }} />
+                  <YAxis domain={[0.9, 1]} stroke={colors.dim} tick={{ fontSize: 12, fill: colors.steel }} tickFormatter={(v) => v.toFixed(2)} />
+                  <Tooltip formatter={(v) => v.toFixed(4)} contentStyle={{ background: colors.ink[3], border: `1px solid ${colors.line.strong}`, borderRadius: 8, fontSize: 12, color: colors.paper }} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                  <Legend wrapperStyle={{ fontSize: 12, color: colors.steel }} />
+                  <Bar dataKey="Real" fill={colors.dim} radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Fake" fill={colors.signal.DEFAULT} radius={[2, 2, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+
+          <section aria-labelledby="h-matrix" className="lg:col-span-5">
+            <h2 id="h-matrix" className="t-h2 mb-4">
+              Confusion matrix
+            </h2>
+            <ConfusionMatrix matrix={test.confusion_matrix} />
+          </section>
+
+          <section aria-labelledby="h-features" className="lg:col-span-7">
+            <h2 id="h-features" className="t-h2">
+              What the model leans on
+            </h2>
+            <p className="t-caption mb-4 mt-1">Highest-weight words and phrases. Many are publisher or formatting habits, not claims, which is why the score says little about truth.</p>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <p className="mb-1.5 text-[0.8125rem] text-steel">Toward the “fake” label</p>
+                <p className="t-data text-[0.8125rem] leading-relaxed">{variant.top_features.most_fake.slice(0, 12).join(' · ')}</p>
+              </div>
+              <div>
+                <p className="mb-1.5 text-[0.8125rem] text-steel">Toward the “real” label</p>
+                <p className="t-data text-[0.8125rem] leading-relaxed">{variant.top_features.most_real.slice(0, 12).join(' · ')}</p>
+              </div>
+            </div>
+          </section>
         </div>
-        <p className="mt-4 text-xs text-veritas-dim">
-          Split ({data.split_strategy}):{' '}
-          {Object.entries(data.split_sizes).map(([name, s]) => `${name} ${s.rows.toLocaleString()}`).join(' · ')}. Leakage check: {data.leakage_check}. {data.label_convention}.
-        </p>
-      </Card>
+      </div>
 
-      <h2 className="mb-3 mt-10 text-lg font-semibold tracking-tight text-veritas-text">Limitations</h2>
-      <ul className="grid gap-3 md:grid-cols-2">
-        {data.limitations.map((l) => (
-          <li key={l.title}>
-            <Card className="h-full">
-              <h3 className="text-sm font-semibold text-veritas-text">{l.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-veritas-muted">{l.detail}</p>
-            </Card>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-6 text-xs text-veritas-dim">Metrics generated {new Date(data.generated_at).toLocaleString()} by the training script; nothing on this page is entered by hand.</p>
-    </>
+      <section aria-labelledby="h-data" className="mt-16 border-t border-line pt-10">
+        <h2 id="h-data" className="t-h2">
+          The dataset
+        </h2>
+        <p className="t-body mt-3">
+          {data.dataset_name} ({data.dataset_license}).{' '}
+          <a href={data.dataset_source} target="_blank" rel="noopener noreferrer" className="text-signal underline decoration-signal/30 hover:decoration-signal">
+            Source record
+          </a>
+          . {data.label_convention}.
+        </p>
+        <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Raw rows', c.raw_rows],
+            ['Removed: empty or very short', c.dropped_empty_content],
+            ['Removed: duplicates', c.dropped_exact_duplicates + c.dropped_duplicate_text],
+            ['Used', c.final_rows],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <dt className="t-caption">{k}</dt>
+              <dd className="t-data text-2xl">{v.toLocaleString()}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="t-caption mt-5 max-w-3xl">
+          Split ({data.split_strategy}): {Object.entries(data.split_sizes).map(([name, s]) => `${name} ${s.rows.toLocaleString()}`).join(' · ')}. Leakage check: {data.leakage_check}.
+        </p>
+      </section>
+
+      <section aria-labelledby="h-limits" className="mt-16 border-t border-line pt-10">
+        <h2 id="h-limits" className="t-h2">
+          Limitations
+        </h2>
+        <ul className="mt-6 grid gap-x-16 gap-y-7 md:grid-cols-2">
+          {data.limitations.map((l) => (
+            <li key={l.title}>
+              <h3 className="t-h3">{l.title}</h3>
+              <p className="t-body mt-1.5 text-[0.9375rem]">{l.detail}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="t-caption mt-10">Metrics generated {new Date(data.generated_at).toLocaleString()} by the training script. Nothing on this page is entered by hand.</p>
+      </section>
+    </>,
   )
 }
