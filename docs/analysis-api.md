@@ -1,0 +1,42 @@
+# Analysis API, evidence collection and uncertainty
+
+## Endpoints (all under `/api/v1`)
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/analysis` | Analyze `{ "title"?: str, "text": str }` (text 20 to 20,000 characters). |
+| GET | `/evidence/passages?topic=` | List the reference collection. |
+| GET | `/evidence/search?q=&top_k=` | Semantic search over the collection (`q` 3 to 500 chars, `top_k` 1 to 10). |
+
+Errors use the standard envelope. Invalid input returns 422 `VALIDATION_ERROR`. If the ML components are not installed or trained, the API returns 503 `MODEL_UNAVAILABLE` with a generic message. The first analysis request loads the models (a few seconds); later requests reuse them. Analyses are not stored yet (history arrives with authentication).
+
+URL submission is **not** implemented. Fetching arbitrary URLs from the server needs SSRF protection and article extraction, which are left for a later phase.
+
+## Response sections (kept separate on purpose)
+
+1. `classification` (`machine_learning_classification`): the Phase 2 TF-IDF + Logistic Regression model, source-masked variant. Output is `probability_unreliable_style` and a label that says the text *resembles content from sources labelled unreliable/reliable*. It is not a fact-check, and the accompanying test accuracy is agreement with dataset labels on held-out articles from the same dataset.
+2. `linguistic_signals`: descriptive measurements (exclamation marks, ALL-CAPS ratio, sensational and hedging wording per 1,000 words, attribution markers, named entities, numbers, quotation marks, pronouns, sentence length). They are computed with spaCy `en_core_web_sm`, are **not** inputs to the classifier, and are not a score. The sensational and hedging word lists are small, hand-picked and unvalidated.
+3. `evidence` (`retrieved_reference_passages`): passages from the reference collection found by MiniLM embeddings and FAISS cosine similarity, using the title and up to 8 sentences as queries (or the whole text for very short input). Each hit has a similarity score, a `relevant` flag (score at least 0.35) and a source link. The 0.35 threshold is a heuristic chosen by inspection, not tuned on labelled data. The system returns topical relevance only; it does not decide whether a passage supports or contradicts the text.
+4. `uncertainty`: transparent rules, see below.
+
+## Uncertainty rules
+
+Points are added: text under 50 words (+2) or under 150 words (+1); classifier probability within 0.15 of 0.5 (+1); no related reference passage (+1). 0 to 1 points is `moderate`, 2 is `high`, 3 or more is `very_high`. The level is never "low" because the classifier is bound to its training data (WELFake: 2016-2017 US political news with source-based labels), and three standing caveats are always returned. These levels are heuristics, not calibrated probabilities.
+
+## Reference collection
+
+`backend/data/evidence/reference_passages.json`: 34 short passages in health, climate, space, earth science, physics, biology and society, linked to 33 distinct institutional pages (WHO, NASA, NOAA, USGS, NIST, NIH NHGRI, UN).
+
+- Passages are **paraphrased summaries written for this project**, not quotations. They have not been line-by-line reviewed against each page, so consult the linked source.
+- Every URL returned HTTP 200 on 2026-11-20. Candidate pages that returned 403 or 404 to the checker (for example some CDC, IPCC and USGS pages) were left out rather than guessed.
+- Coverage is narrow by design. A text outside these topics gets no related evidence, which says nothing about its accuracy. Contested political topics are excluded.
+
+## Verified behaviour (see `backend/tests/test_analysis.py`)
+
+- A climate article retrieves climate passages (CO2, sea level, warming) as related evidence.
+- An unrelated text (a bakery story) gets no related evidence and an uncertainty reason saying so.
+- A short headline is flagged high or very high uncertainty and still gets a retrieval query.
+- Sensational text scores higher than a sober article on exclamation, ALL-CAPS and sensational-wording signals.
+- Invalid input returns 422, and missing models return 503 without leaking paths or traces.
+
+Observed limitation: on a short, loud headline the classifier can return a very confident label (for example 0.98 "unreliable"). That confidence reflects the model's training distribution, not reliability, which is why short inputs are flagged very uncertain.

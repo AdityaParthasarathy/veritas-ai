@@ -54,3 +54,14 @@ class ResourceNotFoundException(VeritasException):
             details={"resource": resource, "identifier": str(identifier)},
             status_code=status.HTTP_404_NOT_FOUND,
         )
+
+
+class ModelUnavailableException(VeritasException):
+    """Raised when the ML models or artifacts needed for analysis are not installed."""
+
+    def __init__(self, message: str = "Analysis models are not available") -> None:
+        super().__init__(
+            message=message,
+            code="MODEL_UNAVAILABLE",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )

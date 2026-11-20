@@ -38,7 +38,7 @@ export default function Sidebar({ open, onNavigate }) {
         ))}
       </nav>
       <div className="border-t border-veritas-border-subtle p-4 text-xs leading-relaxed text-veritas-dim">
-        Phase 1 · Infrastructure
+        Phase 3 · Analysis API
         <br />
         Model outputs are signals, not proof of truth.
       </div>

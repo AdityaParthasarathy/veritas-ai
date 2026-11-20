@@ -10,15 +10,15 @@ const IMPLEMENTED = [
   'PostgreSQL via Docker Compose with health check',
   'Liveness and readiness endpoints',
   'Typed configuration, CORS and safe error handling',
-  'Password-hashing and JWT dependencies prepared (no auth yet)',
+  'TF-IDF + Logistic Regression classifier trained on WELFake',
+  'Linguistic signals, reference-passage retrieval and uncertainty (Analyze Content)',
+  'Curated reference collection with source links (Evidence Explorer)',
 ]
 
 const UPCOMING = [
-  ['NLP preprocessing and classifier training', 'Phase 2'],
-  ['Model performance and dataset limitations', 'Phase 2'],
-  ['Content analysis and linguistic signals', 'Phase 3'],
-  ['Semantic evidence retrieval', 'Phase 3'],
-  ['Authentication and stored analyses', 'Phase 4'],
+  ['Model performance and dataset limitations page', 'Phase 4'],
+  ['URL analysis', 'Later'],
+  ['Authentication and stored analysis history', 'Phase 4'],
 ]
 
 export default function OverviewPage() {
@@ -29,7 +29,7 @@ export default function OverviewPage() {
       <PageHeader
         title="Misinformation intelligence, grounded in evidence"
         description="VERITAS AI separates machine-learning classification from independently retrieved evidence. A model prediction is a signal, never proof that content is true or false."
-        action={<StatusBadge tone="accent">Phase 1 · Foundation</StatusBadge>}
+        action={<StatusBadge tone="accent">Phase 3 · Analysis</StatusBadge>}
       />
 
       <div className="grid gap-5 lg:grid-cols-5">
@@ -38,7 +38,7 @@ export default function OverviewPage() {
         </div>
         <Card className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-veritas-text">Implementation status</h2>
-          <p className="mt-0.5 text-xs text-veritas-dim">No analysis or model features are available yet.</p>
+          <p className="mt-0.5 text-xs text-veritas-dim">Analysis is statistical and does not verify claims.</p>
           <ul className="mt-4 space-y-2.5">
             {IMPLEMENTED.map((item) => (
               <li key={item} className="flex gap-2.5 text-sm text-veritas-muted">

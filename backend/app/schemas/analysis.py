@@ -1,0 +1,95 @@
+"""Schemas for the content-analysis and evidence endpoints."""
+
+from typing import Literal
+
+from pydantic import BaseModel, Field, field_validator
+
+MAX_TEXT_CHARS = 20_000
+
+
+class AnalysisRequest(BaseModel):
+    title: str | None = Field(default=None, max_length=300, description="Optional headline")
+    text: str = Field(..., min_length=20, max_length=MAX_TEXT_CHARS, description="Headline or article body")
+
+    @field_validator("text")
+    @classmethod
+    def _not_blank(cls, value: str) -> str:
+        if len(value.strip()) < 20:
+            raise ValueError("text must contain at least 20 non-whitespace characters")
+        return value
+
+
+class ModelInfo(BaseModel):
+    name: str
+    trained_on: str
+    test_accuracy_on_dataset_labels: float | None
+
+
+class ClassificationResult(BaseModel):
+    kind: Literal["machine_learning_classification"] = "machine_learning_classification"
+    label: Literal["resembles_unreliable_sources", "resembles_reliable_sources"]
+    probability_unreliable_style: float = Field(..., ge=0, le=1)
+    model: ModelInfo
+    disclaimer: str
+
+
+class SignalOut(BaseModel):
+    key: str
+    label: str
+    value: float
+    unit: str
+    description: str
+
+
+class EvidenceHitOut(BaseModel):
+    id: str
+    score: float
+    relevant: bool
+    topic: str
+    passage: str
+    source_org: str
+    source_title: str
+    source_url: str
+    matched_text: str | None = None
+
+
+class EvidenceResult(BaseModel):
+    kind: Literal["retrieved_reference_passages"] = "retrieved_reference_passages"
+    collection_name: str
+    collection_size: int
+    relevance_threshold: float
+    hits: list[EvidenceHitOut]
+    disclaimer: str
+
+
+class UncertaintyOut(BaseModel):
+    level: Literal["moderate", "high", "very_high"]
+    reasons: list[str]
+    standing_caveats: list[str]
+
+
+class AnalysisResponse(BaseModel):
+    word_count: int
+    classification: ClassificationResult
+    linguistic_signals: list[SignalOut]
+    evidence: EvidenceResult
+    uncertainty: UncertaintyOut
+    disclaimer: str
+
+
+class EvidenceCollectionInfo(BaseModel):
+    name: str
+    description: str
+    size: int
+    url_checked_on: str
+
+
+class EvidenceListResponse(BaseModel):
+    collection: EvidenceCollectionInfo
+    passages: list[EvidenceHitOut]
+
+
+class EvidenceSearchResponse(BaseModel):
+    query: str
+    relevance_threshold: float
+    hits: list[EvidenceHitOut]

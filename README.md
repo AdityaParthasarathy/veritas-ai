@@ -2,7 +2,7 @@
 
 AI-powered misinformation intelligence platform. It will analyze news text and URLs with NLP and machine learning, show model predictions separately from independently retrieved evidence, and report uncertainty. A model prediction is never presented as proof that content is true or false.
 
-**Status: Phase 1 (infrastructure) and Phase 2 (dataset and baseline model) complete. The model is not yet exposed through the API or UI; no authentication exists yet.**
+**Status: Phases 1-3 complete: infrastructure, baseline classifier, and an analysis API with evidence retrieval and a UI. No authentication or stored history yet.**
 
 ## Stack
 
@@ -72,6 +72,9 @@ If another PostgreSQL already uses port 5432, set `POSTGRES_PORT` (for example 5
 | GET | `/api/v1/health/live` | Process liveness; no database dependency. |
 | GET | `/api/v1/health/ready` | Runs `SELECT 1`; 200 when connected, 503 when not. |
 | GET | `/api/v1/system/info` | Name, version, environment, docs URL. |
+| POST | `/api/v1/analysis` | Classification, linguistic signals, related evidence and uncertainty for submitted text. |
+| GET | `/api/v1/evidence/passages` | List the reference collection. |
+| GET | `/api/v1/evidence/search` | Semantic search over the reference collection. |
 
 ## Tests
 
@@ -96,10 +99,12 @@ Phase 2 done: WELFake downloaded and documented, cleaning and leakage-safe split
 
 Phase 3 foundation done: CPU-only PyTorch, sentence-transformers, spaCy and FAISS installed with exact pins; MiniLM embeddings and FAISS similarity search verified by tests (see [docs/ml-setup.md](docs/ml-setup.md)).
 
-Not implemented: authentication, serving the model through the API, the curated evidence collection and analysis endpoint, analytics.
+Phase 3 done: `POST /api/v1/analysis` returns a classifier result, linguistic signals, related reference passages and an uncertainty assessment as separate sections; a 34-passage curated reference collection with verified source links; Analyze Content and Evidence Explorer pages. Details and limits: [docs/analysis-api.md](docs/analysis-api.md).
+
+Not implemented: authentication, stored analysis history, URL analysis, Model Performance page, analytics.
 
 ## Roadmap
 
 1. Phase 2 (done): dataset, cleaning, baseline classifier and evaluation. Train with `cd backend; python -m pip install -r requirements-ml.txt; python -m app.ml.train`.
-2. Phase 3: analysis API, linguistic signals, semantic evidence retrieval, uncertainty.
+2. Phase 3 (done): analysis API, linguistic signals, semantic evidence retrieval, uncertainty. Needs the ML setup in [docs/ml-setup.md](docs/ml-setup.md).
 3. Phase 4: authentication, stored analyses and history, performance and limitations pages.
