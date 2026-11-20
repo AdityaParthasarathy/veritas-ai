@@ -38,6 +38,16 @@ function UncertaintyCard({ uncertainty }) {
         </div>
         <StatusBadge tone={level.tone}>{level.text}</StatusBadge>
       </div>
+      {uncertainty.meaning && <p className="mb-3 text-xs leading-relaxed text-veritas-dim">{uncertainty.meaning}</p>}
+      {uncertainty.domain_check?.available && (
+        <p className="mb-3 text-xs text-veritas-muted">
+          Domain check:{' '}
+          <span className={uncertainty.domain_check.in_domain ? 'text-veritas-success' : 'font-medium text-veritas-warning'}>
+            {uncertainty.domain_check.in_domain ? "resembles the classifier's training articles" : "unlike the classifier's training articles"}
+          </span>{' '}
+          (similarity {uncertainty.domain_check.similarity}, cut-off {uncertainty.domain_check.threshold}).
+        </p>
+      )}
       {uncertainty.reasons.length > 0 && (
         <ul className="mb-3 space-y-1.5 text-sm text-veritas-muted">
           {uncertainty.reasons.map((reason) => (
@@ -127,6 +137,9 @@ export default function AnalysisResults({ result }) {
             </p>
           </div>
           <p className="mt-4 text-xs leading-relaxed text-veritas-dim">{classification.disclaimer}</p>
+          {classification.confidence_note && (
+            <p className="mt-2 rounded-md bg-white/[0.04] p-2.5 text-xs leading-relaxed text-veritas-muted">{classification.confidence_note}</p>
+          )}
           <p className="mt-3 border-t border-veritas-border-subtle pt-3 text-xs text-veritas-dim">
             {classification.model.name}, trained on {classification.model.trained_on}.
             {classification.model.test_accuracy_on_dataset_labels != null &&

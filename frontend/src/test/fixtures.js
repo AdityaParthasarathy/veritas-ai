@@ -8,6 +8,7 @@ export const analysisResult = {
     kind: 'machine_learning_classification',
     label: 'resembles_reliable_sources',
     probability_unreliable_style: 0.2381,
+    confidence_note: 'Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.',
     model: { name: 'TF-IDF + Logistic Regression (source_masked)', trained_on: 'WELFake (about 62k de-duplicated articles)', test_accuracy_on_dataset_labels: 0.9637 },
     disclaimer: 'Describes how closely the writing resembles articles from sources labelled unreliable or reliable. It is not a fact-check.',
   },
@@ -19,7 +20,7 @@ export const analysisResult = {
     kind: 'retrieved_reference_passages',
     collection_name: 'VERITAS AI demo reference collection',
     collection_size: 34,
-    relevance_threshold: 0.35,
+    relevance_threshold: 0.4,
     hits: [
       {
         id: 'climate-co2', score: 0.74, relevant: true, topic: 'Climate',
@@ -32,6 +33,8 @@ export const analysisResult = {
   },
   uncertainty: {
     level: 'moderate',
+    meaning: 'This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false.',
+    domain_check: { available: true, in_domain: true, similarity: 0.0838, threshold: 0.0589 },
     reasons: ['The text is shorter (62 words) than most training articles, which reduces reliability.'],
     standing_caveats: ['The classifier was trained on WELFake.', 'A result cannot establish whether the claims are true.'],
   },

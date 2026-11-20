@@ -9,8 +9,9 @@ from pathlib import Path
 import joblib
 
 from app.ml.data import MAX_CHARS, mask_source_cues
+from app.ml.ood import DomainProfile
+from app.ml.paths import ARTIFACT_DIR
 
-from app.ml.paths import ARTIFACT_DIR  # noqa: E402
 VARIANT = "source_masked"  # less dependent on publisher shortcuts than the plain baseline
 
 
@@ -18,6 +19,8 @@ VARIANT = "source_masked"  # less dependent on publisher shortcuts than the plai
 class ClassifierResult:
     probability_unreliable: float  # P(class 1) = resembles the dataset's "fake/unreliable" label
     label: str
+    domain_similarity: float | None = None  # similarity to the training-data centroid, None if no profile
+    domain_threshold: float | None = None
 
 
 class StyleClassifier:
@@ -34,6 +37,7 @@ class StyleClassifier:
         self._vectorizer = joblib.load(vec_path)
         self._model = joblib.load(model_path)
         self.variant = variant
+        self.domain_profile = DomainProfile.load(artifact_dir)  # optional: run `python -m app.ml.domain_profile`
         self.metrics = self._load_test_metrics(artifact_dir, variant)
 
     @staticmethod
@@ -52,4 +56,6 @@ class StyleClassifier:
         features = self._vectorizer.transform([mask_source_cues(content)])
         p_unreliable = float(self._model.predict_proba(features)[0][1])
         label = "resembles_unreliable_sources" if p_unreliable >= 0.5 else "resembles_reliable_sources"
-        return ClassifierResult(p_unreliable, label)
+        similarity = self.domain_profile.similarity(features) if self.domain_profile else None
+        threshold = self.domain_profile.threshold if self.domain_profile else None
+        return ClassifierResult(p_unreliable, label, similarity, threshold)

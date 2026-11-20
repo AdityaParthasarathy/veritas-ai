@@ -1,0 +1,147 @@
+{
+  "generated_at": "2026-11-20T17:44:37+00:00",
+  "method": "cosine similarity of the document TF-IDF vector to the training-set centroid (source-masked vectorizer)",
+  "threshold_rule": "5th percentile of the validation-split score",
+  "threshold": 0.0589,
+  "note_on_threshold_choice": "The 5th percentile was chosen after a first look at the out-of-domain set (the 2nd percentile detected only 44%), so the detection rate below is optimistic. The set is small and hand-written; treat it as indicative.",
+  "in_domain": {
+    "validation_percentiles": {
+      "p1": 0.0277,
+      "p5": 0.0589,
+      "p25": 0.1009,
+      "p50": 0.1271,
+      "p75": 0.1524
+    },
+    "test_percentiles": {
+      "p1": 0.0261,
+      "p5": 0.0569,
+      "p25": 0.0992,
+      "p50": 0.1259,
+      "p75": 0.1524
+    },
+    "test_false_flag_rate": 0.0546,
+    "test_documents": 9366
+  },
+  "out_of_domain": {
+    "documents": 18,
+    "detected": 18,
+    "detection_rate": 1.0,
+    "per_sample": [
+      {
+        "id": "recipe",
+        "genre": "recipe",
+        "similarity": 0.0233,
+        "flagged": true
+      },
+      {
+        "id": "science-abstract",
+        "genre": "scientific abstract",
+        "similarity": 0.0259,
+        "flagged": true
+      },
+      {
+        "id": "legal-terms",
+        "genre": "legal terms",
+        "similarity": 0.0511,
+        "flagged": true
+      },
+      {
+        "id": "fiction",
+        "genre": "fiction",
+        "similarity": 0.0385,
+        "flagged": true
+      },
+      {
+        "id": "tech-docs",
+        "genre": "software documentation",
+        "similarity": 0.0316,
+        "flagged": true
+      },
+      {
+        "id": "forum-post",
+        "genre": "forum post",
+        "similarity": 0.0549,
+        "flagged": true
+      },
+      {
+        "id": "product-review",
+        "genre": "product review",
+        "similarity": 0.0435,
+        "flagged": true
+      },
+      {
+        "id": "travel-guide",
+        "genre": "travel guide",
+        "similarity": 0.0483,
+        "flagged": true
+      },
+      {
+        "id": "textbook",
+        "genre": "textbook explanation",
+        "similarity": 0.0241,
+        "flagged": true
+      },
+      {
+        "id": "earnings-report",
+        "genre": "financial results",
+        "similarity": 0.0568,
+        "flagged": true
+      },
+      {
+        "id": "meeting-minutes",
+        "genre": "meeting minutes",
+        "similarity": 0.0586,
+        "flagged": true
+      },
+      {
+        "id": "poem-like",
+        "genre": "lyrical prose",
+        "similarity": 0.0261,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-photosynthesis",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0318,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-city",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0436,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-element",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0273,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-species",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0413,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-history",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0574,
+        "flagged": true
+      },
+      {
+        "id": "encyclopedia-sport",
+        "genre": "encyclopedia entry",
+        "similarity": 0.0436,
+        "flagged": true
+      }
+    ]
+  },
+  "auroc_test_vs_out_of_domain": 0.974,
+  "limitations": [
+    "Measures vocabulary and style distance from the training articles, not whether text is news or true.",
+    "Very short texts also score low because they contain few known terms.",
+    "About 5% of genuine in-domain articles are flagged by construction.",
+    "The out-of-domain set has few documents and was written by the project author."
+  ]
+}

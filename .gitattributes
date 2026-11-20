@@ -1,0 +1,5 @@
+# Normalise line endings in the repository (checkout uses the platform default).
+* text=auto
+*.ps1 text
+*.png binary
+*.joblib binary

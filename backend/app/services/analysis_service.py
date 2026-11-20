@@ -14,9 +14,11 @@ from dataclasses import asdict
 from app.core.exceptions import ModelUnavailableException
 from app.ml.uncertainty import RELEVANCE_THRESHOLD, assess
 from app.schemas.analysis import (
+    CONFIDENCE_NOTE,
     AnalysisRequest,
     AnalysisResponse,
     ClassificationResult,
+    DomainCheck,
     EvidenceCollectionInfo,
     EvidenceHitOut,
     EvidenceListResponse,
@@ -120,13 +122,15 @@ class AnalysisService:
         doc = self._nlp(text[:5000])
         hits = self._evidence.retrieve_for_article(title, [s.text.strip() for s in doc.sents])
         top_score = hits[0].score if hits else None
-        uncertainty = assess(word_count, result.probability_unreliable, top_score)
+        uncertainty = assess(word_count, result.probability_unreliable, top_score, result.domain_similarity, result.domain_threshold)
+        has_domain = result.domain_similarity is not None
 
         return AnalysisResponse(
             word_count=word_count,
             classification=ClassificationResult(
                 label=result.label,
                 probability_unreliable_style=round(result.probability_unreliable, 4),
+                confidence_note=CONFIDENCE_NOTE,
                 model=ModelInfo(
                     name=f"TF-IDF + Logistic Regression ({self._classifier.variant})",
                     trained_on="WELFake (about 62k de-duplicated articles)",
@@ -144,8 +148,15 @@ class AnalysisService:
             ),
             uncertainty=UncertaintyOut(
                 level=uncertainty.level,
+                meaning=uncertainty.meaning,
                 reasons=uncertainty.reasons,
                 standing_caveats=uncertainty.standing_caveats,
+                domain_check=DomainCheck(
+                    available=has_domain,
+                    in_domain=(result.domain_similarity >= result.domain_threshold) if has_domain else None,
+                    similarity=round(result.domain_similarity, 4) if has_domain else None,
+                    threshold=round(result.domain_threshold, 4) if has_domain else None,
+                ),
             ),
             disclaimer=OVERALL_DISCLAIMER,
         )

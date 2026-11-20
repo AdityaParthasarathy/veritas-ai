@@ -56,24 +56,15 @@ The backend applies database migrations on start and loads the ML models in the 
 
 ### ML files (not in Git)
 
-The classifier files and the embedding model are large and git-ignored; compose mounts them read-only. Create them once:
+The classifier files and the embedding model are large and git-ignored; compose mounts them read-only. One script creates them (downloads about 350 MB including the checksum-verified WELFake dataset, then trains in about 5 minutes):
 
 ```powershell
 py -3 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r backend\requirements-ml.txt
-python -m pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
-python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu').save('models/all-MiniLM-L6-v2')"
+.venv\Scripts\python.exe -m pip install -r backend\requirements-ml.txt
+powershell -ExecutionPolicy Bypass -File scripts\setup-ml.ps1
 ```
 
-Then download WELFake and train (about 5 minutes), following [data/README.md](data/README.md) and:
-
-```powershell
-cd backend
-python -m app.ml.train
-```
-
-Without these files the app still starts; analysis endpoints return a clear 503 and the rest works. Full details: [docs/ml-setup.md](docs/ml-setup.md).
+The script installs the spaCy model, downloads `all-MiniLM-L6-v2`, downloads and verifies WELFake (provenance in [data/README.md](data/README.md)), then runs `python -m app.ml.train` and `python -m app.ml.domain_profile`. Without these files the app still starts; analysis endpoints return a clear 503 and the rest works. Manual steps and details: [docs/ml-setup.md](docs/ml-setup.md).
 
 ## Local development (without Docker for the app)
 
@@ -118,7 +109,9 @@ CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs backend tests wit
 
 ## Documentation
 
-- [docs/acceptance-report.md](docs/acceptance-report.md): requirements status, test results, unresolved issues, limitations.
+- [docs/technical-report.md](docs/technical-report.md): the full technical report. [docs/acceptance-report.md](docs/acceptance-report.md): every requirement mapped to implementation, tests and limitations.
+- [docs/quality-evaluation.md](docs/quality-evaluation.md): out-of-domain detection and evidence threshold evaluation. [docs/demo-script.md](docs/demo-script.md) and [docs/samples/](docs/samples/): demonstration script and sample inputs.
+- [docs/database-schema.md](docs/database-schema.md), [docs/openapi.json](docs/openapi.json): schema and API specification (both checked by tests).
 - [docs/security-review.md](docs/security-review.md): threat review and verification evidence.
 - [docs/analysis-api.md](docs/analysis-api.md), [docs/auth.md](docs/auth.md): API behaviour and design.
 - [docs/dataset-and-model.md](docs/dataset-and-model.md): dataset, training, metrics, limitations.
@@ -133,5 +126,6 @@ database/   PostgreSQL init scripts
 data/       Dataset provenance (raw CSV is git-ignored)
 docs/       Documentation
 .github/    CI workflow
+scripts/    setup-ml.ps1 (creates the git-ignored ML files)
 docker-compose.yml, .env.example
 ```

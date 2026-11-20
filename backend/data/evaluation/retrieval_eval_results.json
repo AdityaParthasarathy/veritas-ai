@@ -1,0 +1,242 @@
+{
+  "generated_at": "2026-11-20T17:56:51+00:00",
+  "collection_size": 70,
+  "queries": {
+    "total": 120,
+    "positive": 75,
+    "negative": 45,
+    "near_miss_negative": 10,
+    "borderline": 2,
+    "dev": 56,
+    "test": 64
+  },
+  "threshold_selection": "maximise strict F1 on the dev half; ties go to the higher threshold",
+  "chosen_threshold": 0.4,
+  "previous_threshold": 0.35,
+  "top1_retrieval_accuracy_on_positives_all": 0.96,
+  "dev_at_chosen": {
+    "threshold": 0.4,
+    "tp": 30,
+    "fp": 2,
+    "fn": 2,
+    "precision": 0.9375,
+    "recall": 0.9375,
+    "f1": 0.9375,
+    "false_related_rate_on_negatives": 0.0
+  },
+  "test_at_chosen": {
+    "threshold": 0.4,
+    "tp": 39,
+    "fp": 1,
+    "fn": 4,
+    "precision": 0.975,
+    "recall": 0.907,
+    "f1": 0.9398,
+    "false_related_rate_on_negatives": 0.0
+  },
+  "test_at_previous": {
+    "threshold": 0.35,
+    "tp": 41,
+    "fp": 1,
+    "fn": 2,
+    "precision": 0.9762,
+    "recall": 0.9535,
+    "f1": 0.9647,
+    "false_related_rate_on_negatives": 0.0
+  },
+  "all_at_chosen": {
+    "threshold": 0.4,
+    "tp": 69,
+    "fp": 3,
+    "fn": 6,
+    "precision": 0.9583,
+    "recall": 0.92,
+    "f1": 0.9388,
+    "false_related_rate_on_negatives": 0.0
+  },
+  "all_at_previous": {
+    "threshold": 0.35,
+    "tp": 71,
+    "fp": 6,
+    "fn": 4,
+    "precision": 0.9221,
+    "recall": 0.9467,
+    "f1": 0.9342,
+    "false_related_rate_on_negatives": 0.0667
+  },
+  "all_at_chosen_excluding_borderline": {
+    "threshold": 0.4,
+    "tp": 68,
+    "fp": 3,
+    "fn": 5,
+    "precision": 0.9577,
+    "recall": 0.9315,
+    "f1": 0.9444,
+    "false_related_rate_on_negatives": 0.0
+  },
+  "test_curve": [
+    {
+      "threshold": 0.2,
+      "tp": 42,
+      "fp": 9,
+      "fn": 1,
+      "precision": 0.8235,
+      "recall": 0.9767,
+      "f1": 0.8936,
+      "false_related_rate_on_negatives": 0.381
+    },
+    {
+      "threshold": 0.25,
+      "tp": 42,
+      "fp": 6,
+      "fn": 1,
+      "precision": 0.875,
+      "recall": 0.9767,
+      "f1": 0.9231,
+      "false_related_rate_on_negatives": 0.2381
+    },
+    {
+      "threshold": 0.3,
+      "tp": 42,
+      "fp": 2,
+      "fn": 1,
+      "precision": 0.9545,
+      "recall": 0.9767,
+      "f1": 0.9655,
+      "false_related_rate_on_negatives": 0.0476
+    },
+    {
+      "threshold": 0.35,
+      "tp": 41,
+      "fp": 1,
+      "fn": 2,
+      "precision": 0.9762,
+      "recall": 0.9535,
+      "f1": 0.9647,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.4,
+      "tp": 39,
+      "fp": 1,
+      "fn": 4,
+      "precision": 0.975,
+      "recall": 0.907,
+      "f1": 0.9398,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.45,
+      "tp": 38,
+      "fp": 1,
+      "fn": 5,
+      "precision": 0.9744,
+      "recall": 0.8837,
+      "f1": 0.9268,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.5,
+      "tp": 37,
+      "fp": 1,
+      "fn": 6,
+      "precision": 0.9737,
+      "recall": 0.8605,
+      "f1": 0.9136,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.55,
+      "tp": 34,
+      "fp": 1,
+      "fn": 9,
+      "precision": 0.9714,
+      "recall": 0.7907,
+      "f1": 0.8718,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.6,
+      "tp": 30,
+      "fp": 1,
+      "fn": 13,
+      "precision": 0.9677,
+      "recall": 0.6977,
+      "f1": 0.8108,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.65,
+      "tp": 22,
+      "fp": 1,
+      "fn": 21,
+      "precision": 0.9565,
+      "recall": 0.5116,
+      "f1": 0.6667,
+      "false_related_rate_on_negatives": 0.0
+    },
+    {
+      "threshold": 0.7,
+      "tp": 16,
+      "fp": 1,
+      "fn": 27,
+      "precision": 0.9412,
+      "recall": 0.3721,
+      "f1": 0.5333,
+      "false_related_rate_on_negatives": 0.0
+    }
+  ],
+  "score_summary": {
+    "positives_top1_correct": {
+      "p5": 0.424,
+      "p25": 0.579,
+      "p50": 0.639,
+      "p75": 0.739
+    },
+    "negatives": {
+      "p50": 0.189,
+      "p75": 0.241,
+      "p95": 0.36,
+      "p100": 0.399
+    }
+  },
+  "limitations": [
+    "Queries and labels were written by the project author; the test half is not independent of the author's judgement.",
+    "Queries are short news-style sentences. Long articles use several sentence queries, which can raise the best score.",
+    "The collection covers narrow topics, so a high score means topical similarity, not that the text is accurate."
+  ],
+  "errors_on_test_at_chosen": [
+    {
+      "q": "Early detection through screening gives patients a far better chance of beating the disease.",
+      "expected": [
+        "health-cancer"
+      ],
+      "top1": "health-cancer",
+      "score": 0.3427
+    },
+    {
+      "q": "A silent condition that raises the force of blood against artery walls can only be detected by regular blood-pressure checks.",
+      "expected": [
+        "health-hypertension"
+      ],
+      "top1": "health-hypertension",
+      "score": 0.3713
+    },
+    {
+      "q": "The second planet from the Sun is hotter than Mercury because its dense atmosphere traps heat.",
+      "expected": [
+        "space-venus"
+      ],
+      "top1": "space-mercury",
+      "score": 0.7449
+    },
+    {
+      "q": "The icy visitor will grow a bright tail as it nears the Sun and its frozen material vaporises.",
+      "expected": [
+        "space-comets"
+      ],
+      "top1": "space-comets",
+      "score": 0.381
+    }
+  ]
+}

@@ -1,8 +1,12 @@
 """Rule-based uncertainty assessment.
 
-The levels are transparent heuristics, not calibrated probabilities. Because the
-classifier is bound to its training dataset, the lowest level is "moderate": the
-system never reports low uncertainty.
+What the level means: how much to trust *this analysis*, not whether the content is true. The rules look only at
+the input and the analysis (length, domain distance, model indecision, evidence coverage). In particular a very
+confident classifier never lowers the level: classifier confidence measures how strongly the text matches
+patterns in the training labels, not how likely the claims are to be true. Because the classifier is bound to its
+training dataset, the lowest level is "moderate": the system never reports low uncertainty.
+
+The levels are transparent heuristics, not calibrated probabilities.
 """
 
 from __future__ import annotations
@@ -12,11 +16,16 @@ from dataclasses import dataclass, field
 SHORT_TEXT_WORDS = 50
 MEDIUM_TEXT_WORDS = 150
 BORDERLINE_MARGIN = 0.15  # |p - 0.5| below this counts as near the decision boundary
-RELEVANCE_THRESHOLD = 0.35  # minimum cosine similarity to call a reference passage related
+RELEVANCE_THRESHOLD = 0.40  # minimum cosine similarity to call a reference passage related (tuned on labelled queries, see docs)
+
+MEANING = (
+    "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is "
+    "true or false, and a confident model result does not reduce it."
+)
 
 STANDING_CAVEATS = (
     "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
-    "A classifier result describes similarity to the training labels' writing style and sources. It cannot establish whether the claims are true.",
+    "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
     "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text.",
 )
 
@@ -27,9 +36,16 @@ class UncertaintyAssessment:
     points: int
     reasons: list[str] = field(default_factory=list)
     standing_caveats: list[str] = field(default_factory=list)
+    meaning: str = MEANING
 
 
-def assess(word_count: int, probability_unreliable: float, top_evidence_score: float | None) -> UncertaintyAssessment:
+def assess(
+    word_count: int,
+    probability_unreliable: float,
+    top_evidence_score: float | None,
+    domain_similarity: float | None = None,
+    domain_threshold: float | None = None,
+) -> UncertaintyAssessment:
     """Combine simple, explainable checks into an uncertainty level."""
     points = 0
     reasons: list[str] = []
@@ -40,6 +56,14 @@ def assess(word_count: int, probability_unreliable: float, top_evidence_score: f
     elif word_count < MEDIUM_TEXT_WORDS:
         points += 1
         reasons.append(f"The text is shorter ({word_count} words) than most training articles, which reduces reliability.")
+
+    if domain_similarity is not None and domain_threshold is not None and domain_similarity < domain_threshold:
+        points += 2
+        reasons.append(
+            "This text looks unlike the articles the classifier was trained on (different vocabulary or genre; "
+            f"similarity {domain_similarity:.3f} is below the {domain_threshold:.3f} cut-off). "
+            "The classification is outside its training domain and should not be relied on, however confident it appears."
+        )
 
     if abs(probability_unreliable - 0.5) < BORDERLINE_MARGIN:
         points += 1

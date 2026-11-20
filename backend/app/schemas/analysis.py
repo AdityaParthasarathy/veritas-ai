@@ -5,7 +5,13 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.ml.uncertainty import MEANING
+
 MAX_TEXT_CHARS = 20_000
+CONFIDENCE_NOTE = (
+    "Model confidence describes how strongly the text matches patterns in the training labels. "
+    "It is not the probability that the content is true or false."
+)
 
 
 class AnalysisRequest(BaseModel):
@@ -30,6 +36,7 @@ class ClassificationResult(BaseModel):
     kind: Literal["machine_learning_classification"] = "machine_learning_classification"
     label: Literal["resembles_unreliable_sources", "resembles_reliable_sources"]
     probability_unreliable_style: float = Field(..., ge=0, le=1)
+    confidence_note: str = CONFIDENCE_NOTE  # default keeps analyses saved before this field existed readable
     model: ModelInfo
     disclaimer: str
 
@@ -63,10 +70,21 @@ class EvidenceResult(BaseModel):
     disclaimer: str
 
 
+class DomainCheck(BaseModel):
+    """Whether the text resembles the classifier's training data."""
+
+    available: bool
+    in_domain: bool | None = None
+    similarity: float | None = None
+    threshold: float | None = None
+
+
 class UncertaintyOut(BaseModel):
     level: Literal["moderate", "high", "very_high"]
+    meaning: str = MEANING
     reasons: list[str]
     standing_caveats: list[str]
+    domain_check: DomainCheck = DomainCheck(available=False)
 
 
 class UrlAnalysisRequest(BaseModel):
