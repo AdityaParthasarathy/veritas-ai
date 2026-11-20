@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-veritas-bg text-veritas-text font-sans antialiased selection:bg-veritas-primary/30 selection:text-white min-h-screen overflow-x-hidden;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090D18;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1F2C44;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2D3E5D;
+}
