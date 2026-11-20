@@ -29,6 +29,7 @@ LIMITATIONS = [
 
 
 def get_performance() -> PerformanceResponse:
+    """Read metrics.json and attach the interpretation and limitations."""
     if not METRICS_PATH.exists():
         raise ModelUnavailableException("Model metrics are not available. Train the model first (see docs/dataset-and-model.md).")
     data = json.loads(METRICS_PATH.read_text(encoding="utf-8"))

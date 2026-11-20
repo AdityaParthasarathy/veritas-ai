@@ -28,11 +28,13 @@ OOD_SAMPLES = BACKEND_DIR / "data" / "evaluation" / "ood_samples.json"
 
 
 def main() -> None:
+    """Fit the profile, evaluate it, and write the profile and summary files."""
     vectorizer = joblib.load(ARTIFACT_DIR / f"{VARIANT}_tfidf_vectorizer.joblib")
     cleaned, _ = clean(load_raw(RAW_CSV))
     parts = split(cleaned, seed=SEED)
 
     def vectors(texts):
+        """TF-IDF vectors of source-masked texts."""
         return vectorizer.transform([mask_source_cues(t) for t in texts])
 
     train_x = vectors(parts["train"]["content"])

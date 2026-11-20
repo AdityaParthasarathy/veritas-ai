@@ -41,6 +41,7 @@ class Embedder:
 
     @property
     def dimension(self) -> int:
+        """Size of the embedding vectors."""
         return int(self._model.get_embedding_dimension())
 
     def encode(self, texts: list[str]) -> np.ndarray:

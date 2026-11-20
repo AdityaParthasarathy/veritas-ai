@@ -105,10 +105,12 @@ class AnalysisService:
 
     @property
     def evidence(self):
+        """The loaded evidence service (loads components on first use)."""
         self._load()
         return self._evidence
 
     def analyze(self, request: AnalysisRequest) -> AnalysisResponse:
+        """Run classification, signals, evidence retrieval and the uncertainty assessment."""
         from app.ml.signals import compute_signals
 
         self._load()
@@ -162,6 +164,7 @@ class AnalysisService:
         )
 
     def list_passages(self, topic: str | None = None) -> EvidenceListResponse:
+        """List the reference collection, optionally filtered by topic."""
         service = self.evidence
         passages = [
             EvidenceHitOut(id=p["id"], score=0.0, relevant=False, topic=p["topic"], passage=p["passage"],
@@ -176,6 +179,7 @@ class AnalysisService:
         )
 
     def search_passages(self, query: str, top_k: int) -> EvidenceSearchResponse:
+        """Semantic search over the reference collection."""
         hits = self.evidence.search(query, top_k=top_k)
         return EvidenceSearchResponse(query=query, relevance_threshold=RELEVANCE_THRESHOLD, hits=[EvidenceHitOut(**asdict(h)) for h in hits])
 

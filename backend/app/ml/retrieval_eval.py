@@ -35,10 +35,12 @@ _SENTENCES = re.compile(r"(?<=[.!?])\s+")
 
 
 def split_of(query: str) -> str:
+    """Assign a query to the dev or test half by hash."""
     return "dev" if int(hashlib.md5(query.encode("utf-8"), usedforsecurity=False).hexdigest(), 16) % 2 == 0 else "test"
 
 
 def metrics(rows: list[dict], threshold: float) -> dict:
+    """Strict precision, recall and F1 of the relevance decision at ``threshold``."""
     tp = fp = fn = 0
     neg = [r for r in rows if not r["expected"]]
     for r in rows:
@@ -64,6 +66,7 @@ def metrics(rows: list[dict], threshold: float) -> dict:
 
 
 def main() -> None:
+    """Run the evaluation and write the results file."""
     queries = json.loads(EVAL_PATH.read_text(encoding="utf-8"))["queries"]
     service = EvidenceService(Embedder())
     ids = {p["id"] for p in service.passages}

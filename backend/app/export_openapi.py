@@ -14,12 +14,14 @@ OPENAPI_PATH = REPO_ROOT / "docs" / "openapi.json"
 
 
 def build_spec() -> dict:
+    """Return the application's OpenAPI specification as a dict."""
     from app.main import app
 
     return app.openapi()
 
 
 def main() -> None:
+    """Write the specification to docs/openapi.json."""
     OPENAPI_PATH.write_text(json.dumps(build_spec(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"wrote {OPENAPI_PATH}")
 

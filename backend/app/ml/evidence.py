@@ -46,6 +46,7 @@ class EvidenceService:
                            p["source_org"], p["source_title"], p["source_url"], matched)
 
     def search(self, query: str, top_k: int = 5) -> list[EvidenceHit]:
+        """Return the ``top_k`` passages most similar in meaning to ``query``."""
         return [self._hit(h.index, h.score) for h in self._index.search(query, top_k=top_k)]
 
     def retrieve_for_article(self, title: str, sentences: list[str], top_k: int = 3) -> list[EvidenceHit]:

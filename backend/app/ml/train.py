@@ -118,6 +118,7 @@ def run_variant(name: str, parts: dict, transform) -> dict:
 
 
 def main() -> None:
+    """Clean, split, train both variants and write the metrics file."""
     raw = load_raw(RAW_CSV)
     cleaned, report = clean(raw)
     parts = split(cleaned, seed=SEED)  # raises on any cross-split leakage

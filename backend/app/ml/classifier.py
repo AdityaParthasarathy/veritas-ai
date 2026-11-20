@@ -52,6 +52,7 @@ class StyleClassifier:
         return None
 
     def predict(self, title: str, text: str) -> ClassifierResult:
+        """Score text: the probability of the 'unreliable' label plus its similarity to the training data."""
         content = f"{title.strip()}. {text.strip()}".strip(" .")[:MAX_CHARS]
         features = self._vectorizer.transform([mask_source_cues(content)])
         p_unreliable = float(self._model.predict_proba(features)[0][1])

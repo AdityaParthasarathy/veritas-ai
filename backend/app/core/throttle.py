@@ -37,10 +37,12 @@ class LoginThrottle:
                 raise TooManyRequestsException(int(self._window - (now - attempts[0])) + 1)
 
     def record_failure(self, key: str) -> None:
+        """Record a failed attempt for ``key``."""
         with self._lock:
             self._prune(key, time.monotonic()).append(time.monotonic())
 
     def reset(self, key: str | None = None) -> None:
+        """Forget failures for one key, or for all keys when ``key`` is None."""
         with self._lock:
             if key is None:
                 self._failures.clear()
@@ -72,5 +74,6 @@ class RateLimiter:
             hits.append(now)
 
     def reset(self) -> None:
+        """Forget all recorded requests."""
         with self._lock:
             self._hits.clear()

@@ -41,6 +41,7 @@ def _to_item(analysis: Analysis) -> HistoryItem:
 
 
 def list_history(db: Session, user: User, limit: int, offset: int) -> HistoryPage:
+    """Return a page of the user's saved analyses."""
     rows, total = analysis_repository.list_for_user(db, user.id, limit, offset)
     return HistoryPage(items=[_to_item(r) for r in rows], total=total, limit=limit, offset=offset)
 
@@ -54,6 +55,7 @@ def _get_owned(db: Session, user: User, analysis_id: uuid.UUID) -> Analysis:
 
 
 def get_analysis(db: Session, user: User, analysis_id: uuid.UUID) -> StoredAnalysis:
+    """Return a saved analysis the user owns, or raise not-found."""
     a = _get_owned(db, user, analysis_id)
     return StoredAnalysis(
         id=a.id, title=a.title, text=a.text, created_at=a.created_at,
@@ -62,4 +64,5 @@ def get_analysis(db: Session, user: User, analysis_id: uuid.UUID) -> StoredAnaly
 
 
 def delete_analysis(db: Session, user: User, analysis_id: uuid.UUID) -> None:
+    """Delete a saved analysis the user owns, or raise not-found."""
     analysis_repository.delete(db, _get_owned(db, user, analysis_id))

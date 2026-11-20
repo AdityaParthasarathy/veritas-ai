@@ -36,9 +36,16 @@ function Invoke-Step($label, [scriptblock]$action) {
     if ($LASTEXITCODE -ne 0) { throw "Step failed: $label" }
 }
 
+# Runs a probe command and returns $true when it exits with 0. Windows PowerShell 5.1 turns native stderr output
+# into a terminating error while $ErrorActionPreference is "Stop", so the preference is relaxed just for the probe.
+function Test-Probe([scriptblock]$probe) {
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try { & $probe *> $null; return ($LASTEXITCODE -eq 0) } finally { $ErrorActionPreference = $previous }
+}
+
 # 1. spaCy model
-& $python -c "import spacy; spacy.load('en_core_web_sm')" 2>$null
-if ($LASTEXITCODE -ne 0) {
+if (-not (Test-Probe { & $python -c "import spacy; spacy.load('en_core_web_sm')" })) {
     Invoke-Step "Installing the spaCy model en_core_web_sm" { & $python -m pip install $spacyWheel }
 } else { Write-Host "==> spaCy model already installed" }
 

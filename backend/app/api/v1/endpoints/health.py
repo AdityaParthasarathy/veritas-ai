@@ -19,6 +19,7 @@ router = APIRouter(prefix="/health", tags=["Health & Diagnostics"])
     description="Reports whether the analysis models are loaded. Never depends on the database; does not trigger loading.",
 )
 def get_models_status() -> dict:
+    """Report whether the ML components are loaded, without triggering loading."""
     from app.services.analysis_service import get_analysis_service
 
     service = get_analysis_service()

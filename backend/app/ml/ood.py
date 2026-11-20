@@ -38,15 +38,18 @@ class DomainProfile:
         return float(np.asarray(features @ self.centroid).ravel()[0])
 
     def is_in_domain(self, similarity: float) -> bool:
+        """True when the similarity is at or above the threshold."""
         return similarity >= self.threshold
 
     def save(self, directory: Path = ARTIFACT_DIR) -> Path:
+        """Write the profile to ``directory`` and return its path."""
         path = directory / PROFILE_NAME
         joblib.dump({"centroid": self.centroid.astype(np.float32), "threshold": self.threshold, "percentile": self.percentile}, path, compress=3)
         return path
 
     @classmethod
     def load(cls, directory: Path = ARTIFACT_DIR) -> "DomainProfile | None":
+        """Load a saved profile, or return None when it has not been created."""
         path = directory / PROFILE_NAME
         if not path.exists():
             return None
@@ -63,5 +66,6 @@ def fit_profile(train_matrix, validation_matrix, percentile: float = THRESHOLD_P
 
 
 def load_check_summary(directory: Path = ARTIFACT_DIR) -> dict | None:
+    """Load the saved domain-check evaluation summary, if present."""
     path = directory / "domain_check.json"
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None

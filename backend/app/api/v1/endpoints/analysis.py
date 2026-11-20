@@ -37,6 +37,7 @@ Service = Annotated[AnalysisService, Depends(get_analysis_service)]
     ),
 )
 def analyze_text(payload: AnalysisRequest, service: Service, db: DbSession, user: OptionalUser) -> AnalysisResponse:
+    """Analyze submitted text; saved to the signed-in user's history when a valid token is sent."""
     result = service.analyze(payload)
     if user is not None:
         result.analysis_id = history_service.save(db, user, payload, result)
@@ -57,6 +58,7 @@ url_rate_limiter = RateLimiter(settings.URL_RATE_LIMIT_PER_MINUTE, 60)
     ),
 )
 def analyze_url(payload: UrlAnalysisRequest, request: Request, service: Service, db: DbSession, user: OptionalUser) -> AnalysisResponse:
+    """Fetch a public article URL safely, extract its text, then run the standard analysis."""
     url_rate_limiter.hit(request.client.host if request.client else "unknown")
     article = url_ingest.ingest_url(payload.url)
     result = service.analyze(AnalysisRequest(title=article.title, text=article.text))
@@ -68,6 +70,7 @@ def analyze_url(payload: UrlAnalysisRequest, request: Request, service: Service,
 
 @evidence_router.get("/passages", response_model=EvidenceListResponse, summary="List the reference collection")
 def list_passages(service: Service, topic: str | None = Query(default=None, max_length=50)) -> EvidenceListResponse:
+    """List the reference collection, optionally filtered by topic."""
     return service.list_passages(topic)
 
 
@@ -77,4 +80,5 @@ def search_passages(
     q: str = Query(..., min_length=3, max_length=500),
     top_k: int = Query(default=5, ge=1, le=10),
 ) -> EvidenceSearchResponse:
+    """Return the reference passages most similar in meaning to the query."""
     return service.search_passages(q, top_k)

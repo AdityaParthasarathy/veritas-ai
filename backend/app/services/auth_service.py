@@ -27,6 +27,7 @@ def _issue_token(user: User) -> TokenResponse:
 
 
 def register(db: Session, data: RegisterRequest) -> TokenResponse:
+    """Create an account (409 if the email exists) and issue a token."""
     if user_repository.get_by_email(db, data.email):
         raise ConflictException("An account with this email already exists")
     try:
@@ -40,6 +41,7 @@ def register(db: Session, data: RegisterRequest) -> TokenResponse:
 
 
 def login(db: Session, data: LoginRequest, client_ip: str) -> TokenResponse:
+    """Check credentials with throttling and issue a token."""
     key = f"{client_ip}|{data.email}"
     login_throttle.check(key)
 
