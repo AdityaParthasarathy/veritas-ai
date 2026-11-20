@@ -6,7 +6,7 @@ from pathlib import Path
 from app.core.exceptions import ModelUnavailableException
 from app.schemas.performance import Limitation, PerformanceResponse, VariantPerformance
 
-METRICS_PATH = Path(__file__).resolve().parents[2] / "ml_artifacts" / "metrics.json"
+from app.ml.paths import METRICS_PATH  # noqa: E402
 
 VARIANT_DESCRIPTIONS = {
     "baseline": "Cleaned text as-is.",

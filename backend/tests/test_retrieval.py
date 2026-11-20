@@ -6,9 +6,9 @@ These tests use the locally downloaded models and skip (not fail) if they are ab
 import numpy as np
 import pytest
 
-from app.ml.retrieval import DEFAULT_MODEL_DIR
+from tests.ml_support import needs_models
 
-pytestmark = pytest.mark.skipif(not DEFAULT_MODEL_DIR.exists(), reason="embedding model not downloaded")
+pytestmark = needs_models
 
 PASSAGES = [
     "Vaccines train the immune system to recognise a pathogen without causing the disease.",

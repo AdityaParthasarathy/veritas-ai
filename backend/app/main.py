@@ -4,6 +4,7 @@ Configures application lifespan, CORS, middleware, custom error handling,
 and mounts versioned API routers.
 """
 
+import threading
 from contextlib import asynccontextmanager
 import logging
 from typing import AsyncGenerator
@@ -28,6 +29,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager for startup and shutdown routines."""
     logger.info("Starting up %s (Version: %s)...", settings.PROJECT_NAME, settings.VERSION)
     logger.info("Allowed CORS origins: %s", settings.cors_origins)
+    if settings.PRELOAD_MODELS:
+        # Background thread: the API accepts requests immediately; analysis requests wait on the same lock.
+        from app.services.analysis_service import get_analysis_service
+
+        threading.Thread(target=get_analysis_service().preload, name="ml-preload", daemon=True).start()
     yield
     logger.info("Shutting down %s...", settings.PROJECT_NAME)
 
@@ -54,6 +60,30 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
+
+
+MAX_BODY_BYTES = 1_000_000  # request bodies are small JSON documents (analysis text is capped at 20k chars)
+
+
+@app.middleware("http")
+async def security_middleware(request: Request, call_next):
+    """Reject oversized bodies and add defensive response headers."""
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > MAX_BODY_BYTES:
+        return JSONResponse(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            content={"error": {"code": "PAYLOAD_TOO_LARGE", "message": "Request body is too large", "details": {}}},
+        )
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if request.url.path.startswith("/api/"):
+        # JSON API: never cache (auth and user data) and never render as a document.
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+    return response
 
 
 # Global Exception Handlers

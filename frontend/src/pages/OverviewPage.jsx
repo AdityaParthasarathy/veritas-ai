@@ -13,13 +13,15 @@ const IMPLEMENTED = [
   'TF-IDF + Logistic Regression classifier trained on WELFake',
   'Linguistic signals, reference-passage retrieval and uncertainty (Analyze Content)',
   'Curated reference collection with source links (Evidence Explorer)',
-  'Accounts, saved analysis history and per-user access control',
+  'Analyze pasted text or a public article URL (SSRF-protected fetching and extraction)',
+  'Accounts, saved analysis history, password change and account deletion',
   'Model performance and dataset limitations, served from the saved training metrics',
 ]
 
 const UPCOMING = [
-  ['URL analysis', 'Not planned yet'],
-  ['Password change and account deletion', 'Not planned yet'],
+  ['Email verification and password reset', 'Not built'],
+  ['Fine-tuned transformer classifier', 'Not built'],
+  ['Larger reference collection', 'Not built'],
 ]
 
 export default function OverviewPage() {
@@ -30,7 +32,7 @@ export default function OverviewPage() {
       <PageHeader
         title="Misinformation intelligence, grounded in evidence"
         description="VERITAS AI separates machine-learning classification from independently retrieved evidence. A model prediction is a signal, never proof that content is true or false."
-        action={<StatusBadge tone="accent">Phase 4 · Accounts & Metrics</StatusBadge>}
+        action={<StatusBadge tone="accent">Release 1.0</StatusBadge>}
       />
 
       <div className="grid gap-5 lg:grid-cols-5">

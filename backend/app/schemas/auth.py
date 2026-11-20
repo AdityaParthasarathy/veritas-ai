@@ -9,6 +9,15 @@ MIN_PASSWORD_LENGTH = 10
 MAX_PASSWORD_BYTES = 72  # bcrypt ignores anything beyond 72 bytes
 
 
+def validate_new_password(value: str) -> str:
+    """Shared password rules (length is checked by the field constraints)."""
+    if len(value.encode("utf-8")) > MAX_PASSWORD_BYTES:
+        raise ValueError(f"password must be at most {MAX_PASSWORD_BYTES} bytes")
+    if value.strip() != value or not value.strip():
+        raise ValueError("password must not start or end with whitespace")
+    return value
+
+
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=MIN_PASSWORD_LENGTH, max_length=128)
@@ -16,12 +25,8 @@ class RegisterRequest(BaseModel):
 
     @field_validator("password")
     @classmethod
-    def _password_fits_bcrypt(cls, value: str) -> str:
-        if len(value.encode("utf-8")) > MAX_PASSWORD_BYTES:
-            raise ValueError(f"password must be at most {MAX_PASSWORD_BYTES} bytes")
-        if value.strip() != value or not value.strip():
-            raise ValueError("password must not start or end with whitespace")
-        return value
+    def _password_rules(cls, value: str) -> str:
+        return validate_new_password(value)
 
     @field_validator("email")
     @classmethod
@@ -37,6 +42,20 @@ class LoginRequest(BaseModel):
     @classmethod
     def _lower_email(cls, value: str) -> str:
         return value.lower()
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=1, max_length=128)
+    new_password: str = Field(..., min_length=MIN_PASSWORD_LENGTH, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def _password_rules(cls, value: str) -> str:
+        return validate_new_password(value)
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=128)
 
 
 class UserOut(BaseModel):

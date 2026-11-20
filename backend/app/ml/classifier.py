@@ -10,7 +10,7 @@ import joblib
 
 from app.ml.data import MAX_CHARS, mask_source_cues
 
-ARTIFACT_DIR = Path(__file__).resolve().parents[2] / "ml_artifacts"
+from app.ml.paths import ARTIFACT_DIR  # noqa: E402
 VARIANT = "source_masked"  # less dependent on publisher shortcuts than the plain baseline
 
 

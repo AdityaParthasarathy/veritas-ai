@@ -14,6 +14,18 @@ router = APIRouter(prefix="/health", tags=["Health & Diagnostics"])
 
 
 @router.get(
+    "/models",
+    summary="ML component status",
+    description="Reports whether the analysis models are loaded. Never depends on the database; does not trigger loading.",
+)
+def get_models_status() -> dict:
+    from app.services.analysis_service import get_analysis_service
+
+    service = get_analysis_service()
+    return {"status": service.status, "load_seconds": service.load_seconds}
+
+
+@router.get(
     "/live",
     response_model=LiveHealthResponse,
     status_code=status.HTTP_200_OK,

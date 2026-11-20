@@ -49,3 +49,28 @@ class LoginThrottle:
 
 
 login_throttle = LoginThrottle()
+
+
+class RateLimiter:
+    """Sliding-window request limiter (in memory, per process; see module note)."""
+
+    def __init__(self, max_requests: int, window_seconds: int = 60) -> None:
+        self._max = max_requests
+        self._window = window_seconds
+        self._hits: dict[str, deque[float]] = defaultdict(deque)
+        self._lock = threading.Lock()
+
+    def hit(self, key: str) -> None:
+        """Record a request for ``key`` or raise TooManyRequestsException."""
+        now = time.monotonic()
+        with self._lock:
+            hits = self._hits[key]
+            while hits and now - hits[0] > self._window:
+                hits.popleft()
+            if len(hits) >= self._max:
+                raise TooManyRequestsException(int(self._window - (now - hits[0])) + 1)
+            hits.append(now)
+
+    def reset(self) -> None:
+        with self._lock:
+            self._hits.clear()

@@ -14,8 +14,9 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_MODEL_DIR = REPO_ROOT / "models" / "all-MiniLM-L6-v2"
+from app.ml.paths import EMBEDDING_MODEL_DIR
+
+DEFAULT_MODEL_DIR = EMBEDDING_MODEL_DIR
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 

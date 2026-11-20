@@ -6,13 +6,10 @@ from unittest.mock import patch
 import pytest
 
 from app.core.exceptions import ModelUnavailableException
-from app.ml.classifier import ARTIFACT_DIR
-from app.ml.evidence import COLLECTION_PATH
-from app.ml.retrieval import DEFAULT_MODEL_DIR
+from tests.ml_support import needs_models
+from app.ml.paths import EVIDENCE_COLLECTION_PATH as COLLECTION_PATH
 from app.ml.uncertainty import assess
 
-MODELS_PRESENT = DEFAULT_MODEL_DIR.exists() and (ARTIFACT_DIR / "source_masked_logreg_model.joblib").exists()
-needs_models = pytest.mark.skipif(not MODELS_PRESENT, reason="ML models/artifacts not available")
 
 CLIMATE_TEXT = (
     "NASA and NOAA scientists said on Tuesday that global average temperatures have continued to climb, according to new "

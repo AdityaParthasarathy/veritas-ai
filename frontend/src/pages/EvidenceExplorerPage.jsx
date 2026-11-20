@@ -68,7 +68,7 @@ export default function EvidenceExplorerPage() {
           <button
             type="submit"
             disabled={query.trim().length < 3}
-            className="inline-flex items-center gap-2 rounded-lg bg-veritas-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-hover disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-lg bg-veritas-primary-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-solid-hover disabled:opacity-40"
           >
             <Search className="h-4 w-4" /> Search
           </button>

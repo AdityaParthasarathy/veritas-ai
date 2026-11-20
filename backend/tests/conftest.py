@@ -20,6 +20,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
 TEST_DB_NAME = "veritas_test"
+os.environ["PRELOAD_MODELS"] = "false"  # deterministic tests; preload is tested explicitly
 
 
 def _configure_test_database() -> str:
@@ -66,6 +67,9 @@ def clean_state(migrated_test_database) -> None:
     with engine.begin() as connection:
         connection.execute(text("TRUNCATE TABLE analyses, users CASCADE"))
     login_throttle.reset()
+    from app.api.v1.endpoints import analysis as analysis_endpoint
+
+    analysis_endpoint.url_rate_limiter.reset()
 
 
 @pytest.fixture

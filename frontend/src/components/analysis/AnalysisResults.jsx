@@ -1,4 +1,4 @@
-import { AlertTriangle, BookOpenCheck, Brain, Ruler } from 'lucide-react'
+import { AlertTriangle, BookOpenCheck, Brain, Globe, Ruler } from 'lucide-react'
 import Card from '../common/Card'
 import StatusBadge from '../common/StatusBadge'
 import EvidencePassage from './EvidencePassage'
@@ -60,6 +60,34 @@ function UncertaintyCard({ uncertainty }) {
   )
 }
 
+function SourceCard({ source }) {
+  const rows = [
+    ['Domain', source.domain],
+    ['Title found', source.title],
+    ['Author found', source.author],
+    ['Published', source.published],
+  ].filter(([, value]) => value)
+  return (
+    <Card>
+      <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-veritas-text">
+        <Globe className="h-4 w-4 text-veritas-muted" strokeWidth={1.75} aria-hidden="true" />
+        Source page
+      </div>
+      <dl className="grid gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex gap-2">
+            <dt className="shrink-0 text-veritas-dim">{label}</dt>
+            <dd className="min-w-0 break-words text-veritas-text">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-3 break-all text-xs text-veritas-dim">
+        Fetched: {source.final_url}. Analysed {source.extracted_chars.toLocaleString()} characters of extracted text{source.truncated ? ' (truncated)' : ''}. Metadata is extracted automatically and may be missing or wrong. The domain says nothing by itself about reliability.
+      </p>
+    </Card>
+  )
+}
+
 export default function AnalysisResults({ result }) {
   const { classification, linguistic_signals: signals, evidence, uncertainty } = result
   const pct = Math.round(classification.probability_unreliable_style * 100)
@@ -69,6 +97,8 @@ export default function AnalysisResults({ result }) {
       <div role="note" className="rounded-lg border border-veritas-border-subtle bg-white/[0.03] px-4 py-3 text-xs leading-relaxed text-veritas-muted">
         {result.disclaimer}
       </div>
+
+      {result.source && <SourceCard source={result.source} />}
 
       <UncertaintyCard uncertainty={uncertainty} />
 

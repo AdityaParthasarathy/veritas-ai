@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # Application metadata
     PROJECT_NAME: str = "VERITAS AI"
     API_V1_STR: str = "/api/v1"
-    VERSION: str = "1.0.0-phase1"
+    VERSION: str = "1.0.0"
     ENVIRONMENT: str = Field(default="development", description="Runtime environment")
 
     # Security (required; used by JWT in a later phase)
@@ -39,6 +39,17 @@ class Settings(BaseSettings):
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     DB_POOL_TIMEOUT: int = 30
+
+    # ML runtime
+    MODELS_DIR: str | None = Field(default=None, description="Folder containing all-MiniLM-L6-v2 (default: <repo>/models)")
+    ARTIFACTS_DIR: str | None = Field(default=None, description="Folder with trained classifier files (default: backend/ml_artifacts)")
+    PRELOAD_MODELS: bool = Field(default=True, description="Load ML components in the background at startup")
+
+    # URL ingestion
+    URL_FETCH_TIMEOUT_SECONDS: float = 8.0
+    URL_MAX_BYTES: int = 5_000_000
+    URL_MAX_REDIRECTS: int = 3
+    URL_RATE_LIMIT_PER_MINUTE: int = 20
 
     # CORS
     FRONTEND_URL: str = "http://localhost:5173"

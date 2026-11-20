@@ -42,4 +42,4 @@ This checks embedding shape and normalisation, FAISS cosine search on sample pas
 
 ## What exists and what does not
 
-`backend/app/ml/retrieval.py` provides `Embedder` and `PassageIndex` (FAISS `IndexFlatIP` over normalised embeddings). The curated reference collection, the analysis API and the UI are not built yet.
+`backend/app/ml/retrieval.py` provides `Embedder` and `PassageIndex` (FAISS `IndexFlatIP` over normalised embeddings). The reference collection, analysis API, URL ingestion and UI are built on top of it; see [analysis-api.md](analysis-api.md). `backend/requirements-ci.txt` is the small subset used by CI (no PyTorch, FAISS or spaCy); tests needing the full runtime skip themselves when it is absent. In Docker, the model folder and classifier files are mounted from the host, not baked into the image.

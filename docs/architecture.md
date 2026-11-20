@@ -36,6 +36,10 @@ React (Vite)  --HTTP/JSON-->  FastAPI  -->  services  -->  SQLAlchemy  -->  Post
 
 FastAPI will gain NLP preprocessing (spaCy), ML classification, linguistic signal analysis, semantic evidence retrieval (sentence embeddings + FAISS) and uncertainty assessment. Classifier output and retrieved evidence stay separate in the API and UI: a prediction is a statistical signal and is never presented as proof of truth.
 
+## URL ingestion and runtime (Phase 5)
+
+`services/url_ingest.py` fetches user-supplied URLs behind SSRF controls and extracts the article with trafilatura (see [analysis-api.md](analysis-api.md) and [security-review.md](security-review.md)). The ML components are loaded once in a background thread at startup (`AnalysisService.preload`), guarded by a lock so concurrent requests share one load; `GET /api/v1/health/models` reports the state. Middleware adds security headers and rejects request bodies over 1 MB. The whole stack is packaged in `docker-compose.yml` ([deployment.md](deployment.md)).
+
 ## Accounts and history (Phase 4)
 
 See [auth.md](auth.md): JWT bearer authentication, optional-auth analysis endpoint that saves results for signed-in users, ownership-scoped history, and the model-performance endpoint.

@@ -69,7 +69,25 @@ class UncertaintyOut(BaseModel):
     standing_caveats: list[str]
 
 
+class UrlAnalysisRequest(BaseModel):
+    url: str = Field(..., min_length=8, max_length=2048, description="Public http(s) URL of an article")
+
+
+class SourceInfo(BaseModel):
+    """Metadata of the fetched page. Extracted automatically and may be wrong or missing."""
+
+    url: str
+    final_url: str
+    domain: str
+    title: str | None
+    author: str | None
+    published: str | None
+    extracted_chars: int
+    truncated: bool
+
+
 class AnalysisResponse(BaseModel):
+    source: SourceInfo | None = Field(default=None, description="Set when the input came from a URL")
     analysis_id: uuid.UUID | None = Field(default=None, description="Set when the analysis was saved to the signed-in user's history")
     word_count: int
     classification: ClassificationResult

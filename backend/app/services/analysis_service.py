@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import threading
+import time
 from dataclasses import asdict
 
 from app.core.exceptions import ModelUnavailableException
@@ -47,14 +48,36 @@ class AnalysisService:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._loaded = False
+        self._failed = False
+        self._loading = False
+        self.load_seconds: float | None = None
         self._nlp = None
         self._classifier = None
         self._evidence = None
 
+    @property
+    def status(self) -> str:
+        """not_loaded | loading | ready | unavailable"""
+        if self._loaded:
+            return "ready"
+        if self._loading:
+            return "loading"
+        return "unavailable" if self._failed else "not_loaded"
+
+    def preload(self) -> None:
+        """Load all components now (used at startup). Failures are logged, not raised."""
+        try:
+            self._load()
+        except ModelUnavailableException:
+            pass
+
     def _load(self) -> None:
+        self._loading = not self._loaded
         with self._lock:
             if self._loaded:
+                self._loading = False
                 return
+            started = time.monotonic()
             try:
                 import spacy
 
@@ -66,11 +89,17 @@ class AnalysisService:
                 self._classifier = StyleClassifier()
                 self._evidence = EvidenceService(Embedder())
             except Exception as exc:  # missing artifacts, models or packages
+                self._loading = False
+                self._failed = True
                 logger.error("ML components unavailable: %s", exc)
                 raise ModelUnavailableException(
                     "Analysis components are not available. Install the ML requirements, download the models and train the classifier (see docs/ml-setup.md)."
                 ) from exc
+            self._failed = False
+            self._loading = False
             self._loaded = True
+            self.load_seconds = round(time.monotonic() - started, 2)
+            logger.info("ML components loaded in %.1fs", self.load_seconds)
 
     @property
     def evidence(self):

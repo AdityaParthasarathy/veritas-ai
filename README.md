@@ -1,50 +1,88 @@
 # VERITAS AI
 
-AI-powered misinformation intelligence platform. It will analyze news text and URLs with NLP and machine learning, show model predictions separately from independently retrieved evidence, and report uncertainty. A model prediction is never presented as proof that content is true or false.
+AI-powered misinformation intelligence platform. It analyzes pasted text or a public article URL with NLP and machine learning, shows the model's output **separately** from independently retrieved reference passages, and reports uncertainty. **A model result is never proof that content is true or false.**
 
-**Status: Phases 1-4 complete: infrastructure, baseline classifier, analysis API with evidence retrieval, accounts with saved history, and a model-performance page.**
+> The classifier learns the writing style and sources of one dataset's labels. It does not fact-check. Read [docs/dataset-and-model.md](docs/dataset-and-model.md) and [docs/acceptance-report.md](docs/acceptance-report.md) for what the numbers do and do not mean.
+
+## What it does
+
+| Feature | Notes |
+| --- | --- |
+| Analyze pasted text or an article URL | URL fetching is SSRF-protected; article text and metadata are extracted automatically. |
+| Classification | TF-IDF + Logistic Regression trained on WELFake; reported as "resembles unreliable/reliable sources", not truth. |
+| Linguistic signals | Descriptive measurements (spaCy): emphasis, ALL-CAPS, sensational and hedging wording, attribution, entities, etc. |
+| Evidence retrieval | Semantic search (MiniLM + FAISS) over a small curated reference collection with verified source links. |
+| Uncertainty | Transparent rules: short text, undecided model, no related evidence. Never lower than "moderate". |
+| Accounts and history | Registration, login, saved analyses (per-user), password change, account deletion. |
+| Model Performance page | Metrics, confusion matrices, dataset cleaning and limitations, served from the saved training run. |
 
 ## Stack
 
-- Frontend: React 19, Vite, JavaScript, Tailwind CSS 3, React Router, Axios, Lucide, Recharts (reserved for later)
-- Backend: Python, FastAPI, Uvicorn, Pydantic Settings, SQLAlchemy 2, Psycopg 3, Alembic, PyJWT, Passlib + bcrypt, Pytest, HTTPX
-- Database: PostgreSQL 16 (Docker Compose)
-- Later phases: scikit-learn, Transformers, Sentence Transformers, spaCy, PyTorch, FAISS
+- Frontend: React 19, Vite, Tailwind CSS 3, React Router, Axios, Recharts, Lucide. Tests: Vitest, Testing Library, axe.
+- Backend: Python 3.13, FastAPI, Pydantic Settings, SQLAlchemy 2, Psycopg 3, Alembic, bcrypt, PyJWT, httpx, trafilatura.
+- ML: scikit-learn, spaCy, sentence-transformers (CPU PyTorch), FAISS (CPU). `transformers` is installed as a dependency of sentence-transformers; no transformer is fine-tuned.
+- Database: PostgreSQL 16. Packaging: Docker Compose. CI: GitHub Actions.
 
 ## Architecture
 
 ```
-React  ->  FastAPI (/api/v1)  ->  services  ->  SQLAlchemy  ->  PostgreSQL
+React (nginx in Docker) -> FastAPI /api/v1 -> services -> repositories (SQLAlchemy) -> PostgreSQL
+                                  |
+                                  +-- URL ingestion (SSRF-safe fetch + extraction)
+                                  +-- spaCy signals | TF-IDF classifier | MiniLM + FAISS evidence | uncertainty rules
 ```
 
-Details: [docs/architecture.md](docs/architecture.md)
+Details: [docs/architecture.md](docs/architecture.md).
 
-## Repository structure
+## Quick start with Docker (recommended)
 
-```
-frontend/   React app (components, pages, layouts, services, hooks)
-backend/    FastAPI app (api, core, database, models, schemas, services), alembic, tests
-database/   PostgreSQL init scripts
-docs/       architecture.md, setup-guide.md
-docker-compose.yml, .env.example
-```
-
-## Quick start (Windows PowerShell)
-
-Prerequisites: Python 3.11+, Node.js 20+, Docker Desktop (running), Git. Full steps: [docs/setup-guide.md](docs/setup-guide.md).
+Prerequisites: Docker Desktop (running), Git, and the ML files (see "ML files" below).
 
 ```powershell
 Copy-Item .env.example .env
-Copy-Item frontend\.env.example frontend\.env
-docker compose up -d db
-py -3 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r backend\requirements.txt
-cd backend
-python -m uvicorn app.main:app --reload --port 8000
 ```
 
-Edit `.env` first (secrets, matching DB password). In a second terminal:
+Edit `.env`: set `SECRET_KEY` and one database password (used in `POSTGRES_PASSWORD` **and** `DATABASE_URL`). Then:
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+- App: http://localhost:5173
+- API: http://localhost:8000 and Swagger at http://localhost:8000/docs
+
+The backend applies database migrations on start and loads the ML models in the background (about 15 s; `GET /api/v1/health/models` reports `loading` then `ready`). Stop with `docker compose stop`; `docker compose down` removes containers but keeps the database volume.
+
+### ML files (not in Git)
+
+The classifier files and the embedding model are large and git-ignored; compose mounts them read-only. Create them once:
+
+```powershell
+py -3 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r backend\requirements-ml.txt
+python -m pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu').save('models/all-MiniLM-L6-v2')"
+```
+
+Then download WELFake and train (about 5 minutes), following [data/README.md](data/README.md) and:
+
+```powershell
+cd backend
+python -m app.ml.train
+```
+
+Without these files the app still starts; analysis endpoints return a clear 503 and the rest works. Full details: [docs/ml-setup.md](docs/ml-setup.md).
+
+## Local development (without Docker for the app)
+
+```powershell
+docker compose up -d db
+cd backend
+python -m alembic upgrade head
+python -m uvicorn app.main:app --reload --port 8000
+```
 
 ```powershell
 cd frontend
@@ -52,65 +90,48 @@ npm install
 npm run dev
 ```
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:8000
-- Swagger: http://localhost:8000/docs
+More commands, ports and troubleshooting: [docs/setup-guide.md](docs/setup-guide.md) and [docs/deployment.md](docs/deployment.md).
 
-## Configuration
-
-| File | Purpose |
-| --- | --- |
-| `.env` (root, git-ignored) | Docker database credentials, `DATABASE_URL`, `SECRET_KEY`, CORS URLs. `DATABASE_URL` and `SECRET_KEY` are required. |
-| `frontend/.env` | `VITE_API_BASE_URL` (default `http://localhost:8000`). |
-
-If another PostgreSQL already uses port 5432, set `POSTGRES_PORT` (for example 5434) and use the same port in `DATABASE_URL`.
-
-## API
-
-| Method | Path | Description |
-| --- | --- | --- |
-| GET | `/api/v1/health/live` | Process liveness; no database dependency. |
-| GET | `/api/v1/health/ready` | Runs `SELECT 1`; 200 when connected, 503 when not. |
-| GET | `/api/v1/system/info` | Name, version, environment, docs URL. |
-| POST | `/api/v1/analysis` | Classification, linguistic signals, related evidence and uncertainty for submitted text. Saved to history when signed in. |
-| POST | `/api/v1/auth/register`, `/auth/login` | Create an account / sign in (bearer token). |
-| GET | `/api/v1/auth/me` | Current user. |
-| GET, DELETE | `/api/v1/analyses`, `/analyses/{id}` | Your saved analyses. |
-| GET | `/api/v1/models/performance` | Training metrics and dataset limitations. |
-| GET | `/api/v1/evidence/passages` | List the reference collection. |
-| GET | `/api/v1/evidence/search` | Semantic search over the reference collection. |
-
-## Tests
+## Tests and checks
 
 ```powershell
-cd backend
-python -m pytest -q
+cd backend; python -m pytest -q          # needs the database container; ML tests skip if ML files/packages are absent
+cd frontend; npm run lint; npm test; npm run build
 ```
 
-```powershell
-cd frontend
-npm run lint
-npm run build
+CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs backend tests with bandit, frontend lint/tests/build/audit, and the Docker image build.
+
+## API summary
+
+| Method | Path | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/api/v1/health/live`, `/health/ready`, `/health/models` | none | Liveness; database readiness; ML load status. |
+| GET | `/api/v1/system/info` | none | Name, version, environment. |
+| POST | `/api/v1/analysis` | optional | Analyze text. Saved when signed in. |
+| POST | `/api/v1/analysis/url` | optional | Fetch a URL, extract the article, analyze. |
+| GET | `/api/v1/evidence/passages`, `/evidence/search` | none | Browse / semantically search the reference collection. |
+| GET | `/api/v1/models/performance` | none | Metrics and dataset limitations. |
+| POST | `/api/v1/auth/register`, `/auth/login` | none | Create account / sign in. |
+| GET, DELETE | `/api/v1/auth/me` | required | Current user / delete account. |
+| POST | `/api/v1/auth/change-password` | required | Change password (revokes old tokens). |
+| GET, DELETE | `/api/v1/analyses`, `/analyses/{id}` | required | Saved analyses. |
+
+## Documentation
+
+- [docs/acceptance-report.md](docs/acceptance-report.md): requirements status, test results, unresolved issues, limitations.
+- [docs/security-review.md](docs/security-review.md): threat review and verification evidence.
+- [docs/analysis-api.md](docs/analysis-api.md), [docs/auth.md](docs/auth.md): API behaviour and design.
+- [docs/dataset-and-model.md](docs/dataset-and-model.md): dataset, training, metrics, limitations.
+- [docs/deployment.md](docs/deployment.md), [docs/setup-guide.md](docs/setup-guide.md), [docs/ml-setup.md](docs/ml-setup.md), [docs/architecture.md](docs/architecture.md).
+
+## Repository structure
+
 ```
-
-Backend tests use a separate `veritas_test` database on the same PostgreSQL server (created and migrated automatically), so start the container first. Other database commands: `docker compose ps`, `docker compose logs -f db`, `docker compose stop`.
-
-## Implementation status
-
-Done: repository structure, FastAPI app with health and system endpoints, SQLAlchemy engine/session, Alembic setup (no migrations yet), PostgreSQL container, React shell with a live status dashboard, security foundations (env config, CORS, safe errors, hashing and JWT helpers), backend tests, documentation.
-
-Phase 2 done: WELFake downloaded and documented, cleaning and leakage-safe split, TF-IDF + Logistic Regression baseline (test accuracy 0.9705, with a source-masked variant at 0.9637), saved artifacts. These scores reflect agreement with dataset labels, not factual verification; see [docs/dataset-and-model.md](docs/dataset-and-model.md).
-
-Phase 3 foundation done: CPU-only PyTorch, sentence-transformers, spaCy and FAISS installed with exact pins; MiniLM embeddings and FAISS similarity search verified by tests (see [docs/ml-setup.md](docs/ml-setup.md)).
-
-Phase 3 done: `POST /api/v1/analysis` returns a classifier result, linguistic signals, related reference passages and an uncertainty assessment as separate sections; a 34-passage curated reference collection with verified source links; Analyze Content and Evidence Explorer pages. Details and limits: [docs/analysis-api.md](docs/analysis-api.md).
-
-Phase 4 done: registration and login (bcrypt, JWT), per-user saved analysis history with ownership isolation, Alembic migration for `users` and `analyses`, and a Model Performance page (metrics, confusion matrices, dataset limitations) served from the saved training metrics. Details and trade-offs: [docs/auth.md](docs/auth.md).
-
-Not implemented: URL analysis, password reset/change, account deletion, email verification.
-
-## Roadmap
-
-1. Phase 2 (done): dataset, cleaning, baseline classifier and evaluation. Train with `cd backend; python -m pip install -r requirements-ml.txt; python -m app.ml.train`.
-2. Phase 3 (done): analysis API, linguistic signals, semantic evidence retrieval, uncertainty. Needs the ML setup in [docs/ml-setup.md](docs/ml-setup.md).
-3. Phase 4 (done): authentication, stored analyses and history, performance and limitations pages.
+frontend/   React app, tests, Dockerfile + nginx template
+backend/    FastAPI app (api, core, database, models, repositories, schemas, services, ml), alembic, tests, Dockerfile
+database/   PostgreSQL init scripts
+data/       Dataset provenance (raw CSV is git-ignored)
+docs/       Documentation
+.github/    CI workflow
+docker-compose.yml, .env.example
+```

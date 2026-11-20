@@ -4,11 +4,8 @@ import uuid
 
 import pytest
 
-from app.ml.classifier import ARTIFACT_DIR
-from app.ml.retrieval import DEFAULT_MODEL_DIR
+from tests.ml_support import needs_models
 
-MODELS_PRESENT = DEFAULT_MODEL_DIR.exists() and (ARTIFACT_DIR / "source_masked_logreg_model.joblib").exists()
-needs_models = pytest.mark.skipif(not MODELS_PRESENT, reason="ML models/artifacts not available")
 
 TEXT = (
     "NASA and NOAA scientists said on Tuesday that global average temperatures have continued to climb, according to new "

@@ -90,7 +90,13 @@ npm run build
 
 Backend tests use a separate `veritas_test` database on the same server (created and migrated automatically), so the container must be running.
 
-## 7. Troubleshooting
+## 7. Full stack in Docker
+
+See [deployment.md](deployment.md): `docker compose up -d --build` starts the database, backend and frontend; the app is at http://localhost:5173.
+
+Frontend tests: `cd frontend; npm test`. Backend tests need the database container running.
+
+## 8. Troubleshooting
 
 - `password authentication failed`: the password in `DATABASE_URL` differs from the one the volume was first created with. Align them, or reset the role password inside the container: `docker exec veritas_postgres psql -U veritas_user -d veritas_db -c "ALTER USER veritas_user PASSWORD 'new-password'"`.
 - Backend reaches the wrong database: another PostgreSQL owns port 5432. Find it with `Get-NetTCPConnection -LocalPort 5432 -State Listen` and set `POSTGRES_PORT` as above.

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { setUnauthorizedHandler } from '../services/api'
-import { fetchCurrentUser, loginUser, registerUser } from '../services/authService'
+import { changePasswordRequest, deleteAccountRequest, fetchCurrentUser, loginUser, registerUser } from '../services/authService'
 import { getToken, setToken } from '../services/tokenStore'
 
 const AuthContext = createContext(null)
@@ -50,9 +50,22 @@ export function AuthProvider({ children }) {
     [applySession],
   )
 
+  // Changing the password revokes every older token on the server and returns a fresh one.
+  const changePassword = useCallback(
+    async (currentPassword, newPassword) => applySession(await changePasswordRequest(currentPassword, newPassword)),
+    [applySession],
+  )
+  const deleteAccount = useCallback(
+    async (password) => {
+      await deleteAccountRequest(password)
+      clearSession()
+    },
+    [clearSession],
+  )
+
   const value = useMemo(
-    () => ({ user, checking, sessionExpired, login, register, logout: clearSession }),
-    [user, checking, sessionExpired, login, register, clearSession],
+    () => ({ user, checking, sessionExpired, login, register, changePassword, deleteAccount, logout: clearSession }),
+    [user, checking, sessionExpired, login, register, changePassword, deleteAccount, clearSession],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

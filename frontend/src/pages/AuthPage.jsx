@@ -94,7 +94,7 @@ export default function AuthPage({ mode }) {
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-veritas-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-hover disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-veritas-primary-solid px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-veritas-primary-solid-hover disabled:opacity-50"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
             {isRegister ? 'Create account' : 'Sign in'}

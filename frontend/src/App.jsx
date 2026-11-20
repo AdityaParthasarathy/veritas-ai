@@ -8,6 +8,7 @@ import HistoryDetailPage from './pages/HistoryDetailPage'
 import HistoryPage from './pages/HistoryPage'
 import ModelPerformancePage from './pages/ModelPerformancePage'
 import OverviewPage from './pages/OverviewPage'
+import NotFoundPage from './pages/NotFoundPage'
 import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
@@ -23,7 +24,7 @@ export default function App() {
         <Route path="history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
         <Route path="history/:id" element={<ProtectedRoute><HistoryDetailPage /></ProtectedRoute>} />
         <Route path="settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        <Route path="*" element={<OverviewPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   )

@@ -11,10 +11,11 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.ml.paths import EVIDENCE_COLLECTION_PATH
 from app.ml.retrieval import Embedder, PassageIndex
 from app.ml.uncertainty import RELEVANCE_THRESHOLD
 
-COLLECTION_PATH = Path(__file__).resolve().parents[2] / "data" / "evidence" / "reference_passages.json"
+COLLECTION_PATH = EVIDENCE_COLLECTION_PATH
 MAX_QUERY_SENTENCES = 8
 MIN_SENTENCE_WORDS = 6
 

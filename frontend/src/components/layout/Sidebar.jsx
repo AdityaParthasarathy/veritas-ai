@@ -9,8 +9,9 @@ export default function Sidebar({ open, onNavigate }) {
   const navigate = useNavigate()
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-veritas-border-subtle bg-veritas-secondary/95 backdrop-blur transition-transform duration-200 lg:translate-x-0 ${
-        open ? 'translate-x-0' : '-translate-x-full'
+      id="primary-navigation"
+      className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-veritas-border-subtle bg-veritas-secondary/95 backdrop-blur transition-[transform,visibility] duration-200 lg:visible lg:translate-x-0 ${
+        open ? 'visible translate-x-0' : 'invisible -translate-x-full'
       }`}
     >
       <div className="flex h-16 items-center px-5">

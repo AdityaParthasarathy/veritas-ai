@@ -5,12 +5,20 @@
 | Method | Path | Purpose |
 | --- | --- | --- |
 | POST | `/analysis` | Analyze `{ "title"?: str, "text": str }` (text 20 to 20,000 characters). |
+| POST | `/analysis/url` | Analyze `{ "url": str }`: the server fetches the page, extracts the article, then runs the same analysis. Response adds a `source` object. |
+| GET | `/health/models` | ML load status: `not_loaded`, `loading`, `ready` or `unavailable`. |
 | GET | `/evidence/passages?topic=` | List the reference collection. |
 | GET | `/evidence/search?q=&top_k=` | Semantic search over the collection (`q` 3 to 500 chars, `top_k` 1 to 10). |
 
-Errors use the standard envelope. Invalid input returns 422 `VALIDATION_ERROR`. If the ML components are not installed or trained, the API returns 503 `MODEL_UNAVAILABLE` with a generic message. The first analysis request loads the models (a few seconds); later requests reuse them. Analyses are not stored yet (history arrives with authentication).
+Errors use the standard envelope. Invalid input returns 422 `VALIDATION_ERROR`. If the ML components are not installed or trained, the API returns 503 `MODEL_UNAVAILABLE` with a generic message. The models are loaded in a background thread at startup (`PRELOAD_MODELS`, about 15 s); a request that arrives while they are still loading waits for the load to finish, and later requests reuse them. Analyses are not stored yet (history arrives with authentication).
 
-URL submission is **not** implemented. Fetching arbitrary URLs from the server needs SSRF protection and article extraction, which are left for a later phase.
+## URL analysis
+
+`POST /analysis/url` fetches a public page and analyses the extracted article. The fetch is SSRF-protected: http/https on ports 80/443 only, no URL credentials, the server resolves the host and refuses unless **every** address is public, connects to the vetted IP (TLS still verified against the host name), follows at most 3 redirects and revalidates each hop, ignores proxy settings and cookies, accepts only HTML or plain text, and caps the download at 5 MB and 20 s. Requests are limited to 20 per minute per IP. Extraction uses trafilatura; the `source` object (`domain`, `final_url`, `title`, `author`, `published`, `extracted_chars`, `truncated`) is **automatic and can be wrong or missing**. Text is truncated to 20,000 characters.
+
+Error codes (all with safe messages): `URL_BLOCKED` (private, local or reserved address, or a non-standard port; 422), `URL_REJECTED` (malformed or non-http URL; 422), `URL_UNSUPPORTED_CONTENT` and `URL_TOO_LARGE` (422), `EXTRACTION_FAILED` (paywalled, script-rendered or non-article page; 422), `URL_FETCH_FAILED` (DNS, timeout or HTTP error from the remote site; 502), `TOO_MANY_REQUESTS` (429). Details and tests: [security-review.md](security-review.md).
+
+Known limitation: the page's domain says nothing about reliability, and encyclopedic or other non-news text is outside the classifier's training domain (see the acceptance report for a measured example).
 
 ## Response sections (kept separate on purpose)
 

@@ -1,0 +1,8 @@
+# Minimal set used by CI: core backend plus the data-science libraries imported by app.ml.data.
+# Tests that need PyTorch, the MiniLM model or the trained classifier skip themselves when those
+# (large, git-ignored) files are absent; run the full suite locally after following docs/ml-setup.md.
+-r requirements.txt
+pandas==3.1.1
+scikit-learn==1.9.1
+joblib==1.6.0
+numpy==2.5.5

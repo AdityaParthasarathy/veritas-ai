@@ -87,7 +87,7 @@ def test_successful_login_resets_failure_count(client):
 
 
 def _token(sub: str, **overrides) -> str:
-    claims = {"sub": sub, "type": "access", "exp": datetime.now(timezone.utc) + timedelta(minutes=5), **overrides}
+    claims = {"sub": sub, "type": "access", "tv": 0, "exp": datetime.now(timezone.utc) + timedelta(minutes=5), **overrides}
     return jwt.encode(claims, settings.secret_key, algorithm=settings.ALGORITHM)
 
 
@@ -110,3 +110,79 @@ def test_unsigned_token_is_rejected(client, make_user):
     _, user = make_user()
     none_token = jwt.encode({"sub": user["id"], "type": "access"}, key=None, algorithm="none")
     assert client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {none_token}"}).status_code == 401
+
+
+# ---- password change and account deletion ---------------------------------------------------------
+NEW_PASSWORD = "another-strong-passphrase"
+
+
+def test_change_password_invalidates_old_tokens_and_returns_a_working_one(client, make_user):
+    headers, user = make_user("c@example.com")
+    r = client.post("/api/v1/auth/change-password", headers=headers, json={"current_password": PASSWORD, "new_password": NEW_PASSWORD})
+    assert r.status_code == 200
+    new_headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    assert client.get("/api/v1/auth/me", headers=headers).status_code == 401  # old token revoked
+    assert client.get("/api/v1/auth/me", headers=new_headers).status_code == 200
+    assert client.post("/api/v1/auth/login", json={"email": "c@example.com", "password": PASSWORD}).status_code == 401
+    assert client.post("/api/v1/auth/login", json={"email": "c@example.com", "password": NEW_PASSWORD}).status_code == 200
+
+
+def test_change_password_requires_correct_current_password(client, make_user):
+    headers, _ = make_user()
+    r = client.post("/api/v1/auth/change-password", headers=headers, json={"current_password": "wrong-password!", "new_password": NEW_PASSWORD})
+    assert r.status_code == 401 and r.json()["error"]["message"] == "Incorrect password"
+    assert client.get("/api/v1/auth/me", headers=headers).status_code == 200  # token still valid
+
+
+@pytest.mark.parametrize("new_password", ["short", "x" * 73, " leading-space-pw", PASSWORD])
+def test_change_password_validates_new_password(client, make_user, new_password):
+    headers, _ = make_user()
+    r = client.post("/api/v1/auth/change-password", headers=headers, json={"current_password": PASSWORD, "new_password": new_password})
+    assert r.status_code in (409, 422)
+
+
+def test_change_password_requires_authentication(client):
+    r = client.post("/api/v1/auth/change-password", json={"current_password": PASSWORD, "new_password": NEW_PASSWORD})
+    assert r.status_code == 401
+
+
+def test_repeated_wrong_current_passwords_are_throttled(client, make_user):
+    headers, _ = make_user()
+    for _ in range(MAX_FAILURES):
+        client.post("/api/v1/auth/change-password", headers=headers, json={"current_password": "wrong-password!", "new_password": NEW_PASSWORD})
+    r = client.post("/api/v1/auth/change-password", headers=headers, json={"current_password": PASSWORD, "new_password": NEW_PASSWORD})
+    assert r.status_code == 429
+
+
+def test_delete_account_removes_user_and_all_their_data(client, make_user):
+    from sqlalchemy import text
+
+    from app.database.session import engine
+
+    headers, user = make_user("gone@example.com")
+    other, _ = make_user("stays@example.com")
+    with engine.begin() as c:
+        for owner, label in ((user["id"], "mine"), (None, "theirs")):
+            uid = owner or c.execute(text("SELECT id FROM users WHERE email='stays@example.com'")).scalar()
+            c.execute(
+                text("INSERT INTO analyses (id, user_id, text, word_count, classifier_label, probability_unreliable, uncertainty_level, result, created_at) "
+                     "VALUES (gen_random_uuid(), :u, :t, 1, 'x', 0.5, 'moderate', '{}'::jsonb, now())"),
+                {"u": uid, "t": label},
+            )
+    r = client.request("DELETE", "/api/v1/auth/me", headers=headers, json={"password": PASSWORD})
+    assert r.status_code == 204
+    assert client.get("/api/v1/auth/me", headers=headers).status_code == 401
+    assert client.post("/api/v1/auth/login", json={"email": "gone@example.com", "password": PASSWORD}).status_code == 401
+    with engine.connect() as c:
+        assert c.execute(text("SELECT count(*) FROM analyses WHERE text='mine'")).scalar() == 0
+        assert c.execute(text("SELECT count(*) FROM analyses WHERE text='theirs'")).scalar() == 1
+    assert client.get("/api/v1/auth/me", headers=other).status_code == 200
+
+
+def test_delete_account_needs_the_right_password(client, make_user):
+    headers, _ = make_user()
+    wrong = client.request("DELETE", "/api/v1/auth/me", headers=headers, json={"password": "wrong-password!"})
+    assert wrong.status_code == 401
+    assert client.request("DELETE", "/api/v1/auth/me", json={"password": PASSWORD}).status_code == 401
+    assert client.request("DELETE", "/api/v1/auth/me", headers=headers, json={}).status_code == 422
+    assert client.get("/api/v1/auth/me", headers=headers).status_code == 200

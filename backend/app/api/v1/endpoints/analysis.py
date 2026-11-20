@@ -1,17 +1,23 @@
 """Content analysis and evidence endpoints."""
 
+from dataclasses import asdict
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
 from app.api.deps import DbSession, OptionalUser
 from app.services import history_service
+from app.core.config import settings
+from app.core.throttle import RateLimiter
 from app.schemas.analysis import (
+    SourceInfo,
+    UrlAnalysisRequest,
     AnalysisRequest,
     AnalysisResponse,
     EvidenceListResponse,
     EvidenceSearchResponse,
 )
+from app.services import url_ingest
 from app.services.analysis_service import AnalysisService, get_analysis_service
 
 analysis_router = APIRouter(prefix="/analysis", tags=["Analysis"])
@@ -34,6 +40,29 @@ def analyze_text(payload: AnalysisRequest, service: Service, db: DbSession, user
     result = service.analyze(payload)
     if user is not None:
         result.analysis_id = history_service.save(db, user, payload, result)
+    return result
+
+
+url_rate_limiter = RateLimiter(settings.URL_RATE_LIMIT_PER_MINUTE, 60)
+
+
+@analysis_router.post(
+    "/url",
+    response_model=AnalysisResponse,
+    summary="Fetch an article from a URL and analyze it",
+    description=(
+        "Fetches a public http(s) page with SSRF protections (public addresses only, standard ports, size/time limits, "
+        "revalidated redirects), extracts the article text and metadata, then runs the same analysis as POST /analysis. "
+        "Extracted metadata is automatic and may be incomplete or wrong."
+    ),
+)
+def analyze_url(payload: UrlAnalysisRequest, request: Request, service: Service, db: DbSession, user: OptionalUser) -> AnalysisResponse:
+    url_rate_limiter.hit(request.client.host if request.client else "unknown")
+    article = url_ingest.ingest_url(payload.url)
+    result = service.analyze(AnalysisRequest(title=article.title, text=article.text))
+    result.source = SourceInfo(**{k: v for k, v in asdict(article).items() if k != "text"})
+    if user is not None:
+        result.analysis_id = history_service.save(db, user, AnalysisRequest(title=article.title, text=article.text), result)
     return result
 
 
