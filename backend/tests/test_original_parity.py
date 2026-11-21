@@ -29,8 +29,15 @@ def _manifest() -> dict[str, str]:
     return {line.split("  ", 1)[1]: line.split("  ", 1)[0] for line in lines if line and not line.startswith("#")}
 
 
+CRLF, LF = bytes([13, 10]), bytes([10])
+
+
 def _sha256(relative: str) -> str:
-    return hashlib.sha256((BACKEND_DIR / relative).read_bytes()).hexdigest()
+    """SHA-256 as recorded in the manifest: binary files exactly, text files after normalising CRLF to LF."""
+    data = (BACKEND_DIR / relative).read_bytes()
+    if not relative.endswith(".joblib"):
+        data = data.replace(CRLF, LF)  # Windows checkouts convert line endings; the repository stores LF
+    return hashlib.sha256(data).hexdigest()
 
 
 def test_artefacts_match_the_recorded_sha256_manifest():

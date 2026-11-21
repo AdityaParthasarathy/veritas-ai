@@ -5,7 +5,7 @@
   "source_masked_domain_profile.joblib": "8b2ca7d1a7bcc115990f0f21df6efed194019d058395b32f32933d04be195559",
   "source_masked_logreg_model.joblib": "4cc204adc4544c8e61d6518ffeda2b7316c8fc5527a90847509b3893386d8226",
   "source_masked_tfidf_vectorizer.joblib": "ca26bd84f503c408f3155cfc7f8f60fae556fc7f6e21828f4967267a477e3bd6",
-  "reference_passages.json": "ba83ea219b61ee5e98c9865f52d4b8d53124e73cb5782cb95a8e051f615a02ec"
+  "reference_passages.json": "9d87ed8997c17c42664633515458a4ac9e5a14f515b341144f771dcf51ed4279"
  },
  "cases": [
   {
@@ -422,5 +422,6 @@
     "first_second_person": 0.0
    }
   }
- ]
+ ],
+ "artefact_sha256_note": "Binary files hashed exactly; text files hashed after normalising CRLF to LF (identical to the blobs on main)."
 }

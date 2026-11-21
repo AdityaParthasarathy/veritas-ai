@@ -24,5 +24,8 @@ cd frontend; npm run lint; npm test; npm run build
 ```
 The backend tests include the original-parity tests (classifier outputs and SHA-256 hashes against the original `main` pipeline). Tests that need the analysis runtime skip when spaCy, its model or the classifier files are missing.
 
+## Changing dependencies
+Edit `backend/requirements.in`, then regenerate the pinned `backend/requirements.txt` with the `uv pip compile` command in its header (Linux, Python 3.13). Do not hand-edit the generated file.
+
 ## Retraining (optional)
 `python -m app.ml.train` and `python -m app.ml.domain_profile` need `data/raw/WELFake_Dataset.csv` (see [../data/README.md](../data/README.md)). Do not retrain for the Vercel edition: the committed artefacts are the originals and are hash-checked. Re-run `python -m app.ml.lexical_eval` only if the reference passages change.
