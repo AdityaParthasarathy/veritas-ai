@@ -1,11 +1,13 @@
-import { BarChart3, BookOpen, ScanSearch } from 'lucide-react'
+import { BarChart3, BookOpen, FolderClock, LibraryBig, ScanSearch, Settings } from 'lucide-react'
 
-/** Primary destinations. Paths are the application's routes and must not change. */
+/** Primary destinations. Paths are the application's routes. */
 export const NAV_ITEMS = [
   { to: '/analyze', label: 'Investigate', hint: 'Analyze text or an article URL', icon: ScanSearch },
-  { to: '/evidence', label: 'Library', hint: 'The reference passages and their sources', icon: BookOpen },
-  { to: '/performance', label: 'Method', hint: 'Model metrics and what they do not mean', icon: BarChart3 },
+  { to: '/casebook', label: 'Casebook', hint: 'Invented example investigations you can reproduce', icon: BookOpen },
+  { to: '/evidence', label: 'Library', hint: 'The reference passages and their sources', icon: LibraryBig },
+  { to: '/performance', label: 'Method', hint: 'How it works, with model metrics and their limits', icon: BarChart3 },
 ]
 
-/** Routes drawn in the marketing shell (top bar, footer). Everything else uses the application shell (sidebar). */
-export const MARKETING_PATHS = ['/']
+/** Signed-in destinations. */
+export const SAVED_ITEM = { to: '/history', label: 'Saved investigations', hint: 'Investigations saved to your account', icon: FolderClock }
+export const SETTINGS_ITEM = { to: '/settings', label: 'Settings', hint: 'Account, password, deletion', icon: Settings }

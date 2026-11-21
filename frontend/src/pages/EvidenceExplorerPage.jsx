@@ -3,6 +3,7 @@ import { ExternalLink, Info, Search } from 'lucide-react'
 import EvidenceItem from '../components/report/EvidenceItem'
 import Badge from '../components/ui/Badge'
 import Kbd from '../components/ui/Kbd'
+import Modal from '../components/ui/Modal'
 import Skeleton from '../components/ui/Skeleton'
 import Tabs from '../components/ui/Tabs'
 import Button from '../components/ui/Button'
@@ -13,6 +14,8 @@ export default function EvidenceExplorerPage() {
   const [collection, setCollection] = useState(null)
   const [passages, setPassages] = useState([])
   const [topic, setTopic] = useState('All')
+  const [publisher, setPublisher] = useState('all')
+  const [open, setOpen] = useState(null)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState(null)
   const [searching, setSearching] = useState(false)
@@ -55,7 +58,8 @@ export default function EvidenceExplorerPage() {
     const counts = passages.reduce((acc, p) => ({ ...acc, [p.topic]: (acc[p.topic] ?? 0) + 1 }), {})
     return [{ id: 'All', label: 'All', count: passages.length }, ...Object.entries(counts).map(([id, count]) => ({ id, label: id, count }))]
   }, [passages])
-  const visible = topic === 'All' ? passages : passages.filter((p) => p.topic === topic)
+  const publishers = useMemo(() => [...new Set(passages.map((p) => p.source_org))].sort(), [passages])
+  const visible = passages.filter((p) => (topic === 'All' || p.topic === topic) && (publisher === 'all' || p.source_org === publisher))
 
   return (
     <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
@@ -131,7 +135,22 @@ export default function EvidenceExplorerPage() {
           </div>
         ) : (
           <>
-            <Tabs tabs={topics} value={topic} onChange={setTopic} label="Filter by topic" idPrefix="topic" />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Tabs tabs={topics} value={topic} onChange={setTopic} label="Filter by topic" idPrefix="topic" className="min-w-0 flex-1" />
+              <div className="flex items-center gap-2">
+                <label htmlFor="publisher" className="t-meta">
+                  Publisher
+                </label>
+                <select id="publisher" value={publisher} onChange={(e) => setPublisher(e.target.value)} className="h-9 rounded-full border border-line bg-ink-1/80 px-3 text-sm text-steel outline-none hover:border-line-strong focus:border-violet">
+                  <option value="all">All publishers ({publishers.length})</option>
+                  {publishers.map((org) => (
+                    <option key={org} value={org}>
+                      {org}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div id="topic-panel" role="tabpanel" aria-labelledby={`topic-tab-${topic}`} className="pt-5">
             <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visible.map((p) => (
@@ -141,7 +160,10 @@ export default function EvidenceExplorerPage() {
                     <Badge>{p.topic}</Badge>
                     <span className="t-meta ml-auto">{p.id}</span>
                   </div>
-                  <p className="flex-1 text-[0.9375rem] leading-relaxed text-paper">{p.passage}</p>
+                  <p className="line-clamp-4 flex-1 text-[0.9375rem] leading-relaxed text-paper">{p.passage}</p>
+                  <button type="button" onClick={() => setOpen(p)} className="press self-start text-[0.8125rem] text-violet underline decoration-violet/40 underline-offset-4 hover:decoration-violet" aria-label={`Read the full passage ${p.id}`}>
+                    Read passage
+                  </button>
                   <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1.5 border-t border-line pt-3 text-[0.8125rem] text-signal underline decoration-signal/30 hover:decoration-signal">
                     <span className="min-w-0 truncate">{p.source_title}</span>
                     <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
@@ -150,11 +172,32 @@ export default function EvidenceExplorerPage() {
                 </li>
               ))}
             </ol>
+            {visible.length === 0 && (
+              <div className="panel border-dashed p-8 text-center">
+                <p className="text-sm font-semibold text-paper">No passage matches these filters</p>
+                <p className="t-caption mt-1">Try another topic or publisher.</p>
+              </div>
+            )}
             </div>
             {collection && <p className="t-caption mt-6 max-w-3xl">{collection.description}</p>}
           </>
         )}
       </section>
+
+      <Modal open={Boolean(open)} onClose={() => setOpen(null)} title={open?.source_title ?? ''} description={open ? `${open.source_org} · ${open.topic}` : ''} size="lg">
+        {open && (
+          <div>
+            <p className="text-[1rem] leading-relaxed text-paper">{open.passage}</p>
+            <p className="t-meta mt-4">Passage id {open.id}</p>
+            <a href={open.source_url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-[0.875rem] text-signal underline decoration-signal/30 hover:decoration-signal">
+              Open the original source: {open.source_org}
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+            <p className="t-caption mt-5 border-t border-line pt-4">This passage is a short paraphrase written for this project; the linked source is the authority. The collection is small, so the absence of a passage never establishes that a claim is false.</p>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

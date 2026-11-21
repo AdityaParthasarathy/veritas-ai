@@ -30,7 +30,9 @@
 - Then paste `http://169.254.169.254/latest/meta-data/` and show the blocked message. Explain briefly: the server only fetches public addresses on ports 80/443, checks every redirect, and pins the connection to the vetted address. (If a news site answers HTTP 403 the app reports that plainly; some sites, including Wikipedia, refuse automated requests.)
 
 ## 6. Evidence tools (7:00 to 8:00)
-- Open the **Library**, search by meaning, and show the limited collection notice. There is no sign-in in the web app; nothing is saved.
+- Open the **Casebook**, run an invented case, and compare it with its recorded report.
+- Open the **Library**, search by meaning, open a passage, and show the limited collection notice.
+- Register, re-run a case while signed in, and open it from **Saved investigations**.
 - **Evidence Explorer**: semantic search "why do we have seasons" returns the seasons passage even though the wording differs. State: 70 passages, every source link checked.
 
 ## 7. Model performance and honesty (8:00 to 9:00)

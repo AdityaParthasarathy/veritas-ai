@@ -13,7 +13,7 @@ AI-powered misinformation intelligence platform. It analyzes pasted text or a pu
 | Linguistic signals | Descriptive measurements (spaCy): emphasis, ALL-CAPS, sensational and hedging wording, attribution, entities, etc. |
 | Evidence retrieval | Semantic search (MiniLM + FAISS) over a small curated reference collection with verified source links. |
 | Uncertainty | Transparent rules: short text, undecided model, no related evidence. Never lower than "moderate". |
-| Accounts and history | Backend API only (registration, login, per-user saved analyses). The web UI has no sign-in; every analysis there is anonymous and not saved. |
+| Accounts and history | Registration, login, saved investigations (per-user, owner-only), password change, account deletion. Anonymous use stays available and is not saved. |
 | Model Performance page | Metrics, confusion matrices, dataset cleaning and limitations, served from the saved training run. |
 
 ## Stack

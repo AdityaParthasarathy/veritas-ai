@@ -2,11 +2,10 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import CommandPalette from '../components/layout/CommandPalette'
 import MobileNav from '../components/layout/MobileNav'
-import { MARKETING_PATHS } from '../components/layout/navigation'
-import Sidebar from '../components/layout/Sidebar'
 import Topbar from '../components/layout/Topbar'
 import Logo from '../components/ui/Logo'
 import Skeleton from '../components/ui/Skeleton'
+import { useAuth } from '../context/AuthContext'
 import { useHotkey } from '../hooks/useHotkey'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { useReadout } from '../hooks/useReadout'
@@ -22,6 +21,7 @@ function PageFallback() {
 }
 
 function Footer() {
+  const { user } = useAuth()
   const column = 'space-y-2.5 text-sm'
   const link = 'text-steel transition-colors duration-fast hover:text-paper'
   return (
@@ -39,7 +39,24 @@ function Footer() {
           <p className="t-eyebrow mb-3">Product</p>
           <ul className={column}>
             <li><Link to="/analyze" className={link}>Investigate</Link></li>
+            <li><Link to="/casebook" className={link}>Casebook</Link></li>
             <li><Link to="/evidence" className={link}>Library</Link></li>
+          </ul>
+        </nav>
+        <nav aria-label="Footer account" className="lg:col-span-2">
+          <p className="t-eyebrow mb-3">Account</p>
+          <ul className={column}>
+            {user ? (
+              <>
+                <li><Link to="/history" className={link}>Saved investigations</Link></li>
+                <li><Link to="/settings" className={link}>Settings</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link to="/login" className={link}>Sign in</Link></li>
+                <li><Link to="/register" className={link}>Create an account</Link></li>
+              </>
+            )}
           </ul>
         </nav>
         <nav aria-label="Footer method" className="lg:col-span-2">
@@ -65,7 +82,6 @@ export default function AppLayout() {
   const { pathname, hash } = useLocation()
   const mainRef = useRef(null)
   const firstRender = useRef(true)
-  const marketing = MARKETING_PATHS.includes(pathname)
 
   useHotkey('mod+k', () => setPaletteOpen((open) => !open), { allowInInputs: true })
 
@@ -107,31 +123,13 @@ export default function AppLayout() {
     </>
   )
 
-  if (marketing) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        {skip}
-        <Topbar readout={readout} onOpenPalette={() => setPaletteOpen(true)} onOpenMobileNav={() => setNavOpen(true)} />
-        {offline}
-        {content}
-        <Footer />
-        {overlays}
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       {skip}
-      <Sidebar readout={readout} />
-      <div className="flex min-h-screen flex-col lg:pl-60">
-        <Topbar variant="app" readout={readout} onOpenPalette={() => setPaletteOpen(true)} onOpenMobileNav={() => setNavOpen(true)} />
-        {offline}
-        {content}
-        <footer className="no-print border-t border-line">
-          <p className="t-caption mx-auto max-w-[88rem] px-4 py-5 sm:px-8">A statistical instrument, not a fact-checker. It cannot establish what is true.</p>
-        </footer>
-      </div>
+      <Topbar readout={readout} onOpenPalette={() => setPaletteOpen(true)} onOpenMobileNav={() => setNavOpen(true)} />
+      {offline}
+      {content}
+      <Footer />
       {overlays}
     </div>
   )

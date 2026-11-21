@@ -11,9 +11,9 @@ const LINES = [
   { lead: 'Every source deserves', struck: 'blind trust', swap: 'evidence' },
   { lead: 'Every confident answer deserves', struck: 'applause', swap: 'a second look' },
 ]
-const STEP = 1100 // ms between lines
-const STRIKE_AT = 650 // ms after a line begins before its strike draws
-const SWAP_AT = 1250 // ms after a line begins before the replacement arrives
+const STEP = 2700 // ms between lines: read, pause, strike, replace, read
+const STRIKE_AT = 900 // ms after a line begins: the sentence is read as written before it is struck
+const SWAP_AT = 1750 // ms after a line begins: the replacement arrives once the strike has landed
 
 /**
  * The strike-through story. Lines are laid out first; once the block scrolls into view each line plays in turn:

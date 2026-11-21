@@ -2,11 +2,13 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { CornerDownLeft, Search } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 import Kbd from '../ui/Kbd'
 import { buildCommands } from './commands'
 
 /** Command palette: type to filter, arrows to move, Enter to run, Escape to close. */
 export default function CommandPalette({ open, onClose }) {
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -14,7 +16,7 @@ export default function CommandPalette({ open, onClose }) {
   const openerRef = useRef(null)
   const listId = useId()
 
-  const commands = useMemo(() => buildCommands(), [])
+  const commands = useMemo(() => buildCommands({ user }), [user])
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     return q ? commands.filter((c) => `${c.label} ${c.hint ?? ''} ${c.group}`.toLowerCase().includes(q)) : commands
@@ -37,7 +39,10 @@ export default function CommandPalette({ open, onClose }) {
   const run = (command) => {
     if (!command) return
     close()
-    navigate(command.to, command.state ? { state: command.state } : undefined)
+    if (command.action === 'signout') {
+      logout()
+      navigate('/login')
+    } else navigate(command.to, command.state ? { state: command.state } : undefined)
   }
   const onKeyDown = (event) => {
     if (event.key === 'Escape') {
@@ -58,7 +63,7 @@ export default function CommandPalette({ open, onClose }) {
   return createPortal(
     <div className="fixed inset-0 z-[75] flex items-start justify-center px-4 pt-[12vh]">
       <div className="animate-fade-in absolute inset-0 bg-ink-0/80" onClick={close} aria-hidden="true" />
-      <div role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={onKeyDown} className="animate-sheet-in relative w-full max-w-xl overflow-hidden rounded-xl border border-line-strong bg-ink-2 shadow-float">
+      <div role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={onKeyDown} className="animate-sheet-in glass relative w-full max-w-xl overflow-hidden rounded-xl shadow-float">
         <div className="flex items-center gap-3 border-b border-line px-4">
           <Search className="h-4 w-4 shrink-0 text-dim" aria-hidden="true" />
           <input

@@ -3,11 +3,14 @@ import StyleScale from './StyleScale'
 import TrustLadder from './TrustLadder'
 import { LABEL_TEXT } from './reportModel'
 
-function Card({ icon: Icon, tone, title, caption, children }) {
+function Card({ id, number, icon: Icon, tone, title, caption, children }) {
   return (
-    <article className="panel flex flex-col p-6">
-      <div className={`mb-4 flex h-9 w-9 items-center justify-center rounded-md ${tone}`}>
-        <Icon className="h-5 w-5" aria-hidden="true" />
+    <article id={id} className="panel flex scroll-mt-28 flex-col p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <span className={`flex h-9 w-9 items-center justify-center rounded-md ${tone}`}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <span className="font-mono text-[0.6875rem] tracking-widest text-dim">INSTRUMENT {number}</span>
       </div>
       <h3 className="t-h2">{title}</h3>
       <p className="t-caption mb-5 mt-1">{caption}</p>
@@ -21,15 +24,15 @@ export default function InstrumentCards({ result, reading }) {
   const { classification, evidence, uncertainty } = result
   const hits = evidence.hits
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
-      <Card icon={Gauge} tone="bg-brand/25 text-violet" title="Writing-style analysis" caption={`Machine-learning output: ${LABEL_TEXT[classification.label].toLowerCase()}.`}>
+    <div className="grid gap-5 xl:grid-cols-3">
+      <Card id="writing-style" number="01" icon={Gauge} tone="bg-brand/25 text-violet" title="Writing-style reading" caption={`Machine-learning output: ${LABEL_TEXT[classification.label].toLowerCase()}.`}>
         <StyleScale probability={classification.probability_unreliable_style} dimmed={reading.outOfDomain} />
         <p className="mt-5 rounded-md border border-line bg-ink-1/70 p-3 text-[0.8125rem] leading-relaxed text-steel">{classification.confidence_note}</p>
-        <p className="t-caption mt-3">The model reads style and source habits. It does not read facts, so this is not a measure of truth.</p>
+        <p className="t-caption mt-3">It measures how closely the writing matches patterns in the training labels. It cannot establish whether any claim is true.</p>
       </Card>
 
-      <Card icon={ScanSearch} tone="bg-signal/15 text-signal" title="Evidence retrieval" caption="Passages close in meaning to the text. Relevance only.">
-        <p className="font-display text-[2rem] font-semibold leading-none tracking-tight text-paper">
+      <Card id="evidence-retrieval" number="02" icon={ScanSearch} tone="bg-signal/15 text-signal" title="Evidence retrieval" caption="Related reference material, found by semantic similarity.">
+        <p className="text-[2rem] font-semibold leading-none tracking-tight text-paper">
           {reading.relatedCount}
           <span className="ml-2 text-base font-normal text-dim">of {evidence.collection_size} passages related</span>
         </p>
@@ -37,7 +40,7 @@ export default function InstrumentCards({ result, reading }) {
           <div className="mt-5 flex gap-3 rounded-md border border-dashed border-line-strong p-4">
             <SearchX className="mt-0.5 h-5 w-5 shrink-0 text-dim" aria-hidden="true" />
             <p className="text-[0.875rem] leading-relaxed text-steel">
-              Nothing in the collection is close enough in meaning to count as related. The collection is small, so this reflects its coverage, not the accuracy of the text.
+              No clearly related reference passage was found. The collection is small, so this reflects its coverage, not the accuracy of the text, and it is not a failed analysis.
             </p>
           </div>
         ) : (
@@ -56,10 +59,10 @@ export default function InstrumentCards({ result, reading }) {
             ))}
           </ol>
         )}
-        <p className="t-caption mt-4">The white tick is the relevance cut-off ({evidence.relevance_threshold}).</p>
+        <p className="t-caption mt-4">A high similarity does not mean a passage supports the text. The white tick is the relevance cut-off ({evidence.relevance_threshold}).</p>
       </Card>
 
-      <Card icon={ShieldHalf} tone="bg-caution/15 text-caution" title="Trust in this analysis" caption="About the analysis, not the claims.">
+      <Card id="trust" number="03" icon={ShieldHalf} tone="bg-caution/15 text-caution" title="Trust in the analysis" caption="About the analysis, not the claims.">
         <TrustLadder level={uncertainty.level} />
         {uncertainty.reasons.length > 0 ? (
           <ul className="mt-5 space-y-2 border-t border-line pt-4">
@@ -71,6 +74,11 @@ export default function InstrumentCards({ result, reading }) {
           </ul>
         ) : (
           <p className="t-caption mt-5 border-t border-line pt-4">No specific warning was raised for this text. The standing limitations still apply.</p>
+        )}
+        {uncertainty.domain_check?.available && (
+          <p className="t-meta mt-4">
+            domain {uncertainty.domain_check.in_domain ? 'suitable' : 'unsuitable'} · similarity {uncertainty.domain_check.similarity} / cut-off {uncertainty.domain_check.threshold}
+          </p>
         )}
         <p className="t-caption mt-3">{uncertainty.meaning}</p>
       </Card>

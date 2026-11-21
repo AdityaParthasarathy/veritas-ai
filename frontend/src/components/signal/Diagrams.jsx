@@ -6,12 +6,12 @@ const STROKE = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }
 export function StyleDiagram() {
   return (
     <svg viewBox="0 0 160 64" className="h-24 w-56" aria-hidden="true" {...STROKE}>
-      <line x1="6" y1="38" x2="154" y2="38" stroke="#3B4580" strokeWidth="1" />
+      <line x1="6" y1="38" x2="154" y2="38" stroke="#38417A" strokeWidth="1" />
       {Array.from({ length: 21 }, (_, i) => (
-        <line key={i} x1={6 + i * 7.4} y1={38 - (i === 10 ? 9 : i % 2 ? 3 : 5)} x2={6 + i * 7.4} y2={38 + (i === 10 ? 9 : i % 2 ? 3 : 5)} stroke={i === 10 ? '#8791B3' : '#3B4580'} strokeWidth="1" />
+        <line key={i} x1={6 + i * 7.4} y1={38 - (i === 10 ? 9 : i % 2 ? 3 : 5)} x2={6 + i * 7.4} y2={38 + (i === 10 ? 9 : i % 2 ? 3 : 5)} stroke={i === 10 ? '#8793AF' : '#38417A'} strokeWidth="1" />
       ))}
-      <path d="M104 12 L104 38" stroke="#45D9E8" strokeWidth="1.6" />
-      <path d="M99.5 8 L108.5 8 L104 15 Z" fill="#45D9E8" stroke="none" />
+      <path d="M104 12 L104 38" stroke="#48D9ED" strokeWidth="1.6" />
+      <path d="M99.5 8 L108.5 8 L104 15 Z" fill="#48D9ED" stroke="none" />
     </svg>
   )
 }
@@ -22,8 +22,8 @@ export function SignalsDiagram() {
     <svg viewBox="0 0 160 64" className="h-24 w-56" aria-hidden="true" {...STROKE}>
       {rows.map((v, i) => (
         <g key={i}>
-          <line x1="6" y1={8 + i * 9.5} x2="154" y2={8 + i * 9.5} stroke="#262E57" strokeWidth="1" />
-          <line x1="6" y1={8 + i * 9.5} x2={6 + 148 * v} y2={8 + i * 9.5} stroke={v > 0.6 ? '#F5B84B' : '#8791B3'} strokeWidth="2" />
+          <line x1="6" y1={8 + i * 9.5} x2="154" y2={8 + i * 9.5} stroke="#242C52" strokeWidth="1" />
+          <line x1="6" y1={8 + i * 9.5} x2={6 + 148 * v} y2={8 + i * 9.5} stroke={v > 0.6 ? '#F5B84B' : '#8793AF'} strokeWidth="2" />
         </g>
       ))}
     </svg>
@@ -33,12 +33,12 @@ export function SignalsDiagram() {
 export function EvidenceDiagram() {
   return (
     <svg viewBox="0 0 160 64" className="h-24 w-56" aria-hidden="true" {...STROKE}>
-      <path d="M6 14 H72 M6 24 H60 M6 34 H68" stroke="#A8B0CB" strokeWidth="1.5" />
-      <path d="M6 24 H60" stroke="#45D9E8" strokeWidth="2" />
-      <path d="M66 18 L72 18 L72 30 L66 30" stroke="#45D9E8" strokeWidth="1.4" />
-      <path d="M72 24 H104" stroke="#45D9E8" strokeWidth="1" strokeDasharray="3 3" />
-      <rect x="104" y="12" width="48" height="40" rx="3" stroke="#3B4580" strokeWidth="1.4" />
-      <path d="M112 22 H144 M112 30 H140 M112 38 H134" stroke="#3B4580" strokeWidth="1.4" />
+      <path d="M6 14 H72 M6 24 H60 M6 34 H68" stroke="#A3AEC9" strokeWidth="1.5" />
+      <path d="M6 24 H60" stroke="#48D9ED" strokeWidth="2" />
+      <path d="M66 18 L72 18 L72 30 L66 30" stroke="#48D9ED" strokeWidth="1.4" />
+      <path d="M72 24 H104" stroke="#48D9ED" strokeWidth="1" strokeDasharray="3 3" />
+      <rect x="104" y="12" width="48" height="40" rx="3" stroke="#38417A" strokeWidth="1.4" />
+      <path d="M112 22 H144 M112 30 H140 M112 38 H134" stroke="#38417A" strokeWidth="1.4" />
     </svg>
   )
 }
@@ -47,8 +47,8 @@ export function TrustDiagram() {
   return (
     <svg viewBox="0 0 160 64" className="h-24 w-56" aria-hidden="true" {...STROKE}>
       <rect x="40" y="38" width="22" height="16" rx="2" fill="#F5B84B" fillOpacity="0.75" />
-      <rect x="68" y="26" width="22" height="28" rx="2" fill="#262E57" />
-      <rect x="96" y="12" width="22" height="42" rx="2" fill="#262E57" />
+      <rect x="68" y="26" width="22" height="28" rx="2" fill="#242C52" />
+      <rect x="96" y="12" width="22" height="42" rx="2" fill="#242C52" />
     </svg>
   )
 }

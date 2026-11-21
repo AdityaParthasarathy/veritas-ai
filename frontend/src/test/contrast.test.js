@@ -25,7 +25,6 @@ describe('design tokens meet WCAG AA (4.5:1 for normal text)', () => {
   it('white text on the primary button gradient (both ends)', () => {
     expect(ratio('#FFFFFF', '#6847F0')).toBeGreaterThanOrEqual(4.5)
     expect(ratio('#FFFFFF', '#7A58F7')).toBeGreaterThanOrEqual(4.5)
-    expect(ratio('#FFFFFF', colors.brand.DEFAULT)).toBeGreaterThanOrEqual(4.5)
   })
 
   it('dark text on filled controls (skip link, danger hover)', () => {

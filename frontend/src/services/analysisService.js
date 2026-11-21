@@ -23,6 +23,11 @@ export function describeError(error) {
   const { status, data } = error.response
   const apiError = data?.error
   if (apiError?.code && SAFE_SERVER_MESSAGE.test(apiError.code) && apiError.message) return apiError.message
+  if (status === 401) {
+    return ['Incorrect email or password', 'Incorrect password'].includes(apiError?.message)
+      ? apiError.message
+      : 'Your session has expired. Please sign in again.'
+  }
   if (status === 404) return 'That item was not found.'
   if (status === 413) return 'The submitted content is too large.'
   if (status === 422) {

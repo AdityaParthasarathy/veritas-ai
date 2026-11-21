@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { X } from 'lucide-react'
 import Skeleton from '../components/ui/Skeleton'
 import Tabs from '../components/ui/Tabs'
-import { PIPELINE } from '../data/pipeline'
+import { NOT_INTERCHANGEABLE, PIPELINE } from '../data/pipeline'
 import { colors } from '../design/tokens'
 import { describeError } from '../services/analysisService'
 import { getPerformance } from '../services/performanceService'
@@ -51,23 +51,55 @@ function Pipeline() {
       <h2 id="h-pipeline" className="t-h2">
         How an analysis is made
       </h2>
-      <p className="t-caption mb-6 mt-1">The same six steps the server runs. Each one states what it does not do.</p>
-      <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <p className="t-caption mb-6 mt-1">The same six steps the server runs. Each one states what it does, what it uses, what it produces and what it cannot establish.</p>
+      <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {PIPELINE.map((step, i) => (
-          <li key={step.title} className="panel panel-hover p-5">
+          <li key={step.title} className="panel panel-hover flex flex-col p-5">
             <span className="font-mono text-[0.75rem] text-violet">{String(i + 1).padStart(2, '0')}</span>
             <h3 className="t-h3 mt-2">{step.title}</h3>
-            <p className="t-body mt-1.5 text-[0.875rem]">{step.does}</p>
-            <p className="t-caption mt-3 flex gap-2 border-t border-line pt-3">
+            <dl className="mt-3 space-y-2.5 text-[0.8125rem] leading-relaxed">
+              <div>
+                <dt className="t-meta">What happens</dt>
+                <dd className="text-steel">{step.does}</dd>
+              </div>
+              <div>
+                <dt className="t-meta">Technology</dt>
+                <dd className="text-steel">{step.tech}</dd>
+              </div>
+              <div>
+                <dt className="t-meta">Produces</dt>
+                <dd className="text-steel">{step.produces}</dd>
+              </div>
+            </dl>
+            <p className="t-caption mt-auto flex gap-2 border-t border-line pt-3">
               <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-contra" aria-hidden="true" />
               <span>
-                <span className="sr-only">Does not: </span>
+                <span className="font-medium text-steel">Cannot establish: </span>
                 {step.not}
               </span>
             </p>
           </li>
         ))}
       </ol>
+    </section>
+  )
+}
+
+function Glossary() {
+  return (
+    <section aria-labelledby="h-glossary" className="mb-14">
+      <h2 id="h-glossary" className="t-h2">
+        Five numbers that are not interchangeable
+      </h2>
+      <p className="t-caption mb-6 mt-1">Reports show several measurements side by side. Each answers a different question.</p>
+      <dl className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {NOT_INTERCHANGEABLE.map((item) => (
+          <div key={item.term} className="panel p-5">
+            <dt className="text-sm font-semibold text-paper">{item.term}</dt>
+            <dd className="t-body mt-1.5 text-[0.875rem]">{item.body}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   )
 }
@@ -129,6 +161,7 @@ export default function ModelPerformancePage() {
       </div>
 
       <Pipeline />
+      <Glossary />
 
       <Tabs tabs={tabs} value={variant.variant} onChange={setVariantKey} label="Model variant" idPrefix="variant" />
       <div id="variant-panel" role="tabpanel" aria-labelledby={`variant-tab-${variant.variant}`}>

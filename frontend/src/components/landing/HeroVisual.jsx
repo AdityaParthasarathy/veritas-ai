@@ -4,7 +4,7 @@ function DocCard({ className = '', lines = [], mark = -1, delay = '0s' }) {
   return (
     <div
       aria-hidden="true"
-      className={`glass animate-float absolute w-40 rounded-lg p-3 sm:w-48 ${className}`}
+      className={`glass absolute w-40 rounded-lg p-3 sm:w-48 ${className}`}
       style={{ animationDelay: delay }}
     >
       <div className="mb-2.5 h-1.5 w-10 rounded-full bg-violet/60" />

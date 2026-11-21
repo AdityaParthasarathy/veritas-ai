@@ -7,8 +7,12 @@ import ErrorBoundary from '../components/common/ErrorBoundary'
 import CommandPalette from '../components/layout/CommandPalette'
 import Report from '../components/report/Report'
 import { ToastProvider } from '../components/ui/Toast'
+import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../layouts/AppLayout'
 import AnalyzePage from '../pages/AnalyzePage'
+import AuthPage from '../pages/AuthPage'
+import CaseDetailPage from '../pages/CaseDetailPage'
+import CasebookPage from '../pages/CasebookPage'
 import EvidenceExplorerPage from '../pages/EvidenceExplorerPage'
 import LandingPage from '../pages/LandingPage'
 import ModelPerformancePage from '../pages/ModelPerformancePage'
@@ -55,13 +59,15 @@ describe('automated accessibility checks (axe)', () => {
   it('application shell: skip link, landmarks, navigation, readout', async () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/']}>
-        <ToastProvider>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route index element={<LandingPage />} />
-            </Route>
-          </Routes>
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <Routes>
+              <Route element={<AppLayout />}>
+                <Route index element={<LandingPage />} />
+              </Route>
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
       </MemoryRouter>,
     )
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main')
@@ -74,10 +80,30 @@ describe('automated accessibility checks (axe)', () => {
   })
 
   it.each([
+    ['sign in', <AuthPage key="a" mode="login" />],
+    ['create account', <AuthPage key="b" mode="register" />],
     ['investigation workspace (text)', <AnalyzePage key="c" />],
-    ['not found', <NotFoundPage key="d" />],
+    ['casebook', <CasebookPage key="d" />],
+    ['not found', <NotFoundPage key="e" />],
   ])('%s has no violations', async (_name, ui) => {
     const { container } = renderWithProviders(ui)
+    await expectNoViolations(container)
+  })
+
+  it('a casebook case with its recorded report has no violations', async () => {
+    const { container } = render(
+      <MemoryRouter initialEntries={['/casebook/03-misleading-sober']}>
+        <AuthProvider>
+          <ToastProvider>
+            <Routes>
+              <Route path="/casebook/:id" element={<CaseDetailPage />} />
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>,
+    )
+    expect(await screen.findByRole('heading', { name: 'Three separate readings' })).toBeInTheDocument()
+    expect(screen.getByText('Invented example')).toBeInTheDocument()
     await expectNoViolations(container)
   })
 
@@ -110,9 +136,13 @@ describe('automated accessibility checks (axe)', () => {
     await expectNoViolations(method.container)
   })
 
-  it('command palette dialog has no violations', async () => {
+  it('command palette dialog has no violations and offers only actions that exist', async () => {
     renderWithProviders(<CommandPalette open onClose={() => {}} />)
     await expectNoViolations(screen.getByRole('dialog'))
+    const options = screen.getAllByRole('option').map((o) => o.textContent)
+    expect(options.join(' ')).toMatch(/Start an investigation/)
+    expect(options.join(' ')).toMatch(/Casebook/)
+    expect(options.join(' ')).not.toMatch(/Saved investigations/) // signed-out users have none
   })
 
   it('error boundary fallback is announced as an alert and hides internals', async () => {

@@ -100,49 +100,83 @@ export function notableSignals(signals) {
   return signals.filter((s) => !['word_count', 'avg_sentence_length'].includes(s.key) && s.value > 0)
 }
 
-/**
- * The headline state of a report. These are descriptive states of the analysis, never verdicts about the text:
- * - ood: the domain check says the text is unlike the training articles, so the style label means nothing here.
- * - inconclusive: the backend rates caution "very high", or the model is within 10 points of its decision boundary.
- * - unreliable / reliable: the style label, with a plain statement that claims stay unverified.
- * - insufficient: a reliable-like style reading with no related reference passage to point at.
- * Every sentence is assembled from fields the API returned.
- */
-export function buildAssessment(result) {
-  const { classification, uncertainty, evidence } = result
+/** The primary explanation: what the classifier observed, with the probability presented as a measurement of style. */
+export function buildPrimary(result) {
+  const { classification } = result
   const reading = buildReading(result)
   const p = classification.probability_unreliable_style
   const unreliable = classification.label === 'resembles_unreliable_sources'
-  const related = reading.relatedCount
-  const evidenceSentence =
-    related === 0
-      ? `The reference collection (${evidence.collection_size} passages) contains no clearly related passage, so its factual claims remain unverified.`
-      : `${related} reference passage${related === 1 ? ' is' : 's are'} topically related, but whether ${related === 1 ? 'it supports' : 'they support'} or ${related === 1 ? 'contradicts' : 'contradict'} the text is not assessed, so its factual claims remain unverified.`
+  return {
+    outOfDomain: reading.outOfDomain,
+    headline: reading.outOfDomain
+      ? 'The writing-style reading is not meaningful for this text.'
+      : unreliable
+        ? 'Writing style resembles examples labelled unreliable.'
+        : 'Writing style resembles examples labelled reliable.',
+    measurement: `Model probability for the unreliable label: ${percent(p)}`,
+    note: `This measures similarity to patterns in the training labels. It is not a ${percent(p)} probability that the article is fake.`,
+    styleNote: reading.styleNote,
+  }
+}
 
-  if (reading.outOfDomain) {
-    return { key: 'ood', title: 'Out of domain', tone: 'caution', icon: 'ShieldAlert', summary: `This text is unlike the articles the classifier was trained on, so its style reading is not meaningful here. ${evidenceSentence}` }
-  }
-  if (uncertainty.level === 'very_high' || Math.abs(p - 0.5) < 0.1) {
-    const why = uncertainty.reasons[0] ?? 'The model is close to its decision boundary.'
-    return { key: 'inconclusive', title: 'Analysis inconclusive', tone: 'caution', icon: 'CircleHelp', summary: `${why} ${evidenceSentence}` }
-  }
-  if (unreliable) {
-    return {
-      key: 'unreliable',
-      title: 'Unreliable-like writing style',
-      tone: 'contra',
-      icon: 'PenLine',
-      summary: `The writing resembles content from sources labelled unreliable in the training data. This describes style only; it is not a verdict that the claims are false. ${evidenceSentence}`,
-    }
-  }
-  if (related === 0) {
-    return {
-      key: 'insufficient',
-      title: 'Insufficient evidence',
-      tone: 'caution',
-      icon: 'ShieldQuestion',
-      summary: `The article resembles writing labelled reliable in the training data, but the reference collection contains no clearly related passages. Its factual claims remain unverified.`,
-    }
-  }
-  return { key: 'reliable', title: 'Reliable-like writing style', tone: 'support', icon: 'PenLine', summary: `The writing resembles content from sources labelled reliable in the training data. ${evidenceSentence}` }
+const joinOrgs = (names) => (names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`)
+
+/**
+ * "What should I take away from this?" Three plain-language sentences, one per reading, assembled from the response,
+ * followed by a bottom line that is always true: the system has not checked the claims.
+ */
+export function buildTakeaway(result) {
+  const { classification, uncertainty, evidence } = result
+  const reading = buildReading(result)
+  const unreliable = classification.label === 'resembles_unreliable_sources'
+  const related = evidence.hits.filter((h) => h.relevant)
+  const orgs = [...new Set(related.map((h) => h.source_org))]
+
+  const observed = reading.outOfDomain
+    ? 'The text is unlike the news articles the classifier was trained on, so the style label it produced carries no meaning here.'
+    : unreliable
+      ? 'The classifier found writing patterns associated with unreliable-labelled training examples. That describes style, such as emphasis and wording habits. It does not mean the claims are false.'
+      : 'The classifier found writing patterns associated with reliable-labelled training examples. That describes style. It does not mean the claims are true.'
+
+  const retrieved =
+    related.length === 0
+      ? `No clearly related passage was found in the reference collection (${evidence.collection_size} passages). The collection is small, so this reflects its coverage, not the accuracy of the text.`
+      : `${related.length} reference passage${related.length === 1 ? '' : 's'} from ${joinOrgs(orgs)} ${related.length === 1 ? 'is' : 'are'} close in meaning to the text. That is related material, not confirmation: the system does not judge whether a passage supports or contradicts the text.`
+
+  const level = uncertainty.level
+  const reason = uncertainty.reasons[0] ? uncertainty.reasons[0].replace(/\.$/, '') : null
+  const trust =
+    level === 'moderate'
+      ? 'Trust in this analysis is moderate. That is the lowest level of caution the system reports, so read the result with care.'
+      : `Caution is ${LEVEL_TEXT[level]?.short ?? level}${reason ? `: ${reason}` : ''}. ${LEVEL_TEXT[level]?.advice ?? ''}`.trim()
+
+  const bottomLine =
+    related.length === 0
+      ? "This means the system has not independently checked the article's claims."
+      : "This means the system has not independently checked the article's claims. Compare them with the linked sources yourself."
+  return { observed, retrieved, trust, bottomLine }
+}
+
+/** The long clipboard text: the summary, then every retrieved passage and measurement. */
+export function buildFullReportText(result, { title, text } = {}) {
+  const { classification, evidence, linguistic_signals: signals, uncertainty } = result
+  const lines = [
+    buildSummaryText(result, { title }),
+    '',
+    '--- Full report ---',
+    `Classifier: ${classification.model.name} (trained on ${classification.model.trained_on})`,
+    `Reference collection: ${evidence.collection_name}, ${evidence.collection_size} passages, relevance cut-off ${evidence.relevance_threshold}`,
+    '',
+    'All retrieved passages (similarity only; support or contradiction is not assessed):',
+    ...(evidence.hits.length ? evidence.hits.map((h) => `- [${h.relevant ? 'related' : 'below cut-off'}] ${h.score.toFixed(2)} ${h.source_org}: ${h.source_title} <${h.source_url}>\n  ${h.passage}`) : ['- none']),
+    '',
+    'Linguistic indicators (descriptive counts):',
+    ...signals.map((s) => `- ${s.label}: ${s.value} ${s.unit}`),
+    '',
+    'Standing caveats:',
+    ...uncertainty.standing_caveats.map((c) => `- ${c}`),
+    `- ${classification.disclaimer}`,
+    text ? `\nSubmitted text:\n${text}` : null,
+  ]
+  return lines.filter((l) => l !== null).join('\n')
 }

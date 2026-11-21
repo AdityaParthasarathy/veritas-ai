@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analysisResult } from '../../test/fixtures'
-import { buildAssessment, buildProof, buildReading, buildSummaryText, notableSignals } from './reportModel'
+import { buildFullReportText, buildPrimary, buildProof, buildReading, buildSummaryText, buildTakeaway, notableSignals } from './reportModel'
 
 const withHits = (hits) => ({ ...analysisResult, evidence: { ...analysisResult.evidence, hits } })
 
@@ -80,31 +80,52 @@ describe('notableSignals', () => {
   })
 })
 
-describe('buildAssessment', () => {
+describe('buildPrimary and buildTakeaway', () => {
   const base = analysisResult
-  const withHits = (hits) => ({ ...base, evidence: { ...base.evidence, hits } })
+  const reliable = { ...base.classification, label: 'resembles_reliable_sources', probability_unreliable_style: 0.12 }
+  const noHits = { ...base.evidence, hits: [] }
 
-  it('reports insufficient evidence for a reliable-like reading with no related passage, without calling it a verdict', () => {
-    const a = buildAssessment({ ...withHits([]), classification: { ...base.classification, label: 'resembles_reliable_sources', probability_unreliable_style: 0.12 }, uncertainty: { ...base.uncertainty, level: 'moderate' } })
-    expect(a.key).toBe('insufficient')
-    expect(a.title).toBe('Insufficient evidence')
-    expect(a.summary).toMatch(/remain unverified/)
+  it('states the style reading and says the probability is not a probability of being fake', () => {
+    const primary = buildPrimary({ ...base, classification: reliable })
+    expect(primary.headline).toBe('Writing style resembles examples labelled reliable.')
+    expect(primary.measurement).toBe('Model probability for the unreliable label: 12%')
+    expect(primary.note).toMatch(/not a 12% probability that the article is fake/)
   })
 
-  it('never presents an out-of-domain label as a finding', () => {
-    const a = buildAssessment({ ...base, uncertainty: { ...base.uncertainty, level: 'very_high', domain_check: { available: true, in_domain: false, similarity: 0.03, threshold: 0.06 } } })
-    expect(a.key).toBe('ood')
-    expect(a.summary).toMatch(/not meaningful here/)
+  it('reliable-like with no related passage: the system has not checked the claims', () => {
+    const t = buildTakeaway({ ...base, classification: reliable, evidence: noHits })
+    expect(t.observed).toMatch(/reliable-labelled training examples.*does not mean the claims are true/)
+    expect(t.retrieved).toMatch(/No clearly related passage.*coverage, not the accuracy/)
+    expect(t.bottomLine).toBe("This means the system has not independently checked the article's claims.")
   })
 
-  it('calls an unreliable-like reading a style description, not a verdict', () => {
-    const a = buildAssessment({ ...base, classification: { ...base.classification, label: 'resembles_unreliable_sources', probability_unreliable_style: 0.93 }, uncertainty: { ...base.uncertainty, level: 'high' } })
-    expect(a.key).toBe('unreliable')
-    expect(a.summary).toMatch(/not a verdict that the claims are false/)
+  it('related passages are related material, never confirmation', () => {
+    const t = buildTakeaway({ ...base, classification: reliable })
+    expect(t.retrieved).toMatch(/1 reference passage from NOAA is close in meaning.*not confirmation/)
+    expect(t.bottomLine).toMatch(/Compare them with the linked sources yourself/)
   })
 
-  it('is inconclusive when the model sits near its decision boundary', () => {
-    const a = buildAssessment({ ...base, classification: { ...base.classification, probability_unreliable_style: 0.52 }, uncertainty: { ...base.uncertainty, level: 'moderate', reasons: [] } })
-    expect(a.key).toBe('inconclusive')
+  it('unreliable-like describes style and does not call the claims false', () => {
+    const t = buildTakeaway({ ...base, classification: { ...base.classification, label: 'resembles_unreliable_sources', probability_unreliable_style: 0.93 } })
+    expect(t.observed).toMatch(/unreliable-labelled.*does not mean the claims are false/)
+  })
+
+  it('out of domain: the label carries no meaning', () => {
+    const result = { ...base, uncertainty: { ...base.uncertainty, level: 'very_high', domain_check: { available: true, in_domain: false, similarity: 0.03, threshold: 0.06 } } }
+    expect(buildPrimary(result).headline).toMatch(/not meaningful/)
+    expect(buildTakeaway(result).observed).toMatch(/carries no meaning here/)
+  })
+
+  it('raised caution quotes the first reason from the response', () => {
+    const t = buildTakeaway({ ...base, uncertainty: { ...base.uncertainty, level: 'high', reasons: ['The text is very short (9 words).'] } })
+    expect(t.trust).toMatch(/Caution is high: The text is very short \(9 words\)\./)
+  })
+
+  it('the full report text contains every passage and the caveats', () => {
+    const text = buildFullReportText(base, { title: 'T', text: 'Body.' })
+    expect(text).toMatch(/Full report/)
+    expect(text).toMatch(/NOAA/)
+    expect(text).toMatch(/Standing caveats/)
+    expect(text).toMatch(/Body\./)
   })
 })

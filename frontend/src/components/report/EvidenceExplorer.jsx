@@ -26,9 +26,9 @@ export default function EvidenceExplorer({ evidence, activeRef, onActivate, show
             <Telescope className="h-6 w-6" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-semibold text-paper">No related passages</p>
+            <p className="text-sm font-semibold text-paper">No clearly related reference passage was found</p>
             <p className="t-body mt-1 text-[0.9375rem]">
-              No passage in the reference collection ({evidence.collection_size} passages) is clearly related. That says nothing about whether this text is accurate.
+              The reference collection has {evidence.collection_size} passages. Nothing in it is close enough in meaning to this text, which says nothing about whether the text is accurate.
             </p>
             <p className="t-caption mt-2">The collection covers a narrow set of institutional topics. A text about anything else will usually find nothing, whatever its quality.</p>
           </div>

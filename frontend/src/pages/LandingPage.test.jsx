@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { ToastProvider } from '../components/ui/Toast'
+import { AuthProvider } from '../context/AuthContext'
 import LandingPage from './LandingPage'
 
 function Where() {
@@ -13,12 +14,14 @@ function Where() {
 function renderLanding() {
   return render(
     <MemoryRouter initialEntries={['/']}>
-      <ToastProvider>
-        <Routes>
-          <Route index element={<LandingPage />} />
-          <Route path="analyze" element={<Where />} />
-        </Routes>
-      </ToastProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <Routes>
+            <Route index element={<LandingPage />} />
+            <Route path="analyze" element={<Where />} />
+          </Routes>
+        </ToastProvider>
+      </AuthProvider>
     </MemoryRouter>,
   )
 }
@@ -35,7 +38,7 @@ describe('Landing page', () => {
 
   it('does not hand over an input that is too short, and says why', async () => {
     renderLanding()
-    await userEvent.type(screen.getByLabelText('Article text to investigate'), 'too short')
+    await userEvent.type(screen.getByLabelText('Article text'), 'too short')
     await userEvent.click(screen.getByRole('button', { name: /Analyze/ }))
     expect(await screen.findByRole('alert')).toHaveTextContent(/Add at least 20 characters/)
     expect(screen.queryByTestId('where')).not.toBeInTheDocument()
@@ -44,15 +47,16 @@ describe('Landing page', () => {
   it('hands a valid text draft to the workspace', async () => {
     renderLanding()
     const text = 'NASA scientists said on Tuesday that global temperatures continued to climb.'
-    await userEvent.type(screen.getByLabelText('Article text to investigate'), text)
+    await userEvent.click(screen.getByLabelText('Article text'))
+    await userEvent.paste(text)
     await userEvent.click(screen.getByRole('button', { name: /Analyze/ }))
-    expect(await screen.findByTestId('where')).toHaveTextContent(`/analyze{"draft":{"mode":"text","text":"${text}","url":""}}`)
+    expect(await screen.findByTestId('where')).toHaveTextContent(`/analyze{"draft":{"mode":"text","title":"","text":"${text}","url":""}}`)
   })
 
   it('validates and hands over a URL, and loads a demo input into the box', async () => {
     renderLanding()
     await userEvent.click(screen.getByRole('button', { name: 'Sourdough guide' }))
-    expect(screen.getByLabelText('Article text to investigate').value).toMatch(/Sourdough bread/)
+    expect(screen.getByLabelText('Article text').value).toMatch(/Sourdough bread/)
     await userEvent.click(screen.getByRole('tab', { name: 'Article URL' }))
     await userEvent.type(screen.getByLabelText('Article address'), 'nope')
     await userEvent.click(screen.getByRole('button', { name: /Analyze/ }))

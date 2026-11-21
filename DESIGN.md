@@ -1,4 +1,4 @@
-# VERITAS AI design system (v2)
+# VERITAS AI design system (v3)
 
 Source of truth for values: `frontend/src/design/tokens.js`. Direction: the user's generated concept image (midnight indigo, violet, cyan, glass).
 This replaces the v1 "galley-proof desk" world (obsidian, cyan, serif).
@@ -7,19 +7,18 @@ This replaces the v1 "galley-proof desk" world (obsidian, cyan, serif).
 A night-time intelligence console. Layered glass panels on a midnight indigo ground; violet marks action, cyan marks analysis, amber marks caution. The idea that survives from v1: three separate instruments (style, evidence, trust) that are never merged into one verdict.
 
 ## Colour
-- Ground: `ink-0..3` #080A18, #0D1124, #141A32, #1C2344. Lines `line` #262E57, `line-strong` #3B4580.
-- Text: `paper` #F5F4FF, `steel` #A8B0CB, `dim` #8791B3 (lifted from the brief's #737E9D so it holds WCAG AA on raised surfaces; enforced by `contrast.test.js`).
-- Action: `brand` #7654F6 (gradient #6847F0 to #7A58F7, white text, both ends >= 4.5:1), `violet` #A78BFA for highlights and eyebrows.
-- Analysis: `signal` cyan #45D9E8 (data, links, focus ring).
-- State: `caution` #F5B84B, `support` #35D6A0, `contra` #F06A79. Green and red describe state or the descriptive style reading. They never mean "true" or "false".
+- Ground: `ink-0..3` #080B18, #0D1224, #141B35, #1A2342. Lines `line` #242C52, `line-strong` #38417A. A static noise tile and two radial lights sit under the page.
+- Text: `paper` #F4F5FF, `steel` #A3AEC9, `dim` #8793AF (lifted from the brief's #77839F, which measures 4.06:1 on the highest surface; enforced by `contrast.test.js`).
+- Action: `brand` #8060FF as the accent; the primary button uses a darker gradient (#6847F0 to #7A58F7) so white text holds 4.5:1. `violet` #A78BFA for highlights.
+- Analysis: `signal` cyan #48D9ED (data, links, focus ring).
+- State: `caution` #F5B84B, `support` #37D3A8, `contra` #EE6F7C. Green and red describe state or the descriptive style reading. They never mean "true" or "false".
 - Gradients are used for: the primary button, the analysis bars (cyan to violet), the single accent word in the hero, and two static radial lights on the page.
 
 ## Type
-- Display: Sora (landing headlines, page titles, report headings).
-- Interface: Inter.
-- Technical: JetBrains Mono (ids, timestamps, measurements; tabular numerals).
-- Accent: Instrument Serif italic, used only for the replacement words in the landing story (`.t-accent`).
-- Classes: `t-display`, `t-h1..3`, `t-lead`, `t-body`, `t-caption`, `t-meta`, `t-data`, `t-galley`, `t-eyebrow`.
+- Inter for headings and the interface (headings at weight 600 with tight tracking).
+- JetBrains Mono for ids, timestamps and measurements (tabular numerals).
+- Instrument Serif for exactly two display moments: the hero line (`.t-hero`) and the replacement words in the landing story (`.t-accent`).
+- Classes: `t-hero`, `t-display`, `t-h1..3`, `t-lead`, `t-body`, `t-caption`, `t-meta`, `t-data`, `t-galley`, `t-eyebrow`.
 
 ## Surfaces
 - `.glass`: translucent panel with blur, for hero and floating layers only.
@@ -29,16 +28,16 @@ A night-time intelligence console. Layered glass panels on a midnight indigo gro
 ## Motion
 Tokens `--dur-*`, `--ease-out`. Strike-through story (CSS transitions triggered once on scroll, Replay button), floating document sheets, slow orbit, sliding nav and tab indicators, magnetic primary buttons (fine pointers only). Reduced motion: final states shown at once, durations near zero, no transforms.
 
-## Application shell
-- Marketing shell (`/`): top bar, footer. There is no sign-in or account in the web UI.
-- App shell (everything else): fixed sidebar (large screens), top bar with search, mobile navigation sheet.
-- Pages after the landing page are lazy-loaded; the charting library only loads with the Method page.
+## Shell
+One sticky top bar on every page: logo, Investigate / Casebook / Library / Method with a sliding indicator, readiness indicator, command palette, sign-in or account menu, and the primary CTA. It is transparent over the hero and gains a surface and border on scroll. Below 1024px the navigation moves into a sheet. Pages after the landing page are lazy-loaded; the charting library only loads with the Method page.
 
 ## Report (the key screen)
-Order: overall assessment, three instruments, claim breakdown, evidence explorer, article details, technical details.
-- Assessment states are descriptive, never verdicts: out of domain, inconclusive, unreliable-like style, insufficient evidence, reliable-like style (see `buildAssessment` in `reportModel.js`).
-- Claim breakdown states that claim extraction and per-claim verdicts are not performed, and shows only matched sentences. It accepts a `claims` array if a backend capability appears.
-- Evidence cards state "Support or contradiction: not assessed".
+Header (title, metadata, every action) and a section rail, then: what the classifier observed (with the probability explained as not a probability of being fake), what was retrieved, how far to trust it; "What should I take away from this?" (assembled from the response by `buildTakeaway`); the three readings; related reference material; the article; method and limitations. The notice that VERITAS does not verify claims is part of the first screen.
+- Evidence cards say "Support or contradiction: not assessed". An empty evidence result is explained as coverage, not failure.
+- Save investigation: investigations are saved by the server when analysed while signed in. For a signed-in user the button shows where it was saved; for an anonymous user it goes to sign-in and the input is re-run and saved afterwards.
+
+## Casebook and Library
+The Casebook holds six invented cases with real recorded outputs (`data/recorded-results.json`, produced by the live pipeline on 2026-11-21) and a Run this case button. Saved investigations live at `/history`. The Library has topic and publisher filters and a passage detail dialog, and says the collection is limited.
 
 ## Honesty rules
 1. Classification, model confidence and trust in the analysis stay separate.
