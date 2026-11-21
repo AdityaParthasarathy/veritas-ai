@@ -1,5 +1,7 @@
 # Analysis API, evidence collection and uncertainty
 
+> Vercel edition: there are no accounts and nothing is stored (`analysis_id` is always `null`); evidence retrieval is lexical (TF-IDF), not semantic. See [vercel-edition.md](vercel-edition.md).
+
 ## Endpoints (all under `/api/v1`)
 
 | Method | Path | Purpose |
@@ -8,9 +10,9 @@
 | POST | `/analysis/url` | Analyze `{ "url": str }`: the server fetches the page, extracts the article, then runs the same analysis. Response adds a `source` object. |
 | GET | `/health/models` | ML load status: `not_loaded`, `loading`, `ready` or `unavailable`. |
 | GET | `/evidence/passages?topic=` | List the reference collection. |
-| GET | `/evidence/search?q=&top_k=` | Semantic search over the collection (`q` 3 to 500 chars, `top_k` 1 to 10). |
+| GET | `/evidence/search?q=&top_k=` | Lexical (TF-IDF) search over the collection (`q` 3 to 500 chars, `top_k` 1 to 10). |
 
-Errors use the standard envelope. Invalid input returns 422 `VALIDATION_ERROR`. If the ML components are not installed or trained, the API returns 503 `MODEL_UNAVAILABLE` with a generic message. The models are loaded in a background thread at startup (`PRELOAD_MODELS`, about 15 s); a request that arrives while they are still loading waits for the load to finish, and later requests reuse them. Anonymous requests are analysed but not stored; with a valid bearer token the result is saved to the user's history (`analysis_id` in the response, see [auth.md](auth.md)).
+Errors use the standard envelope. Invalid input returns 422 `VALIDATION_ERROR`. If the ML components are not installed or trained, the API returns 503 `MODEL_UNAVAILABLE` with a generic message. The models are loaded in a background thread at startup (`PRELOAD_MODELS`, about 15 s); a request that arrives while they are still loading waits for the load to finish, and later requests reuse them. Nothing is stored: there are no accounts and no saved analyses.
 
 ## URL analysis
 
@@ -26,7 +28,7 @@ Known limitation: the page's domain says nothing about reliability, and encyclop
 
 1. `classification` (`machine_learning_classification`): the Phase 2 TF-IDF + Logistic Regression model, source-masked variant. Output is `probability_unreliable_style` and a label that says the text *resembles content from sources labelled unreliable/reliable*. It is not a fact-check, and the accompanying test accuracy is agreement with dataset labels on held-out articles from the same dataset.
 2. `linguistic_signals`: descriptive measurements (exclamation marks, ALL-CAPS ratio, sensational and hedging wording per 1,000 words, attribution markers, named entities, numbers, quotation marks, pronouns, sentence length). They are computed with spaCy `en_core_web_sm`, are **not** inputs to the classifier, and are not a score. The sensational and hedging word lists are small, hand-picked and unvalidated.
-3. `evidence` (`retrieved_reference_passages`): passages from the reference collection found by MiniLM embeddings and FAISS cosine similarity, using the title and up to 8 sentences as queries (or the whole text for very short input). Each hit has a similarity score, a `relevant` flag (score at least **0.40**) and a source link. The 0.40 threshold was tuned on a labelled query set (see [quality-evaluation.md](quality-evaluation.md)): it favours precision, so a passage is only called related when the match is clear. The system returns topical relevance only; it does not decide whether a passage supports or contradicts the text.
+3. `evidence` (`retrieved_reference_passages`): passages from the reference collection found by TF-IDF (character 3 to 5-gram) cosine similarity, using the title and up to 8 sentences as queries (or the whole text for very short input). Each hit has a similarity score, a `relevant` flag (score at least **0.25**) and a source link. The threshold was chosen on the dev half of a labelled query set (see [vercel-edition.md](vercel-edition.md)). Lexical matching can miss a passage written in different words and can flag a weak match for unrelated text. The system returns shared-wording relevance only; it does not decide whether a passage supports or contradicts the text.
 4. `uncertainty`: transparent rules, see below.
 
 ## Uncertainty rules

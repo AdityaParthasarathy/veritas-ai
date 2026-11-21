@@ -1,5 +1,7 @@
 # Demonstration script (about 9 minutes)
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 **Goal:** show a working system, and be honest about what it can and cannot do. The strongest message is the pairing of a working analysis pipeline with visible, repeated statements that it does not verify truth.
 
 **Before you start (2 minutes, off camera)**

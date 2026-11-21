@@ -13,7 +13,7 @@ async function readStatus() {
   const apiOnline = live.status === 'fulfilled' && live.value?.status === 'alive'
   let database = 'unknown'
   if (apiOnline) {
-    if (ready.status === 'fulfilled') database = ready.value?.database === 'connected' ? 'connected' : 'disconnected'
+    if (ready.status === 'fulfilled') database = ready.value?.database ?? 'unknown' // connected | not_used (this edition has none)
     else if (ready.reason?.response?.status === 503) database = 'disconnected'
   }
   const modelData = apiOnline && models.status === 'fulfilled' ? models.value : null

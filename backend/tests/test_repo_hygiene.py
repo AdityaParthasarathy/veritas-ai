@@ -33,7 +33,10 @@ def test_no_source_files_are_git_ignored():
     assert _ignored(sources) == []
 
 
-def test_large_local_artifacts_stay_ignored():
-    expected = ["models/all-MiniLM-L6-v2/model.safetensors", "data/raw/WELFake_Dataset.csv", "backend/ml_artifacts/x.joblib", ".env"]
+def test_the_classifier_files_are_committed_and_local_secrets_stay_ignored():
+    # The serverless function ships the three classifier files, so they must not be git-ignored.
+    shipped = [f"backend/ml_artifacts/source_masked_{part}.joblib" for part in ("tfidf_vectorizer", "logreg_model", "domain_profile")]
+    assert _ignored(shipped) == []
+    expected = ["data/raw/WELFake_Dataset.csv", ".env", "frontend/.env", "backend/.vercel/project.json"]
     # Also proves the helper really detects ignored paths, so the source-file test above cannot pass vacuously.
     assert sorted(_ignored(expected)) == sorted(expected)

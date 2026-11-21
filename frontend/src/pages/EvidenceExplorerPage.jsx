@@ -66,7 +66,7 @@ export default function EvidenceExplorerPage() {
       <div className="mb-10 max-w-3xl">
         <p className="t-eyebrow mb-2">Research repository</p>
         <h1 className="t-h1">Reference library</h1>
-        <p className="t-lead mt-4">The passages Veritas retrieves from. Each is a short paraphrase of an institutional source, written for this project; the link is the authority. Search matches meaning, not just words.</p>
+        <p className="t-lead mt-4">The passages Veritas retrieves from. Each is a short paraphrase of an institutional source, written for this project; the link is the authority. Search matches shared words, not meaning: a passage on the same subject in different words can be missed.</p>
         {collection && (
           <p className="t-meta mt-4">
             {collection.name} · {collection.size} passages · source links checked {collection.url_checked_on}
@@ -83,7 +83,7 @@ export default function EvidenceExplorerPage() {
 
       <form onSubmit={handleSearch} role="search" className="max-w-2xl">
         <label htmlFor="library-search" className="sr-only">
-          Search the reference library by meaning
+          Search the reference library by keyword
         </label>
         <div className="relative">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" aria-hidden="true" />
@@ -116,7 +116,7 @@ export default function EvidenceExplorerPage() {
       {results && (
         <section aria-label="Search results" className="mt-10">
           <h2 className="t-h2 mb-1">Closest passages to “{results.query}”</h2>
-          <p className="t-caption mb-2">Ranked by similarity. The tick marks the cut-off Veritas uses to call a passage related.</p>
+          <p className="t-caption mb-2">Ranked by lexical similarity (shared wording). The tick marks the cut-off Veritas uses to call a passage related.</p>
           <ol className="mt-4 grid gap-4 md:grid-cols-2">
             {results.hits.map((hit) => (
               <EvidenceItem key={hit.id} hit={hit} threshold={results.relevance_threshold} muted={!hit.relevant} />

@@ -1,5 +1,7 @@
 # VERITAS AI: Technical Report
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 ## 1. Summary
 
 VERITAS AI is a web application that analyses a news article, a headline or a public article URL and returns four **separate** things: (1) a machine-learning classification of the text's writing style, (2) descriptive linguistic measurements, (3) reference passages retrieved by semantic similarity from a small curated collection, and (4) an uncertainty assessment of the analysis itself. It deliberately never claims that a text is true or false. The classifier is trained on a dataset whose labels come from the reliability of the publishing source, so it reports whether text *resembles content from sources labelled unreliable or reliable*, and the interface and API repeat that limit wherever a result is shown.

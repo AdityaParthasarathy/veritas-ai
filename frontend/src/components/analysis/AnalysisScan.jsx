@@ -9,7 +9,7 @@ const PIPELINE = [
   { id: 'signals', label: 'Measure linguistic indicators (spaCy)' },
   { id: 'style', label: 'Read the writing style (TF-IDF and logistic regression)' },
   { id: 'domain', label: 'Check whether the text resembles the training articles' },
-  { id: 'evidence', label: 'Retrieve related reference passages (MiniLM and FAISS)' },
+  { id: 'evidence', label: 'Retrieve related reference passages (TF-IDF lexical match)' },
   { id: 'trust', label: 'Assess how far to trust the analysis' },
 ]
 

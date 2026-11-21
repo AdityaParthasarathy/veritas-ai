@@ -1,8 +1,7 @@
 """Evidence retrieval over the curated reference collection.
 
-Retrieval is purely semantic similarity (MiniLM embeddings + FAISS). It returns
-topically related passages; it does not decide whether a passage supports or
-contradicts the submitted text.
+Retrieval is lexical (TF-IDF cosine similarity), not semantic: it returns passages that share vocabulary with the
+text. It shows topical overlap only; it does not decide whether a passage supports or contradicts the submitted text.
 """
 
 from __future__ import annotations
@@ -11,8 +10,8 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.ml.lexical_retrieval import METHOD, LexicalIndex
 from app.ml.paths import EVIDENCE_COLLECTION_PATH
-from app.ml.retrieval import Embedder, PassageIndex
 from app.ml.uncertainty import RELEVANCE_THRESHOLD
 
 COLLECTION_PATH = EVIDENCE_COLLECTION_PATH
@@ -34,11 +33,13 @@ class EvidenceHit:
 
 
 class EvidenceService:
-    def __init__(self, embedder: Embedder, collection_path: Path = COLLECTION_PATH) -> None:
+    method = METHOD
+
+    def __init__(self, collection_path: Path = COLLECTION_PATH, index: LexicalIndex | None = None) -> None:
         data = json.loads(collection_path.read_text(encoding="utf-8"))
         self.collection = data["collection"]
         self.passages = data["passages"]
-        self._index = PassageIndex(embedder, [p["passage"] for p in self.passages])
+        self._index = index or LexicalIndex([p["passage"] for p in self.passages])
 
     def _hit(self, i: int, score: float, matched: str | None = None) -> EvidenceHit:
         p = self.passages[i]
@@ -46,7 +47,7 @@ class EvidenceService:
                            p["source_org"], p["source_title"], p["source_url"], matched)
 
     def search(self, query: str, top_k: int = 5) -> list[EvidenceHit]:
-        """Return the ``top_k`` passages most similar in meaning to ``query``."""
+        """Return the ``top_k`` passages with the highest lexical similarity to ``query``."""
         return [self._hit(h.index, h.score) for h in self._index.search(query, top_k=top_k)]
 
     def retrieve_for_article(self, title: str, sentences: list[str], top_k: int = 3) -> list[EvidenceHit]:

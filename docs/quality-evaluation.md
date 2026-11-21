@@ -1,5 +1,7 @@
 # Quality evaluation: out-of-domain detection and evidence retrieval
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 All numbers come from scripts in this repository and can be regenerated (commands below). Both evaluation sets were written by the project author, so labels reflect one person's judgement and the results should be read as indicative.
 
 ## 1. Out-of-domain (OOD) detection

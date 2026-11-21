@@ -1,18 +1,17 @@
-# VERITAS AI - core backend dependencies (exact versions verified on Python 3.13, Windows x64)
+# VERITAS AI (Vercel edition) - runtime dependencies. Exact versions, verified on Python 3.13 / Linux x86_64.
+# Deliberately absent: PyTorch, Transformers, sentence-transformers, FAISS, SQLAlchemy, psycopg, Alembic,
+# JWT/bcrypt/passlib and pandas (none is needed to run an analysis).
 fastapi==0.165.0
-uvicorn[standard]==0.54.0
 pydantic==2.14.4
 pydantic-settings==2.16.3
-sqlalchemy==2.1.9
-psycopg==3.3.9
-psycopg-binary==3.3.9
-alembic==1.20.1
-PyJWT==2.15.1
-cryptography==50.0.2
-passlib==1.7.4
-bcrypt==4.0.1
 python-dotenv==1.2.4
 httpx==0.28.1
-pytest==9.2.0
-email-validator==2.4.0
 trafilatura==2.3.1
+numpy==2.5.5
+scipy==1.18.1
+# The saved classifier is a pickle: it must be loaded with the scikit-learn version that wrote it.
+scikit-learn==1.9.1
+joblib==1.6.0
+spacy==3.8.18
+# spaCy language model (installed from its release wheel; Gate 0 confirmed Vercel installs this).
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

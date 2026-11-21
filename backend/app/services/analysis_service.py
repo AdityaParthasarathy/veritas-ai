@@ -39,7 +39,8 @@ CLASSIFIER_DISCLAIMER = (
     "It is not a fact-check."
 )
 EVIDENCE_DISCLAIMER = (
-    "Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; "
+    "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, "
+    "so a passage on the same subject written in different words can be missed. They show related reference material only; "
     "the system does not determine whether they support or contradict the text."
 )
 
@@ -85,11 +86,10 @@ class AnalysisService:
 
                 from app.ml.classifier import StyleClassifier
                 from app.ml.evidence import EvidenceService
-                from app.ml.retrieval import Embedder
 
                 self._nlp = spacy.load("en_core_web_sm")
                 self._classifier = StyleClassifier()
-                self._evidence = EvidenceService(Embedder())
+                self._evidence = EvidenceService()
             except Exception as exc:  # missing artifacts, models or packages
                 self._loading = False
                 self._failed = True
@@ -146,6 +146,7 @@ class AnalysisService:
             ),
             linguistic_signals=[SignalOut(**asdict(s)) for s in signals],
             evidence=EvidenceResult(
+                retrieval_method=self._evidence.method,
                 collection_name=self._evidence.collection["name"],
                 collection_size=len(self._evidence.passages),
                 relevance_threshold=RELEVANCE_THRESHOLD,
@@ -183,7 +184,7 @@ class AnalysisService:
         )
 
     def search_passages(self, query: str, top_k: int) -> EvidenceSearchResponse:
-        """Semantic search over the reference collection."""
+        """Lexical (TF-IDF) search over the reference collection."""
         hits = self.evidence.search(query, top_k=top_k)
         return EvidenceSearchResponse(query=query, relevance_threshold=RELEVANCE_THRESHOLD, hits=[EvidenceHitOut(**asdict(h)) for h in hits])
 

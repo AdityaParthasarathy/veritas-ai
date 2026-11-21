@@ -84,7 +84,7 @@ def resolve_public_addresses(host: str, port: int) -> list[str]:
     """Resolve ``host`` and return its addresses, refusing if any is not public."""
     try:
         infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
-    except socket.gaierror:
+    except OSError:  # socket.gaierror, and the plain OSError some serverless resolvers raise (e.g. errno 16 on Vercel)
         raise UrlFetchFailedException("The host name could not be resolved.") from None
     addresses = list(dict.fromkeys(info[4][0] for info in infos))
     if not addresses or not all(is_public_address(a) for a in addresses):

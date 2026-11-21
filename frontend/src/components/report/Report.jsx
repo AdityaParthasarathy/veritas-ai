@@ -34,7 +34,7 @@ function Section({ id, title, aside, children, delay = 0 }) {
  * nothing here gives a verdict about the text itself. `text` is the submitted document (absent for URL analyses, whose
  * extracted text the API does not return).
  */
-export default function Report({ result, text, title, stamp, headingRef, onRerun, onNew, draft }) {
+export default function Report({ result, text, title, stamp, headingRef, onRerun, onNew }) {
   const [activeRef, setActiveRef] = useState(null)
   const { classification, uncertainty, evidence, linguistic_signals: signals, source } = result
   const reading = buildReading(result)
@@ -42,7 +42,7 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
 
   return (
     <article aria-labelledby="report-title">
-      <ReportHeader result={result} title={displayTitle} text={text} stamp={stamp} inputType={source ? 'Article URL' : 'Pasted text'} headingRef={headingRef} onRerun={onRerun} onNew={onNew} draft={draft} />
+      <ReportHeader result={result} title={displayTitle} text={text} stamp={stamp} inputType={source ? 'Article URL' : 'Pasted text'} headingRef={headingRef} onRerun={onRerun} onNew={onNew} />
 
       <div className="mt-8 grid gap-x-10 gap-y-6 lg:grid-cols-[11rem_minmax(0,1fr)]">
         <ReportNav />
@@ -88,7 +88,7 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
             <InstrumentCards result={result} reading={reading} />
           </Section>
 
-          <Section id="evidence" title="Related reference material" aside="Semantic similarity, not support. Matched sentences are marked in the article.">
+          <Section id="evidence" title="Related reference material" aside="Lexical similarity (shared wording), not meaning and not support. Matched sentences are marked in the article.">
             <EvidenceExplorer evidence={evidence} activeRef={activeRef} onActivate={setActiveRef} showMatched={!text} />
           </Section>
 

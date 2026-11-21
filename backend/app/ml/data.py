@@ -8,22 +8,14 @@ mapping printed in the dataset description; see docs/dataset-and-model.md).
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-MAX_CHARS = 20_000  # cap extreme outliers (max article is ~143k chars)
-_WS = re.compile(r"\s+")
-
-# Publisher cues the classifier could use as shortcuts instead of linguistic style.
-_SOURCE_PATTERNS = [
-    re.compile(r"^[A-Z][A-Za-z .,'/&-]{1,60}\((?:Reuters|AP)\)\s*[-–—]?\s*"),  # news-agency dateline
-    re.compile(r"\b(?:Reuters|Associated Press|The New York Times|New York Times|Breitbart|Breitbart News)\b", re.I),
-    re.compile(r"\b(?:Twitter|twitchy\.com|pic\.twitter\.com\S*)\b", re.I),
-]
+# Masking lives in app.ml.text_masking (importable without pandas); re-exported here for the training scripts.
+from app.ml.text_masking import _SOURCE_PATTERNS, _WS, MAX_CHARS, mask_source_cues  # noqa: E402,F401
 
 
 @dataclass
@@ -45,13 +37,6 @@ class CleaningReport:
 
 def _normalize(value: str) -> str:
     return _WS.sub(" ", value.lower()).strip()
-
-
-def mask_source_cues(text: str) -> str:
-    """Remove obvious publisher markers (agency datelines, outlet names, Twitter embeds)."""
-    for pattern in _SOURCE_PATTERNS:
-        text = pattern.sub(" ", text)
-    return _WS.sub(" ", text).strip()
 
 
 def load_raw(path: Path) -> pd.DataFrame:

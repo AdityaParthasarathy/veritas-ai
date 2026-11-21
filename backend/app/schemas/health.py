@@ -1,6 +1,5 @@
 """VERITAS AI - Health Check Schemas."""
 
-from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -11,13 +10,6 @@ class LiveHealthResponse(BaseModel):
 
 
 class ReadyHealthResponse(BaseModel):
-    """Response payload for readiness probe when database is available."""
+    """Response payload for the readiness probe."""
     status: str = Field(default="ready", description="Service readiness indicator")
-    database: str = Field(default="connected", description="Database connection status")
-
-
-class HealthNotReadyResponse(BaseModel):
-    """Response payload for readiness probe when dependencies are unavailable."""
-    status: str = Field(default="not_ready", description="Service readiness indicator")
-    database: str = Field(default="disconnected", description="Database connection status")
-    detail: Optional[str] = Field(default="Database unavailable", description="High-level reason")
+    database: str = Field(default="not_used", description="This edition has no database; always 'not_used'")

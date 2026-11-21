@@ -1,13 +1,7 @@
 """VERITAS AI - Health Check Endpoints."""
 
 from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
-from app.core.exceptions import DatabaseUnavailableException
-from app.schemas.health import (
-    LiveHealthResponse,
-    ReadyHealthResponse,
-    HealthNotReadyResponse,
-)
+from app.schemas.health import LiveHealthResponse, ReadyHealthResponse
 from app.services.health_service import HealthService
 
 router = APIRouter(prefix="/health", tags=["Health & Diagnostics"])
@@ -41,30 +35,13 @@ def get_liveness() -> LiveHealthResponse:
 @router.get(
     "/ready",
     response_model=ReadyHealthResponse,
-    responses={
-        status.HTTP_200_OK: {
-            "model": ReadyHealthResponse,
-            "description": "Database and backend ready to accept traffic",
-        },
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "model": HealthNotReadyResponse,
-            "description": "Database connection is unavailable",
-        },
-    },
     status_code=status.HTTP_200_OK,
     summary="Application Readiness Check",
-    description="Performs an actual query against the PostgreSQL database to verify operational readiness.",
+    description=(
+        "This edition has no database, so the process is ready as soon as it can answer requests; `database` is always "
+        "`not_used`. The analysis components load on the first analysis request: see `/health/models`."
+    ),
 )
-def get_readiness():
-    """Verify that the database is connected and queries can be executed."""
-    try:
-        return HealthService.get_ready_status()
-    except DatabaseUnavailableException as exc:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content=HealthNotReadyResponse(
-                status="not_ready",
-                database="disconnected",
-                detail=exc.message,
-            ).model_dump(),
-        )
+def get_readiness() -> ReadyHealthResponse:
+    """Report readiness (there is no database dependency)."""
+    return HealthService.get_ready_status()

@@ -1,0 +1,617 @@
+{
+  "generated_at": "2026-11-21T15:25:45+00:00",
+  "retrieval_method": "tfidf_lexical (vectorizer fitted on the 70 passages only)",
+  "collection_size": 70,
+  "queries": {
+    "total": 120,
+    "positive": 75
+  },
+  "selection_rule": "maximise strict F1 on dev subject to a false-related rate <= 5% on negative labelled queries (dev) and <= 10% on 600 held-out out-of-collection WELFake articles; ties go to the stricter threshold (the article limit was added after seeing the first result, see the module docstring)",
+  "chosen_variant": "char_wb_3-5gram",
+  "rule_selected_threshold": 0.26,
+  "deployed_threshold": 0.25,
+  "deployed_threshold_note": "Chosen by the project owner. It satisfies both limits for the chosen variant and sits one grid step below the rule's own pick; dev metrics are identical, the rule's tie-break prefers the stricter value.",
+  "chosen_threshold": 0.25,
+  "chosen": {
+    "params": {
+      "analyzer": "char_wb",
+      "ngram_range": [
+        3,
+        5
+      ],
+      "sublinear_tf": true
+    },
+    "top1_retrieval_accuracy_on_positives_all": 0.9067,
+    "dev_at_chosen": {
+      "threshold": 0.26,
+      "tp": 27,
+      "fp": 0,
+      "fn": 5,
+      "precision": 1.0,
+      "recall": 0.8438,
+      "f1": 0.9153,
+      "false_related_rate_on_negatives": 0.0
+    },
+    "test_at_chosen": {
+      "threshold": 0.26,
+      "tp": 30,
+      "fp": 1,
+      "fn": 13,
+      "precision": 0.9677,
+      "recall": 0.6977,
+      "f1": 0.8108,
+      "false_related_rate_on_negatives": 0.0476
+    },
+    "all_at_chosen": {
+      "threshold": 0.26,
+      "tp": 57,
+      "fp": 1,
+      "fn": 18,
+      "precision": 0.9828,
+      "recall": 0.76,
+      "f1": 0.8571,
+      "false_related_rate_on_negatives": 0.0222
+    },
+    "at_deployed_threshold": {
+      "threshold": 0.25,
+      "dev": {
+        "threshold": 0.25,
+        "tp": 27,
+        "fp": 0,
+        "fn": 5,
+        "precision": 1.0,
+        "recall": 0.8438,
+        "f1": 0.9153,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test": {
+        "threshold": 0.25,
+        "tp": 31,
+        "fp": 3,
+        "fn": 12,
+        "precision": 0.9118,
+        "recall": 0.7209,
+        "f1": 0.8052,
+        "false_related_rate_on_negatives": 0.0952
+      },
+      "articles_flagged_related": 0.0933
+    },
+    "article_level": {
+      "articles": 600,
+      "top_score_percentiles_p50_p75_p90_p95_p99": [
+        0.196,
+        0.221,
+        0.247,
+        0.27,
+        0.311
+      ],
+      "flagged_related_at_chosen": 0.065,
+      "flagged_related_at": {
+        "0.200": 0.4483,
+        "0.225": 0.2167,
+        "0.250": 0.0933,
+        "0.275": 0.0433,
+        "0.300": 0.0183,
+        "0.350": 0.0017
+      }
+    }
+  },
+  "all_candidates": {
+    "word_1gram_stopwords": {
+      "params": {
+        "stop_words": "english",
+        "sublinear_tf": true
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.88,
+      "dev_at_chosen": {
+        "threshold": 0.41,
+        "tp": 16,
+        "fp": 0,
+        "fn": 16,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6667,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test_at_chosen": {
+        "threshold": 0.41,
+        "tp": 20,
+        "fp": 1,
+        "fn": 23,
+        "precision": 0.9524,
+        "recall": 0.4651,
+        "f1": 0.625,
+        "false_related_rate_on_negatives": 0.0476
+      },
+      "all_at_chosen": {
+        "threshold": 0.41,
+        "tp": 36,
+        "fp": 1,
+        "fn": 39,
+        "precision": 0.973,
+        "recall": 0.48,
+        "f1": 0.6429,
+        "false_related_rate_on_negatives": 0.0222
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 25,
+          "fp": 6,
+          "fn": 7,
+          "precision": 0.8065,
+          "recall": 0.7812,
+          "f1": 0.7937,
+          "false_related_rate_on_negatives": 0.2083
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 32,
+          "fp": 6,
+          "fn": 11,
+          "precision": 0.8421,
+          "recall": 0.7442,
+          "f1": 0.7901,
+          "false_related_rate_on_negatives": 0.2381
+        },
+        "articles_flagged_related": 0.845
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.295,
+          0.353,
+          0.409,
+          0.471,
+          0.499
+        ],
+        "flagged_related_at_chosen": 0.0983,
+        "flagged_related_at": {
+          "0.200": 0.9917,
+          "0.225": 0.9617,
+          "0.250": 0.845,
+          "0.275": 0.6233,
+          "0.300": 0.445,
+          "0.350": 0.2517
+        }
+      }
+    },
+    "word_1-2gram_stopwords": {
+      "params": {
+        "stop_words": "english",
+        "sublinear_tf": true,
+        "ngram_range": [
+          1,
+          2
+        ]
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.8933,
+      "dev_at_chosen": {
+        "threshold": 0.3,
+        "tp": 19,
+        "fp": 2,
+        "fn": 13,
+        "precision": 0.9048,
+        "recall": 0.5938,
+        "f1": 0.717,
+        "false_related_rate_on_negatives": 0.0417
+      },
+      "test_at_chosen": {
+        "threshold": 0.3,
+        "tp": 20,
+        "fp": 1,
+        "fn": 23,
+        "precision": 0.9524,
+        "recall": 0.4651,
+        "f1": 0.625,
+        "false_related_rate_on_negatives": 0.0476
+      },
+      "all_at_chosen": {
+        "threshold": 0.3,
+        "tp": 39,
+        "fp": 3,
+        "fn": 36,
+        "precision": 0.9286,
+        "recall": 0.52,
+        "f1": 0.6667,
+        "false_related_rate_on_negatives": 0.0444
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 22,
+          "fp": 2,
+          "fn": 10,
+          "precision": 0.9167,
+          "recall": 0.6875,
+          "f1": 0.7857,
+          "false_related_rate_on_negatives": 0.0417
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 27,
+          "fp": 1,
+          "fn": 16,
+          "precision": 0.9643,
+          "recall": 0.6279,
+          "f1": 0.7606,
+          "false_related_rate_on_negatives": 0.0476
+        },
+        "articles_flagged_related": 0.1967
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.203,
+          0.242,
+          0.296,
+          0.327,
+          0.383
+        ],
+        "flagged_related_at_chosen": 0.0933,
+        "flagged_related_at": {
+          "0.200": 0.565,
+          "0.225": 0.37,
+          "0.250": 0.1967,
+          "0.275": 0.135,
+          "0.300": 0.0933,
+          "0.350": 0.0233
+        }
+      }
+    },
+    "word_1gram": {
+      "params": {
+        "sublinear_tf": true
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.8267,
+      "dev_at_chosen": {
+        "threshold": 0.33,
+        "tp": 23,
+        "fp": 0,
+        "fn": 9,
+        "precision": 1.0,
+        "recall": 0.7188,
+        "f1": 0.8364,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test_at_chosen": {
+        "threshold": 0.33,
+        "tp": 25,
+        "fp": 0,
+        "fn": 18,
+        "precision": 1.0,
+        "recall": 0.5814,
+        "f1": 0.7353,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "all_at_chosen": {
+        "threshold": 0.33,
+        "tp": 48,
+        "fp": 0,
+        "fn": 27,
+        "precision": 1.0,
+        "recall": 0.64,
+        "f1": 0.7805,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 27,
+          "fp": 5,
+          "fn": 5,
+          "precision": 0.8438,
+          "recall": 0.8438,
+          "f1": 0.8438,
+          "false_related_rate_on_negatives": 0.125
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 31,
+          "fp": 1,
+          "fn": 12,
+          "precision": 0.9688,
+          "recall": 0.7209,
+          "f1": 0.8267,
+          "false_related_rate_on_negatives": 0.0
+        },
+        "articles_flagged_related": 0.72
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.273,
+          0.299,
+          0.323,
+          0.35,
+          0.389
+        ],
+        "flagged_related_at_chosen": 0.0883,
+        "flagged_related_at": {
+          "0.200": 0.9917,
+          "0.225": 0.9367,
+          "0.250": 0.72,
+          "0.275": 0.4783,
+          "0.300": 0.2433,
+          "0.350": 0.0517
+        }
+      }
+    },
+    "word_1-2gram": {
+      "params": {
+        "sublinear_tf": true,
+        "ngram_range": [
+          1,
+          2
+        ]
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.8133,
+      "dev_at_chosen": {
+        "threshold": 0.27,
+        "tp": 21,
+        "fp": 0,
+        "fn": 11,
+        "precision": 1.0,
+        "recall": 0.6562,
+        "f1": 0.7925,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test_at_chosen": {
+        "threshold": 0.27,
+        "tp": 22,
+        "fp": 0,
+        "fn": 21,
+        "precision": 1.0,
+        "recall": 0.5116,
+        "f1": 0.6769,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "all_at_chosen": {
+        "threshold": 0.27,
+        "tp": 43,
+        "fp": 0,
+        "fn": 32,
+        "precision": 1.0,
+        "recall": 0.5733,
+        "f1": 0.7288,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 21,
+          "fp": 0,
+          "fn": 11,
+          "precision": 1.0,
+          "recall": 0.6562,
+          "f1": 0.7925,
+          "false_related_rate_on_negatives": 0.0
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 24,
+          "fp": 0,
+          "fn": 19,
+          "precision": 1.0,
+          "recall": 0.5581,
+          "f1": 0.7164,
+          "false_related_rate_on_negatives": 0.0
+        },
+        "articles_flagged_related": 0.1183
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.197,
+          0.221,
+          0.254,
+          0.28,
+          0.322
+        ],
+        "flagged_related_at_chosen": 0.0633,
+        "flagged_related_at": {
+          "0.200": 0.4733,
+          "0.225": 0.2267,
+          "0.250": 0.1183,
+          "0.275": 0.0583,
+          "0.300": 0.025,
+          "0.350": 0.0017
+        }
+      }
+    },
+    "char_wb_3-5gram": {
+      "params": {
+        "analyzer": "char_wb",
+        "ngram_range": [
+          3,
+          5
+        ],
+        "sublinear_tf": true
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.9067,
+      "dev_at_chosen": {
+        "threshold": 0.26,
+        "tp": 27,
+        "fp": 0,
+        "fn": 5,
+        "precision": 1.0,
+        "recall": 0.8438,
+        "f1": 0.9153,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test_at_chosen": {
+        "threshold": 0.26,
+        "tp": 30,
+        "fp": 1,
+        "fn": 13,
+        "precision": 0.9677,
+        "recall": 0.6977,
+        "f1": 0.8108,
+        "false_related_rate_on_negatives": 0.0476
+      },
+      "all_at_chosen": {
+        "threshold": 0.26,
+        "tp": 57,
+        "fp": 1,
+        "fn": 18,
+        "precision": 0.9828,
+        "recall": 0.76,
+        "f1": 0.8571,
+        "false_related_rate_on_negatives": 0.0222
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 27,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1.0,
+          "recall": 0.8438,
+          "f1": 0.9153,
+          "false_related_rate_on_negatives": 0.0
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 31,
+          "fp": 3,
+          "fn": 12,
+          "precision": 0.9118,
+          "recall": 0.7209,
+          "f1": 0.8052,
+          "false_related_rate_on_negatives": 0.0952
+        },
+        "articles_flagged_related": 0.0933
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.196,
+          0.221,
+          0.247,
+          0.27,
+          0.311
+        ],
+        "flagged_related_at_chosen": 0.065,
+        "flagged_related_at": {
+          "0.200": 0.4483,
+          "0.225": 0.2167,
+          "0.250": 0.0933,
+          "0.275": 0.0433,
+          "0.300": 0.0183,
+          "0.350": 0.0017
+        }
+      }
+    },
+    "char_wb_4-6gram": {
+      "params": {
+        "analyzer": "char_wb",
+        "ngram_range": [
+          4,
+          6
+        ],
+        "sublinear_tf": true
+      },
+      "top1_retrieval_accuracy_on_positives_all": 0.9067,
+      "dev_at_chosen": {
+        "threshold": 0.29,
+        "tp": 24,
+        "fp": 0,
+        "fn": 8,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571,
+        "false_related_rate_on_negatives": 0.0
+      },
+      "test_at_chosen": {
+        "threshold": 0.29,
+        "tp": 24,
+        "fp": 2,
+        "fn": 19,
+        "precision": 0.9231,
+        "recall": 0.5581,
+        "f1": 0.6957,
+        "false_related_rate_on_negatives": 0.0952
+      },
+      "all_at_chosen": {
+        "threshold": 0.29,
+        "tp": 48,
+        "fp": 2,
+        "fn": 27,
+        "precision": 0.96,
+        "recall": 0.64,
+        "f1": 0.768,
+        "false_related_rate_on_negatives": 0.0444
+      },
+      "at_deployed_threshold": {
+        "threshold": 0.25,
+        "dev": {
+          "threshold": 0.25,
+          "tp": 26,
+          "fp": 0,
+          "fn": 6,
+          "precision": 1.0,
+          "recall": 0.8125,
+          "f1": 0.8966,
+          "false_related_rate_on_negatives": 0.0
+        },
+        "test": {
+          "threshold": 0.25,
+          "tp": 31,
+          "fp": 3,
+          "fn": 12,
+          "precision": 0.9118,
+          "recall": 0.7209,
+          "f1": 0.8052,
+          "false_related_rate_on_negatives": 0.0952
+        },
+        "articles_flagged_related": 0.1767
+      },
+      "article_level": {
+        "articles": 600,
+        "top_score_percentiles_p50_p75_p90_p95_p99": [
+          0.202,
+          0.236,
+          0.28,
+          0.31,
+          0.37
+        ],
+        "flagged_related_at_chosen": 0.085,
+        "flagged_related_at": {
+          "0.200": 0.5183,
+          "0.225": 0.3217,
+          "0.250": 0.1767,
+          "0.275": 0.115,
+          "0.300": 0.065,
+          "0.350": 0.0167
+        }
+      }
+    }
+  },
+  "semantic_minilm_reference_from_the_full_edition": {
+    "threshold": 0.4,
+    "top1_retrieval_accuracy_on_positives_all": 0.96,
+    "test_at_chosen": {
+      "threshold": 0.4,
+      "tp": 39,
+      "fp": 1,
+      "fn": 4,
+      "precision": 0.975,
+      "recall": 0.907,
+      "f1": 0.9398,
+      "false_related_rate_on_negatives": 0.0
+    },
+    "note": "Recorded by the full edition (data/evaluation/retrieval_eval_results.json). Not re-run here: this edition does not ship the embedding model."
+  },
+  "limitations": [
+    "Queries and labels were written by the project author; the test half is not independent of the author's judgement.",
+    "The queries paraphrase the passages and deliberately avoid copying their wording, which is the hardest case for lexical matching. Text that reuses a passage's vocabulary will match better.",
+    "No untouched test set remains: the article-level limit was added after the first result, and test-half numbers for these candidates were seen in an earlier feasibility run (see the module docstring).",
+    "Article-level flags are an upper bound on false matches; the articles were not read one by one.",
+    "Scores are vocabulary overlap, not meaning: a high score means shared words, not that the text is accurate or that the passage supports it."
+  ]
+}

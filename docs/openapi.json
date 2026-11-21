@@ -42,7 +42,7 @@
                 "type": "null"
               }
             ],
-            "description": "Set when the analysis was saved to the signed-in user's history",
+            "description": "Always null: this edition stores nothing (kept so responses stay compatible with the full edition)",
             "title": "Analysis Id"
           },
           "classification": {
@@ -90,28 +90,6 @@
           "disclaimer"
         ],
         "title": "AnalysisResponse",
-        "type": "object"
-      },
-      "ChangePasswordRequest": {
-        "properties": {
-          "current_password": {
-            "maxLength": 128,
-            "minLength": 1,
-            "title": "Current Password",
-            "type": "string"
-          },
-          "new_password": {
-            "maxLength": 128,
-            "minLength": 10,
-            "title": "New Password",
-            "type": "string"
-          }
-        },
-        "required": [
-          "current_password",
-          "new_password"
-        ],
-        "title": "ChangePasswordRequest",
         "type": "object"
       },
       "ClassMetrics": {
@@ -221,21 +199,6 @@
           "matrix"
         ],
         "title": "ConfusionMatrix",
-        "type": "object"
-      },
-      "DeleteAccountRequest": {
-        "properties": {
-          "password": {
-            "maxLength": 128,
-            "minLength": 1,
-            "title": "Password",
-            "type": "string"
-          }
-        },
-        "required": [
-          "password"
-        ],
-        "title": "DeleteAccountRequest",
         "type": "object"
       },
       "DomainCheck": {
@@ -422,6 +385,13 @@
           "relevance_threshold": {
             "title": "Relevance Threshold",
             "type": "number"
+          },
+          "retrieval_method": {
+            "const": "tfidf_lexical",
+            "default": "tfidf_lexical",
+            "description": "Lexical TF-IDF cosine similarity: vocabulary overlap, not meaning",
+            "title": "Retrieval Method",
+            "type": "string"
           }
         },
         "required": [
@@ -450,6 +420,12 @@
           "relevance_threshold": {
             "title": "Relevance Threshold",
             "type": "number"
+          },
+          "retrieval_method": {
+            "const": "tfidf_lexical",
+            "default": "tfidf_lexical",
+            "title": "Retrieval Method",
+            "type": "string"
           }
         },
         "required": [
@@ -471,126 +447,6 @@
           }
         },
         "title": "HTTPValidationError",
-        "type": "object"
-      },
-      "HealthNotReadyResponse": {
-        "description": "Response payload for readiness probe when dependencies are unavailable.",
-        "properties": {
-          "database": {
-            "default": "disconnected",
-            "description": "Database connection status",
-            "title": "Database",
-            "type": "string"
-          },
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": "Database unavailable",
-            "description": "High-level reason",
-            "title": "Detail"
-          },
-          "status": {
-            "default": "not_ready",
-            "description": "Service readiness indicator",
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "title": "HealthNotReadyResponse",
-        "type": "object"
-      },
-      "HistoryItem": {
-        "properties": {
-          "classifier_label": {
-            "title": "Classifier Label",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "preview": {
-            "title": "Preview",
-            "type": "string"
-          },
-          "probability_unreliable": {
-            "title": "Probability Unreliable",
-            "type": "number"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          },
-          "uncertainty_level": {
-            "title": "Uncertainty Level",
-            "type": "string"
-          },
-          "word_count": {
-            "title": "Word Count",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "preview",
-          "word_count",
-          "classifier_label",
-          "probability_unreliable",
-          "uncertainty_level",
-          "created_at"
-        ],
-        "title": "HistoryItem",
-        "type": "object"
-      },
-      "HistoryPage": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/HistoryItem"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "limit": {
-            "title": "Limit",
-            "type": "integer"
-          },
-          "offset": {
-            "title": "Offset",
-            "type": "integer"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "limit",
-          "offset"
-        ],
-        "title": "HistoryPage",
         "type": "object"
       },
       "Limitation": {
@@ -628,27 +484,6 @@
           }
         },
         "title": "LiveHealthResponse",
-        "type": "object"
-      },
-      "LoginRequest": {
-        "properties": {
-          "email": {
-            "format": "email",
-            "title": "Email",
-            "type": "string"
-          },
-          "password": {
-            "maxLength": 128,
-            "minLength": 1,
-            "title": "Password",
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ],
-        "title": "LoginRequest",
         "type": "object"
       },
       "MacroAverage": {
@@ -783,11 +618,11 @@
         "type": "object"
       },
       "ReadyHealthResponse": {
-        "description": "Response payload for readiness probe when database is available.",
+        "description": "Response payload for the readiness probe.",
         "properties": {
           "database": {
-            "default": "connected",
-            "description": "Database connection status",
+            "default": "not_used",
+            "description": "This edition has no database; always 'not_used'",
             "title": "Database",
             "type": "string"
           },
@@ -799,39 +634,6 @@
           }
         },
         "title": "ReadyHealthResponse",
-        "type": "object"
-      },
-      "RegisterRequest": {
-        "properties": {
-          "email": {
-            "format": "email",
-            "title": "Email",
-            "type": "string"
-          },
-          "full_name": {
-            "anyOf": [
-              {
-                "maxLength": 120,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Full Name"
-          },
-          "password": {
-            "maxLength": 128,
-            "minLength": 10,
-            "title": "Password",
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ],
-        "title": "RegisterRequest",
         "type": "object"
       },
       "SignalOut": {
@@ -1001,47 +803,6 @@
         "title": "SplitSize",
         "type": "object"
       },
-      "StoredAnalysis": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "result": {
-            "$ref": "#/components/schemas/AnalysisResponse"
-          },
-          "text": {
-            "title": "Text",
-            "type": "string"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "text",
-          "created_at",
-          "result"
-        ],
-        "title": "StoredAnalysis",
-        "type": "object"
-      },
       "SystemInfoResponse": {
         "description": "Response payload for system information.",
         "properties": {
@@ -1073,34 +834,6 @@
           "docs_url"
         ],
         "title": "SystemInfoResponse",
-        "type": "object"
-      },
-      "TokenResponse": {
-        "properties": {
-          "access_token": {
-            "title": "Access Token",
-            "type": "string"
-          },
-          "expires_in": {
-            "description": "Seconds until the token expires",
-            "title": "Expires In",
-            "type": "integer"
-          },
-          "token_type": {
-            "default": "bearer",
-            "title": "Token Type",
-            "type": "string"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserOut"
-          }
-        },
-        "required": [
-          "access_token",
-          "expires_in",
-          "user"
-        ],
-        "title": "TokenResponse",
         "type": "object"
       },
       "UncertaintyOut": {
@@ -1162,44 +895,6 @@
           "url"
         ],
         "title": "UrlAnalysisRequest",
-        "type": "object"
-      },
-      "UserOut": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "email": {
-            "format": "email",
-            "title": "Email",
-            "type": "string"
-          },
-          "full_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Full Name"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "full_name",
-          "created_at"
-        ],
-        "title": "UserOut",
         "type": "object"
       },
       "ValidationError": {
@@ -1289,16 +984,10 @@
         "title": "VariantPerformance",
         "type": "object"
       }
-    },
-    "securitySchemes": {
-      "HTTPBearer": {
-        "scheme": "bearer",
-        "type": "http"
-      }
     }
   },
   "info": {
-    "description": "Production-grade AI-powered misinformation intelligence platform. Provides linguistic analysis, semantic retrieval, and uncertainty assessment.",
+    "description": "A statistical text-analysis instrument. Provides a writing-style classification, linguistic indicators, lexical (TF-IDF) retrieval of related reference passages, and an uncertainty assessment. It does not verify whether content is true or false.",
     "title": "VERITAS AI",
     "version": "1.0.0"
   },
@@ -1324,160 +1013,9 @@
         ]
       }
     },
-    "/api/v1/analyses": {
-      "get": {
-        "description": "List the signed-in user's saved analyses, newest first.",
-        "operationId": "list_analyses_api_v1_analyses_get",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "default": 20,
-              "maximum": 100,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": false,
-            "schema": {
-              "default": 0,
-              "minimum": 0,
-              "title": "Offset",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HistoryPage"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "List my saved analyses, newest first",
-        "tags": [
-          "History"
-        ]
-      }
-    },
-    "/api/v1/analyses/{analysis_id}": {
-      "delete": {
-        "description": "Delete one saved analysis owned by the signed-in user.",
-        "operationId": "delete_analysis_api_v1_analyses__analysis_id__delete",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "analysis_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Analysis Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Delete one saved analysis",
-        "tags": [
-          "History"
-        ]
-      },
-      "get": {
-        "description": "Return one saved analysis owned by the signed-in user.",
-        "operationId": "get_analysis_api_v1_analyses__analysis_id__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "analysis_id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "title": "Analysis Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StoredAnalysis"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Get one saved analysis",
-        "tags": [
-          "History"
-        ]
-      }
-    },
     "/api/v1/analysis": {
       "post": {
-        "description": "Returns, as separate sections: a machine-learning style classification, linguistic signals, retrieved reference passages and an uncertainty assessment. It does not verify factual claims. Anonymous requests are analysed but not stored; with a valid bearer token the analysis is saved to the user's history.",
+        "description": "Returns, as separate sections: a machine-learning style classification, linguistic signals, retrieved reference passages (lexical TF-IDF similarity) and an uncertainty assessment. It does not verify factual claims. Nothing is stored: there are no accounts and no saved analyses.",
         "operationId": "analyze_text_api_v1_analysis_post",
         "requestBody": {
           "content": {
@@ -1511,11 +1049,6 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Analyze submitted text",
         "tags": [
           "Analysis"
@@ -1558,210 +1091,9 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
         "summary": "Fetch an article from a URL and analyze it",
         "tags": [
           "Analysis"
-        ]
-      }
-    },
-    "/api/v1/auth/change-password": {
-      "post": {
-        "description": "Change the password and return a fresh token; all older tokens stop working.",
-        "operationId": "change_password_api_v1_auth_change_password_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Change password (invalidates all existing tokens)",
-        "tags": [
-          "Authentication"
-        ]
-      }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "description": "Verify credentials and return a bearer token.",
-        "operationId": "login_api_v1_auth_login_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Sign in and receive a bearer token",
-        "tags": [
-          "Authentication"
-        ]
-      }
-    },
-    "/api/v1/auth/me": {
-      "delete": {
-        "description": "Permanently delete the signed-in user's account and saved analyses.",
-        "operationId": "delete_me_api_v1_auth_me_delete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteAccountRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Delete my account and all saved analyses",
-        "tags": [
-          "Authentication"
-        ]
-      },
-      "get": {
-        "description": "Return the signed-in user.",
-        "operationId": "me_api_v1_auth_me_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserOut"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "summary": "Current user",
-        "tags": [
-          "Authentication"
-        ]
-      }
-    },
-    "/api/v1/auth/register": {
-      "post": {
-        "description": "Create an account and return a bearer token.",
-        "operationId": "register_api_v1_auth_register_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create an account",
-        "tags": [
-          "Authentication"
         ]
       }
     },
@@ -1818,7 +1150,7 @@
     },
     "/api/v1/evidence/search": {
       "get": {
-        "description": "Return the reference passages most similar in meaning to the query.",
+        "description": "Return the reference passages that share the most vocabulary with the query (TF-IDF cosine similarity).",
         "operationId": "search_passages_api_v1_evidence_search_get",
         "parameters": [
           {
@@ -1867,7 +1199,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Semantic search over the reference collection",
+        "summary": "Lexical (TF-IDF) search over the reference collection",
         "tags": [
           "Evidence"
         ]
@@ -1921,7 +1253,7 @@
     },
     "/api/v1/health/ready": {
       "get": {
-        "description": "Performs an actual query against the PostgreSQL database to verify operational readiness.",
+        "description": "This edition has no database, so the process is ready as soon as it can answer requests; `database` is always `not_used`. The analysis components load on the first analysis request: see `/health/models`.",
         "operationId": "get_readiness_api_v1_health_ready_get",
         "responses": {
           "200": {
@@ -1932,17 +1264,7 @@
                 }
               }
             },
-            "description": "Database and backend ready to accept traffic"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HealthNotReadyResponse"
-                }
-              }
-            },
-            "description": "Database connection is unavailable"
+            "description": "Successful Response"
           }
         },
         "summary": "Application Readiness Check",

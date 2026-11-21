@@ -1,11 +1,9 @@
 """VERITAS AI - Health & System Service Layer.
 
-Encapsulates application health monitoring and diagnostic logic separate from route handlers.
+Encapsulates application health and diagnostic logic separate from route handlers.
 """
 
 from app.core.config import settings
-from app.core.exceptions import DatabaseUnavailableException
-from app.database.session import check_db_connectivity
 from app.schemas.health import LiveHealthResponse, ReadyHealthResponse
 from app.schemas.system import SystemInfoResponse
 
@@ -23,19 +21,8 @@ class HealthService:
 
     @staticmethod
     def get_ready_status() -> ReadyHealthResponse:
-        """Verify that the primary database is active and accepting queries.
-
-        Raises DatabaseUnavailableException if connection fails.
-        """
-        is_connected = check_db_connectivity()
-        if not is_connected:
-            raise DatabaseUnavailableException(
-                message="Primary database is currently unreachable",
-            )
-        return ReadyHealthResponse(
-            status="ready",
-            database="connected",
-        )
+        """Report readiness. There is no database in this edition, so the process being up is enough."""
+        return ReadyHealthResponse(status="ready", database="not_used")
 
     @staticmethod
     def get_system_info() -> SystemInfoResponse:

@@ -31,7 +31,7 @@ export default function InstrumentCards({ result, reading }) {
         <p className="t-caption mt-3">It measures how closely the writing matches patterns in the training labels. It cannot establish whether any claim is true.</p>
       </Card>
 
-      <Card id="evidence-retrieval" number="02" icon={ScanSearch} tone="bg-signal/15 text-signal" title="Evidence retrieval" caption="Related reference material, found by semantic similarity.">
+      <Card id="evidence-retrieval" number="02" icon={ScanSearch} tone="bg-signal/15 text-signal" title="Evidence retrieval" caption="Related reference material, found by shared wording (lexical TF-IDF similarity).">
         <p className="text-[2rem] font-semibold leading-none tracking-tight text-paper">
           {reading.relatedCount}
           <span className="ml-2 text-base font-normal text-dim">of {evidence.collection_size} passages related</span>

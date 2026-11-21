@@ -193,7 +193,7 @@ export function buildTakeaway(result) {
   const retrieved =
     related.length === 0
       ? `No clearly related passage was found in the reference collection (${evidence.collection_size} passages). The collection is small, so this reflects its coverage, not the accuracy of the text.`
-      : `${related.length} reference passage${related.length === 1 ? '' : 's'} from ${joinOrgs(orgs)} ${related.length === 1 ? 'is' : 'are'} close in meaning to the text. That is related material, not confirmation: the system does not judge whether a passage supports or contradicts the text.`
+      : `${related.length} reference passage${related.length === 1 ? '' : 's'} from ${joinOrgs(orgs)} ${related.length === 1 ? 'is' : 'are'} close to the text in wording (lexical match). That is related material, not confirmation: the system does not judge whether a passage supports or contradicts the text.`
 
   const level = uncertainty.level
   const reason = uncertainty.reasons[0] ? uncertainty.reasons[0].replace(/\.$/, '') : null

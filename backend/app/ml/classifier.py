@@ -8,7 +8,7 @@ from pathlib import Path
 
 import joblib
 
-from app.ml.data import MAX_CHARS, mask_source_cues
+from app.ml.text_masking import MAX_CHARS, mask_source_cues
 from app.ml.ood import DomainProfile
 from app.ml.paths import ARTIFACT_DIR
 
@@ -33,7 +33,7 @@ class StyleClassifier:
         vec_path = artifact_dir / f"{variant}_tfidf_vectorizer.joblib"
         model_path = artifact_dir / f"{variant}_logreg_model.joblib"
         if not (vec_path.exists() and model_path.exists()):
-            raise FileNotFoundError("Classifier artifacts missing. Run `python -m app.ml.train` in backend/.")
+            raise FileNotFoundError("Classifier artifacts missing. Train them with `python -m app.ml.train` in backend/ (needs requirements-dev.txt), or use the committed files.")
         self._vectorizer = joblib.load(vec_path)
         self._model = joblib.load(model_path)
         self.variant = variant

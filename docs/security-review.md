@@ -1,5 +1,7 @@
 # Security review (end to end)
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 Review date: 2026-11-20. Scope: backend API, ML/URL ingestion, frontend, Docker packaging, CI. Method: code review, automated tests, tool scans, and manual probing of the running Docker stack. This is a development-stage review by the author, not an independent penetration test.
 
 ## Threats, controls and evidence

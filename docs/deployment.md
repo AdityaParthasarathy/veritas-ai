@@ -1,63 +1,42 @@
-# Deployment with Docker Compose
+# Deployment on Vercel (free Hobby plan)
 
-`docker-compose.yml` runs three services on one network:
+Two Vercel projects from one repository (the `vercel-deployment` branch): a static frontend and a Python function. No database, no secrets, no paid service.
 
-| Service | Image | Host port (default) | Notes |
-| --- | --- | --- | --- |
-| `db` | `postgres:16-alpine` | `${POSTGRES_PORT:-5432}` | Named volume `veritas_postgres_data`; health check with `pg_isready`. |
-| `backend` | built from `backend/Dockerfile` (Python 3.13, CPU-only ML stack, about 2.7 GB) | `${BACKEND_PORT:-8000}` | Runs as non-root user 10001. Waits for a healthy database, applies Alembic migrations, then starts uvicorn. Health check: `/api/v1/health/live`. |
-| `frontend` | built from `frontend/Dockerfile` (about 75 MB) | `${FRONTEND_PORT:-5173}` | Static React build served by unprivileged nginx on port 8080, with a Content-Security-Policy and other security headers. |
-
-## First run
-
-1. Create `.env` from `.env.example`; set `SECRET_KEY` and a database password (the compose file refuses to start without them).
-2. Create the ML files once (they are large and git-ignored): see the README section "ML files (not in Git)". Compose mounts `./models` to `/models` and `./backend/ml_artifacts` to `/artifacts`, read-only.
-3. `docker compose up -d --build`, then `docker compose ps` until all three are `healthy`.
-
-Inside the compose network the backend reaches the database at `db:5432`, so `DATABASE_URL` in `.env` (which points at `localhost`) is only used when running the backend outside Docker.
-
-## Everyday commands
-
-```powershell
-docker compose ps
-docker compose logs -f backend
-docker compose logs -f db
-docker compose stop
-docker compose up -d --build backend
-```
-
-Model status: `Invoke-RestMethod http://localhost:8000/api/v1/health/models` (`loading` then `ready`; `unavailable` means the ML files or packages are missing).
-
-## Configuration reference
-
-| Variable | Purpose |
+## Project 1: backend (FastAPI function)
+| Setting | Value |
 | --- | --- |
-| `SECRET_KEY` | Signs JWTs; at least 32 random characters (the backend refuses to start otherwise). |
-| `POSTGRES_*`, `DATABASE_URL` | Database credentials (see `.env.example`). |
-| `FRONTEND_URL` | The single browser origin allowed by CORS. Must match the address users open. |
-| `BACKEND_URL` | Informational only. The browser calls `/api/v1` on the frontend's own address and nginx proxies it to the backend, so no API address is compiled into the frontend image. |
-| `BACKEND_PORT`, `FRONTEND_PORT`, `POSTGRES_PORT` | Host ports. |
-| `PRELOAD_MODELS` | Load ML components in a background thread at startup (default true). |
-| `MODELS_DIR`, `ARTIFACTS_DIR` | Where the embedding model and classifier files live. |
-| `URL_*` | URL ingestion limits (timeout, size, redirects, rate limit). |
+| Root Directory | `backend` |
+| Framework preset | FastAPI (auto-detected from `app/main.py`) |
+| Python | 3.13 (`backend/.python-version`) |
+| Dependencies | `backend/requirements.txt` (exact pins; installed by Vercel with uv) |
+| Function config | `backend/vercel.json` (`maxDuration` 60) |
+| Excluded from the bundle | `backend/.vercelignore` (tests, evaluation data, the unused baseline classifier) |
+| Environment variables | none required |
 
-## Backup and restore of the database
+Measured in a compatibility test with the same dependency set: the build log reported a 428 MB bundle (limit: 500 MB for Python functions), the build took about 14 s, the first heavy request on a new instance took about 4 s, and memory after loading spaCy was about 240 MB (Hobby functions get a fixed 2 GB). The environment's `/tmp` had about 78 MB left after Vercel placed the dependencies there, so the function must not write large files.
 
-```powershell
-docker exec veritas_postgres pg_dump -U veritas_user -d veritas_db -Fc -f /tmp/veritas.dump
-docker cp veritas_postgres:/tmp/veritas.dump .\veritas.dump
-```
+## Project 2: frontend (static Vite build)
+| Setting | Value |
+| --- | --- |
+| Root Directory | `frontend` |
+| Framework preset | Vite |
+| Build command / output | `npm run build` / `dist` |
+| Environment variables | none (the app calls `/api/v1` on its own origin) |
+| Routing | `frontend/vercel.json`: rewrite `/api/*` to the backend project's URL, then SPA fallback to `/index.html` |
 
-`docker compose down -v` deletes the volume and all data; do not use it unless you want an empty database.
+The backend URL in `frontend/vercel.json` must be updated to the backend project's address. Because the browser only ever talks to the frontend's origin, no CORS configuration is needed. If you would rather call the backend directly, set `VITE_API_BASE_URL` at build time and `FRONTEND_URL` on the backend.
 
-## Before exposing this to real users
+## First deployment of a project is a production deployment
+Vercel assigns a project's **first** deployment to production even when `--prod` is not passed, so it gets the public project domain (the CLI prints a hint when this happens). Later deployments are previews. The frontend rewrite in `frontend/vercel.json` targets the backend project's production domain (`https://veritas-ai-api.vercel.app` here; change it to yours), because preview URLs are protected. Deploy the backend first and set that address before deploying the frontend.
 
-This stack is production-*ready* in structure but has not been deployed or load-tested. Required steps:
+## Deployment protection
+New Vercel projects enable Vercel Authentication on preview deployments, so a preview URL asks visitors to sign in to Vercel, and a frontend preview cannot reach a protected backend preview through a rewrite. Production deployments use the public project domain. Changing protection is a security setting and is left to the project owner.
 
-1. **TLS.** Put a TLS-terminating reverse proxy (or platform load balancer) in front of both services; the compose file serves plain HTTP. Expose only the frontend port: nginx forwards `/api/` to the backend, so the browser needs one `https://` address and the API needs no CORS entry for it. (`FRONTEND_URL` is needed only when a browser on a different origin calls the API directly.)
-2. **Do not publish the database port.** Remove the `ports` entry of the `db` service (it exists for local convenience).
-3. **Strong, unique secrets** in the environment of the deployment platform, not in a committed file.
-4. **Rate limiting is per process and in memory** (login attempts and URL fetches). With several backend workers or replicas, move it to a shared store or the gateway.
-5. **Egress control for URL analysis.** The backend fetches user-supplied URLs. It blocks private and reserved addresses itself, but also restrict the container's outbound network (for example, deny access to internal subnets and cloud metadata endpoints at the network layer) as defence in depth.
-6. **Disable or protect `/docs`** if you do not want the API explorer public.
-7. **Logging and monitoring**, backups, and image vulnerability scanning in your pipeline.
+## Free-tier limits that matter (Vercel documentation, checked November 2026)
+- Hobby functions: 2 GB memory, 1 vCPU, 300 s maximum duration, 4.5 MB request and response bodies.
+- Monthly allowances: 4 hours of Active CPU, 360 GB-hours of provisioned memory, 1,000,000 invocations. Exceeding a limit pauses the deployment (it returns `503 DEPLOYMENT_PAUSED`) rather than billing.
+- Cold starts add the time to load spaCy and the classifier on a new instance.
+- Hobby is intended for personal, non-commercial use.
+
+## Local development
+See [setup-guide.md](setup-guide.md).

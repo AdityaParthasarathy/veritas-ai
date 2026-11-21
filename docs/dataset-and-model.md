@@ -1,5 +1,7 @@
 # Phase 2: Dataset, Baseline Model and Limitations
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 All numbers below are copied from `backend/ml_artifacts/metrics.json`, produced by `python -m app.ml.train` (reproducible: seed 42, identical results on rerun). Provenance of the data: [data/README.md](../data/README.md).
 
 ## Pipeline

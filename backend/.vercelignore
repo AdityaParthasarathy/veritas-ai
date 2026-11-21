@@ -1,0 +1,11 @@
+# Files that must not be uploaded in the serverless function bundle (the 3 classifier files and the passages ARE needed).
+tests
+**/__pycache__
+.pytest_cache
+.env
+.env.*
+.venv
+requirements-dev.txt
+# Training-only and evaluation material: not used by the API at run time.
+data/evaluation
+ml_artifacts/baseline_*

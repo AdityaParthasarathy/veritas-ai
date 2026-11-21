@@ -1,13 +1,12 @@
 """VERITAS AI - Core Application Configuration.
 
-Loads settings from environment variables or the repository's ``.env`` file using
-Pydantic Settings. Secrets are required (no insecure defaults) and are never
-exposed in representations.
+Loads settings from environment variables or an optional ``.env`` file using Pydantic Settings. The Vercel edition
+has no database and no accounts, so there are no required settings and no secrets: every value has a safe default.
 """
 
 from pathlib import Path
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -29,21 +28,12 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     ENVIRONMENT: str = Field(default="development", description="Runtime environment")
 
-    # Security (required; used by JWT in a later phase)
-    SECRET_KEY: SecretStr = Field(..., description="Secret used to sign tokens")
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-
-    # Database (required; SQLAlchemy 2.x + Psycopg 3)
-    DATABASE_URL: SecretStr = Field(..., description="PostgreSQL connection string")
-    DB_POOL_SIZE: int = 5
-    DB_MAX_OVERFLOW: int = 10
-    DB_POOL_TIMEOUT: int = 30
-
     # ML runtime
-    MODELS_DIR: str | None = Field(default=None, description="Folder containing all-MiniLM-L6-v2 (default: <repo>/models)")
     ARTIFACTS_DIR: str | None = Field(default=None, description="Folder with trained classifier files (default: backend/ml_artifacts)")
-    PRELOAD_MODELS: bool = Field(default=True, description="Load ML components in the background at startup")
+    PRELOAD_MODELS: bool = Field(
+        default=False,
+        description="Load the analysis components while the app starts (blocking). Off by default: they load on the first analysis request.",
+    )
 
     # URL ingestion
     URL_FETCH_TIMEOUT_SECONDS: float = 8.0
@@ -51,27 +41,8 @@ class Settings(BaseSettings):
     URL_MAX_REDIRECTS: int = 3
     URL_RATE_LIMIT_PER_MINUTE: int = 20
 
-    # CORS
+    # CORS: only needed when a browser on another origin calls the API directly (the Vercel setup is same-origin).
     FRONTEND_URL: str = "http://localhost:5173"
-    BACKEND_URL: str = "http://localhost:8000"
-
-    @field_validator("SECRET_KEY")
-    @classmethod
-    def _secret_key_is_strong(cls, value: SecretStr) -> SecretStr:
-        raw = value.get_secret_value()
-        if len(raw) < 32 or raw.startswith("CHANGE_ME"):
-            raise ValueError("SECRET_KEY must be a random string of at least 32 characters")
-        return value
-
-    @property
-    def database_url(self) -> str:
-        """Unwrapped database URL for the engine. Never log or return this value."""
-        return self.DATABASE_URL.get_secret_value()
-
-    @property
-    def secret_key(self) -> str:
-        """Unwrapped signing key. Never log or return this value."""
-        return self.SECRET_KEY.get_secret_value()
 
     @property
     def cors_origins(self) -> list[str]:

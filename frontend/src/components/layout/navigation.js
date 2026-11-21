@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, FolderClock, LibraryBig, ScanSearch, Settings } from 'lucide-react'
+import { BarChart3, BookOpen, LibraryBig, ScanSearch } from 'lucide-react'
 
 /** Primary destinations. Paths are the application's routes. */
 export const NAV_ITEMS = [
@@ -7,7 +7,3 @@ export const NAV_ITEMS = [
   { to: '/evidence', label: 'Library', hint: 'The reference passages and their sources', icon: LibraryBig },
   { to: '/performance', label: 'Method', hint: 'How it works, with model metrics and their limits', icon: BarChart3 },
 ]
-
-/** Signed-in destinations. */
-export const SAVED_ITEM = { to: '/history', label: 'Saved investigations', hint: 'Investigations saved to your account', icon: FolderClock }
-export const SETTINGS_ITEM = { to: '/settings', label: 'Settings', hint: 'Account, password, deletion', icon: Settings }

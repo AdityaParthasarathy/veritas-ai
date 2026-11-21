@@ -26,22 +26,6 @@ class VeritasException(Exception):
         self.details = details or {}
 
 
-class DatabaseUnavailableException(VeritasException):
-    """Raised when the primary database cannot be reached."""
-
-    def __init__(
-        self,
-        message: str = "Database connection unavailable",
-        details: Optional[Dict[str, Any]] = None,
-    ):
-        super().__init__(
-            message=message,
-            code="DATABASE_UNAVAILABLE",
-            details=details,
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
-
-
 class ResourceNotFoundException(VeritasException):
     """Raised when an entity is not found."""
 
@@ -67,25 +51,6 @@ class ModelUnavailableException(VeritasException):
             code="MODEL_UNAVAILABLE",
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-
-
-class AuthenticationException(VeritasException):
-    """Missing, invalid or expired credentials."""
-
-    def __init__(self, message: str = "Could not validate credentials") -> None:
-        super().__init__(
-            message=message,
-            code="UNAUTHORIZED",
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-
-class ConflictException(VeritasException):
-    """The request conflicts with existing data (e.g. duplicate email)."""
-
-    def __init__(self, message: str) -> None:
-        super().__init__(message=message, code="CONFLICT", status_code=status.HTTP_409_CONFLICT)
 
 
 class TooManyRequestsException(VeritasException):

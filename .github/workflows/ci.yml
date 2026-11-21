@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, vercel-deployment]
   pull_request:
 
 permissions:
@@ -14,24 +14,8 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend tests, lint and security scan
+    name: Backend tests and security scan
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: veritas_user
-          POSTGRES_PASSWORD: ci-only-password
-          POSTGRES_DB: veritas_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U veritas_user -d veritas_db"
-          --health-interval 5s --health-timeout 5s --health-retries 10
-    env:
-      DATABASE_URL: postgresql+psycopg://veritas_user:ci-only-password@localhost:5432/veritas_db
-      SECRET_KEY: ci-only-secret-key-not-used-anywhere-else-0123456789
-      PRELOAD_MODELS: "false"
     defaults:
       run:
         working-directory: backend
@@ -43,11 +27,9 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements*.txt
       - name: Install dependencies
-        run: python -m pip install -r requirements-ci.txt bandit
+        run: python -m pip install -r requirements-dev.txt bandit
       - name: Static security scan (bandit)
         run: bandit -q -r app
-      - name: Apply migrations
-        run: python -m alembic upgrade head
       - name: Tests
         run: python -m pytest -q
 
@@ -70,15 +52,3 @@ jobs:
       - run: npm run build
       - name: Dependency audit
         run: npm audit --audit-level=high
-
-  docker:
-    name: Docker images build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create a CI-only environment file
-        run: cp .env.example .env
-      - name: Validate compose file
-        run: docker compose config -q
-      - name: Build images
-        run: docker compose build

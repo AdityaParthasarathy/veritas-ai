@@ -1,5 +1,7 @@
 # Final acceptance report
 
+> **Edition note.** This document describes the **full edition** on the `main` branch (PostgreSQL, accounts, saved investigations, MiniLM + FAISS semantic retrieval). The Vercel edition on the `vercel-deployment` branch differs: see [vercel-edition.md](vercel-edition.md).
+
 Every requirement from the original assignment and from each later phase is mapped to its implementation, the evidence that it works, and any remaining limitation. Status values: **Done** (implemented and verified), **Partial** (implemented with a stated gap), **Not done**. Evidence names tests (in `backend/tests` or `frontend/src`) or commands that were actually run.
 
 ## 1. Verification summary

@@ -63,6 +63,7 @@ class EvidenceHitOut(BaseModel):
 
 class EvidenceResult(BaseModel):
     kind: Literal["retrieved_reference_passages"] = "retrieved_reference_passages"
+    retrieval_method: Literal["tfidf_lexical"] = Field(default="tfidf_lexical", description="Lexical TF-IDF cosine similarity: vocabulary overlap, not meaning")
     collection_name: str
     collection_size: int
     relevance_threshold: float
@@ -110,7 +111,7 @@ class SourceInfo(BaseModel):
 
 class AnalysisResponse(BaseModel):
     source: SourceInfo | None = Field(default=None, description="Set when the input came from a URL")
-    analysis_id: uuid.UUID | None = Field(default=None, description="Set when the analysis was saved to the signed-in user's history")
+    analysis_id: uuid.UUID | None = Field(default=None, description="Always null: this edition stores nothing (kept so responses stay compatible with the full edition)")
     word_count: int
     classification: ClassificationResult
     linguistic_signals: list[SignalOut]
@@ -133,5 +134,6 @@ class EvidenceListResponse(BaseModel):
 
 class EvidenceSearchResponse(BaseModel):
     query: str
+    retrieval_method: Literal["tfidf_lexical"] = "tfidf_lexical"
     relevance_threshold: float
     hits: list[EvidenceHitOut]

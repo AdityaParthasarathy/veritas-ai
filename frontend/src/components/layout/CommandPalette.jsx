@@ -2,13 +2,11 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { CornerDownLeft, Search } from 'lucide-react'
-import { useAuth } from '../../context/AuthContext'
 import Kbd from '../ui/Kbd'
 import { buildCommands } from './commands'
 
 /** Command palette: type to filter, arrows to move, Enter to run, Escape to close. */
 export default function CommandPalette({ open, onClose }) {
-  const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -16,7 +14,7 @@ export default function CommandPalette({ open, onClose }) {
   const openerRef = useRef(null)
   const listId = useId()
 
-  const commands = useMemo(() => buildCommands({ user }), [user])
+  const commands = useMemo(() => buildCommands(), [])
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     return q ? commands.filter((c) => `${c.label} ${c.hint ?? ''} ${c.group}`.toLowerCase().includes(q)) : commands
@@ -39,10 +37,7 @@ export default function CommandPalette({ open, onClose }) {
   const run = (command) => {
     if (!command) return
     close()
-    if (command.action === 'signout') {
-      logout()
-      navigate('/login')
-    } else navigate(command.to, command.state ? { state: command.state } : undefined)
+    navigate(command.to, command.state ? { state: command.state } : undefined)
   }
   const onKeyDown = (event) => {
     if (event.key === 'Escape') {

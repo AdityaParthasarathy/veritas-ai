@@ -115,6 +115,13 @@ def test_dns_failure_is_a_fetch_failure():
             resolve_public_addresses("nonexistent.invalid", 80)
 
 
+def test_a_plain_oserror_from_the_resolver_is_also_a_fetch_failure():
+    """Found on Vercel: an unresolvable host raised OSError (errno 16), not socket.gaierror, and became a 500."""
+    with patch("socket.getaddrinfo", side_effect=OSError(16, "Device or resource busy")):
+        with pytest.raises(UrlFetchFailedException):
+            resolve_public_addresses("nonexistent.invalid", 80)
+
+
 # ---- fetching -----------------------------------------------------------------------------------
 def test_request_is_pinned_to_the_vetted_ip_and_sends_no_credentials(monkeypatch):
     monkeypatch.setenv("HTTP_PROXY", "http://proxy.invalid:3128")

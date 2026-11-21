@@ -5,7 +5,6 @@ import MobileNav from '../components/layout/MobileNav'
 import Topbar from '../components/layout/Topbar'
 import Logo from '../components/ui/Logo'
 import Skeleton from '../components/ui/Skeleton'
-import { useAuth } from '../context/AuthContext'
 import { useHotkey } from '../hooks/useHotkey'
 import { useOnlineStatus } from '../hooks/useOnlineStatus'
 import { useReadout } from '../hooks/useReadout'
@@ -21,7 +20,6 @@ function PageFallback() {
 }
 
 function Footer() {
-  const { user } = useAuth()
   const column = 'space-y-2.5 text-sm'
   const link = 'text-steel transition-colors duration-fast hover:text-paper'
   return (
@@ -41,22 +39,6 @@ function Footer() {
             <li><Link to="/analyze" className={link}>Investigate</Link></li>
             <li><Link to="/casebook" className={link}>Casebook</Link></li>
             <li><Link to="/evidence" className={link}>Library</Link></li>
-          </ul>
-        </nav>
-        <nav aria-label="Footer account" className="lg:col-span-2">
-          <p className="t-eyebrow mb-3">Account</p>
-          <ul className={column}>
-            {user ? (
-              <>
-                <li><Link to="/history" className={link}>Saved investigations</Link></li>
-                <li><Link to="/settings" className={link}>Settings</Link></li>
-              </>
-            ) : (
-              <>
-                <li><Link to="/login" className={link}>Sign in</Link></li>
-                <li><Link to="/register" className={link}>Create an account</Link></li>
-              </>
-            )}
           </ul>
         </nav>
         <nav aria-label="Footer method" className="lg:col-span-2">

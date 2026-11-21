@@ -28,7 +28,7 @@ export default function EvidenceExplorer({ evidence, activeRef, onActivate, show
           <div>
             <p className="text-sm font-semibold text-paper">No clearly related reference passage was found</p>
             <p className="t-body mt-1 text-[0.9375rem]">
-              The reference collection has {evidence.collection_size} passages. Nothing in it is close enough in meaning to this text, which says nothing about whether the text is accurate.
+              The reference collection has {evidence.collection_size} passages. Nothing in it shares enough wording with this text, which says nothing about whether the text is accurate.
             </p>
             <p className="t-caption mt-2">The collection covers a narrow set of institutional topics. A text about anything else will usually find nothing, whatever its quality.</p>
           </div>

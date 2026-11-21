@@ -148,7 +148,7 @@ describe('buildPrimary and buildTakeaway', () => {
 
   it('related passages are related material, never confirmation', () => {
     const t = buildTakeaway({ ...base, classification: reliable })
-    expect(t.retrieved).toMatch(/1 reference passage from NOAA is close in meaning.*not confirmation/)
+    expect(t.retrieved).toMatch(/1 reference passage from NOAA is close to the text in wording.*not confirmation/)
     expect(t.bottomLine).toMatch(/Compare them with the linked sources yourself/)
   })
 

@@ -4,7 +4,6 @@ import { Gauge, ScanSearch, ShieldHalf } from 'lucide-react'
 import AnalysisScan from '../components/analysis/AnalysisScan'
 import InvestigationPanel from '../components/investigate/InvestigationPanel'
 import Report from '../components/report/Report'
-import { useAuth } from '../context/AuthContext'
 import { EXAMPLES } from '../data/examples'
 import { validateInput } from '../data/limits'
 import { useHotkey } from '../hooks/useHotkey'
@@ -14,7 +13,6 @@ const EMPTY = { mode: 'text', title: '', text: '', url: '' }
 const isCancel = (error) => error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
 
 export default function AnalyzePage() {
-  const { user } = useAuth()
   const location = useLocation()
   const [value, setValue] = useState(EMPTY)
   const [touched, setTouched] = useState(false)
@@ -133,15 +131,12 @@ export default function AnalyzePage() {
           headingRef={headingRef}
           onRerun={backToInput}
           onNew={startNew}
-          draft={submitted ? { mode: submitted.mode, title: submitted.title, text: submitted.text, url: submitted.url } : undefined}
         />
       ) : (
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <InvestigationPanel value={value} onChange={patch} onSubmit={submit} touched={touched} onTouch={setTouched} error={error} showHeadline textRef={textRef} onClear={() => setValue(EMPTY)} />
-            <p className="t-caption mt-4">
-              {user ? 'Signed in: this investigation will be saved to your saved investigations.' : 'Not signed in: this investigation will not be saved. You can sign in from the report to keep it.'}
-            </p>
+            <p className="t-caption mt-4">Nothing is saved: the analysis runs on the server and the report exists only in this browser tab.</p>
           </div>
           <aside aria-label="How to read the result" className="lg:col-span-4">
             <div className="lg:sticky lg:top-24">
@@ -149,7 +144,7 @@ export default function AnalyzePage() {
               <ul className="mt-4 space-y-4">
                 {[
                   [Gauge, 'Writing-style reading', 'Whether the style resembles examples labelled reliable or unreliable.'],
-                  [ScanSearch, 'Related reference material', 'Passages close in meaning, with sources. Relevance only.'],
+                  [ScanSearch, 'Related reference material', 'Passages that share wording with the text, with sources. Relevance only.'],
                   [ShieldHalf, 'Trust in the analysis', 'How far to rely on the two readings above, and why.'],
                 ].map(([Icon, title, body]) => (
                   <li key={title} className="flex gap-3">

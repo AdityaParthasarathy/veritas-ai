@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 SHORT_TEXT_WORDS = 50
 MEDIUM_TEXT_WORDS = 150
 BORDERLINE_MARGIN = 0.15  # |p - 0.5| below this counts as near the decision boundary
-RELEVANCE_THRESHOLD = 0.40  # minimum cosine similarity to call a reference passage related (tuned on labelled queries, see docs)
+RELEVANCE_THRESHOLD = 0.25  # minimum TF-IDF cosine similarity to call a passage related; chosen by app.ml.lexical_eval under its two false-related limits (see data/evaluation/lexical_retrieval_eval_results.json)
 
 MEANING = (
     "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is "

@@ -14,7 +14,7 @@ const SampleReport = lazy(() => import('../components/landing/SampleReport'))
 
 const INSTRUMENTS = [
   { title: 'Writing style', diagram: <StyleDiagram />, body: 'Does the writing resemble examples labelled reliable or unreliable in the training data? You get the label and the model probability, with a note on what that number is not.' },
-  { title: 'Evidence relevance', diagram: <EvidenceDiagram />, body: 'Which reference passages are close in meaning? Each comes with its source, link and similarity. If none is close, the report says so, and that proves nothing.' },
+  { title: 'Evidence relevance', diagram: <EvidenceDiagram />, body: 'Which reference passages share wording with the text? Each comes with its source, link and similarity. If none is close, the report says so, and that proves nothing.' },
   { title: 'Trust in the analysis', diagram: <TrustDiagram />, body: 'Short text, text unlike the training news, an undecided model or missing evidence raise caution. A confident model never lowers it.' },
 ]
 
@@ -69,7 +69,7 @@ export default function LandingPage() {
               <dl className="mt-10 flex flex-wrap gap-x-8 gap-y-2" aria-label="Live system readout">
                 {[
                   ['API', readout.api === 'online' ? 'online' : readout.api],
-                  ['Database', readout.database],
+                  ...(readout.database === 'connected' || readout.database === 'disconnected' ? [['Database', readout.database]] : []),
                   ['Models', readout.models === 'ready' && readout.loadSeconds != null ? `ready (${readout.loadSeconds}s load)` : readout.models.replace('_', ' ')],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-baseline gap-2">

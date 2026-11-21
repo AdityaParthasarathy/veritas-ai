@@ -239,11 +239,13 @@ describe('Investigation workspace', () => {
     expect(screen.getByText('No related passage')).toBeInTheDocument()
   })
 
-  it('offers Save investigation to an anonymous user and does not claim it was saved', async () => {
+  it('offers no account or save actions: nothing is stored, and the page says so', async () => {
     analyzeText.mockResolvedValue(analysisResult)
     renderWithProviders(<AnalyzePage />)
+    expect(screen.getByText(/Nothing is saved/)).toBeInTheDocument()
     await fillAndSubmit()
-    expect(await screen.findByRole('link', { name: /Save investigation/ })).toHaveAttribute('href', '/login')
+    await screen.findByRole('heading', { name: 'Three separate readings' })
+    expect(screen.queryByRole('link', { name: /Save investigation|Sign in/ })).not.toBeInTheDocument()
     expect(screen.queryByText(/Saved: open/)).not.toBeInTheDocument()
   })
 

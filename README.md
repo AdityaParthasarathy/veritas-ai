@@ -1,131 +1,82 @@
-# VERITAS AI
+# VERITAS AI (Vercel edition)
 
-A statistical text-analysis instrument. It analyzes pasted text or a public article URL and gives **three separate readings**: how the writing resembles the labelled training data (style), which reference passages are related in meaning (evidence relevance), and how far to trust the analysis itself (uncertainty). **None of them establishes whether content is true or false.**
+A statistical text-analysis instrument. It analyzes pasted text or a public article URL and gives **three separate readings**: how the writing resembles the labelled training data (style), which reference passages share wording with the text (evidence relevance), and how far to trust the analysis itself (uncertainty). **None of them establishes whether content is true or false.**
 
-> The classifier learns the writing style and sources of one dataset's labels. It does not fact-check. Read [docs/dataset-and-model.md](docs/dataset-and-model.md) and [docs/acceptance-report.md](docs/acceptance-report.md) for what the numbers do and do not mean.
+> This is the lightweight edition on the `vercel-deployment` branch, built for Vercel's free Hobby plan. It has no accounts, no saved investigations and no database, and it retrieves evidence **lexically (TF-IDF)** instead of semantically. The full edition (PostgreSQL, accounts, MiniLM + FAISS) is on `main`. What is preserved and what changed, with measured numbers: [docs/vercel-edition.md](docs/vercel-edition.md).
+
+> The classifier learns the writing style and sources of one dataset's labels. It does not fact-check. Read [docs/dataset-and-model.md](docs/dataset-and-model.md) for what the numbers do and do not mean.
 
 ## What it does
 
 | Feature | Notes |
 | --- | --- |
 | Analyze pasted text or an article URL | URL fetching is SSRF-protected; article text and metadata are extracted automatically. |
-| Classification | TF-IDF + Logistic Regression trained on WELFake; reported as "resembles unreliable/reliable sources", not truth. |
-| Linguistic signals | Descriptive measurements (spaCy): emphasis, ALL-CAPS, sensational and hedging wording, attribution, entities, etc. |
-| Evidence retrieval | Semantic search (MiniLM + FAISS) over a small curated reference collection with verified source links. |
+| Classification | The original TF-IDF + Logistic Regression model trained on WELFake (artefacts unchanged and SHA-256 pinned); reported as "resembles unreliable/reliable sources", not truth. |
+| Linguistic indicators | 12 descriptive measurements (spaCy): emphasis, ALL-CAPS, sensational and hedging wording, attribution, named entities, etc. |
+| Evidence retrieval | TF-IDF lexical similarity over a small curated collection of 70 passages with verified source links. It finds shared words, not meaning. |
 | Uncertainty | Transparent rules: short text, text outside the training domain, a page that does not look like an article, an undecided model, no related evidence. Never lower than "moderate". |
-| Accounts and history | Registration, login, saved investigations (per-user, owner-only), password change, account deletion. Anonymous use stays available and is not saved. |
-| Model Performance page | Metrics, confusion matrices, dataset cleaning and limitations, served from the saved training run. |
+| Casebook, Library, Method pages | Six invented demonstration cases (re-recorded with this edition), the reference collection, and the measured model limits. |
 
 ## Stack
-
 - Frontend: React 19, Vite, Tailwind CSS 3, React Router, Axios, Recharts, Lucide. Tests: Vitest, Testing Library, axe.
-- Backend: Python 3.13, FastAPI, Pydantic Settings, SQLAlchemy 2, Psycopg 3, Alembic, bcrypt, PyJWT, httpx, trafilatura.
-- ML: scikit-learn, spaCy, sentence-transformers (CPU PyTorch), FAISS (CPU). `transformers` is installed as a dependency of sentence-transformers; no transformer is fine-tuned.
-- Database: PostgreSQL 16. Packaging: Docker Compose. CI: GitHub Actions.
+- Backend: Python 3.13, FastAPI, Pydantic Settings, httpx, trafilatura, scikit-learn, spaCy (no PyTorch, no FAISS, no database).
+- Hosting: two Vercel projects (static frontend + Python function). CI: GitHub Actions.
 
 ## Architecture
-
 ```
-React (nginx in Docker) -> FastAPI /api/v1 -> services -> repositories (SQLAlchemy) -> PostgreSQL
-                                  |
-                                  +-- URL ingestion (SSRF-safe fetch + extraction)
-                                  +-- spaCy signals | TF-IDF classifier | MiniLM + FAISS evidence | uncertainty rules
+Browser -> Vercel frontend (static) --rewrite /api--> Vercel function (FastAPI)
+                                                       +-- URL ingestion (SSRF-safe fetch + extraction)
+                                                       +-- spaCy indicators | TF-IDF classifier | TF-IDF evidence | uncertainty rules
 ```
-
 Details: [docs/architecture.md](docs/architecture.md).
 
-## Quick start with Docker (recommended)
-
-Prerequisites: Docker Desktop (running), Git, and the ML files (see "ML files" below). **Clone into a short path** such as `C:\dev\veritas-ai`: in a deeply nested folder, pip can hit Windows' 260-character path limit while unpacking PyTorch and fail with `OSError: No such file or directory` (or enable long paths as pip's hint describes).
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Edit `.env`: set `SECRET_KEY` and one database password (used in `POSTGRES_PASSWORD` **and** `DATABASE_URL`). Then:
+## Run locally
+Requirements: Python 3.13 and Node.js 22. No database or Docker. Full steps: [docs/setup-guide.md](docs/setup-guide.md).
 
 ```powershell
-docker compose up -d --build
-docker compose ps
-```
-
-- App: http://localhost:5173
-- API: http://localhost:8000 and Swagger at http://localhost:8000/docs
-
-The backend applies database migrations on start and loads the ML models in the background (about 15 s; `GET /api/v1/health/models` reports `loading` then `ready`). Stop with `docker compose stop`; `docker compose down` removes containers but keeps the database volume.
-
-### ML files (not in Git)
-
-The classifier files and the embedding model are large and git-ignored; compose mounts them read-only. One script creates them (downloads about 350 MB including the checksum-verified WELFake dataset, then trains in about 5 minutes):
-
-```powershell
-py -3 -m venv .venv
-.venv\Scripts\python.exe -m pip install -r backend\requirements-ml.txt
-powershell -ExecutionPolicy Bypass -File scripts\setup-ml.ps1
-```
-
-The script installs the spaCy model, downloads `all-MiniLM-L6-v2`, downloads and verifies WELFake (provenance in [data/README.md](data/README.md)), then runs `python -m app.ml.train` and `python -m app.ml.domain_profile`. Without these files the app still starts; analysis endpoints return a clear 503 and the rest works. Manual steps and details: [docs/ml-setup.md](docs/ml-setup.md).
-
-## Local development (without Docker for the app)
-
-```powershell
-docker compose up -d db
 cd backend
-python -m alembic upgrade head
-python -m uvicorn app.main:app --reload --port 8000
+py -3 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
-
 ```powershell
 cd frontend
 npm install
 npm run dev
 ```
-
-More commands, ports and troubleshooting: [docs/setup-guide.md](docs/setup-guide.md) and [docs/deployment.md](docs/deployment.md).
+Open http://localhost:5173 (the dev server proxies `/api` to port 8000). The analysis components load on the first analysis request.
 
 ## Tests and checks
-
 ```powershell
-cd backend; python -m pytest -q          # needs the database container; ML tests skip if ML files/packages are absent
+cd backend; .venv\Scripts\python.exe -m pytest -q          # includes the original-parity and artefact-hash tests
 cd frontend; npm run lint; npm test; npm run build
 ```
 
-CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs backend tests with bandit, frontend lint/tests/build/audit, and the Docker image build.
+## Deploy on Vercel
+Two projects from this branch (backend root `backend`, frontend root `frontend`); settings, limits and the routing rewrite are in [docs/deployment.md](docs/deployment.md). No secrets or environment variables are required.
 
 ## API summary
 
-| Method | Path | Auth | Description |
-| --- | --- | --- | --- |
-| GET | `/api/v1/health/live`, `/health/ready`, `/health/models` | none | Liveness; database readiness; ML load status. |
-| GET | `/api/v1/system/info` | none | Name, version, environment. |
-| POST | `/api/v1/analysis` | optional | Analyze text. Saved when signed in. |
-| POST | `/api/v1/analysis/url` | optional | Fetch a URL, extract the article, analyze. |
-| GET | `/api/v1/evidence/passages`, `/evidence/search` | none | Browse / semantically search the reference collection. |
-| GET | `/api/v1/models/performance` | none | Metrics and dataset limitations. |
-| POST | `/api/v1/auth/register`, `/auth/login` | none | Create account / sign in. |
-| GET, DELETE | `/api/v1/auth/me` | required | Current user / delete account. |
-| POST | `/api/v1/auth/change-password` | required | Change password (revokes old tokens). |
-| GET, DELETE | `/api/v1/analyses`, `/analyses/{id}` | required | Saved analyses. |
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/v1/health/live`, `/health/ready`, `/health/models` | Liveness; readiness (no database: `database: "not_used"`); analysis component load status. |
+| GET | `/api/v1/system/info` | Name, version, environment. |
+| POST | `/api/v1/analysis` | Analyze text. Nothing is stored. |
+| POST | `/api/v1/analysis/url` | Fetch a URL, extract the article, analyze. |
+| GET | `/api/v1/evidence/passages`, `/evidence/search` | Browse / lexically search the reference collection. |
+| GET | `/api/v1/models/performance` | Metrics and dataset limitations. |
 
 ## Documentation
-
-- [docs/technical-report.md](docs/technical-report.md): the full technical report. [docs/acceptance-report.md](docs/acceptance-report.md): every requirement mapped to implementation, tests and limitations.
-- [docs/quality-evaluation.md](docs/quality-evaluation.md): out-of-domain detection and evidence threshold evaluation. [docs/demo-script.md](docs/demo-script.md) and [docs/samples/](docs/samples/): demonstration script and sample inputs.
-- [docs/database-schema.md](docs/database-schema.md), [docs/openapi.json](docs/openapi.json): schema and API specification (both checked by tests).
-- [docs/security-review.md](docs/security-review.md): threat review and verification evidence.
-- [docs/analysis-api.md](docs/analysis-api.md), [docs/auth.md](docs/auth.md): API behaviour and design.
-- [docs/dataset-and-model.md](docs/dataset-and-model.md): dataset, training, metrics, limitations.
-- [docs/deployment.md](docs/deployment.md), [docs/setup-guide.md](docs/setup-guide.md), [docs/ml-setup.md](docs/ml-setup.md), [docs/architecture.md](docs/architecture.md).
+- [docs/vercel-edition.md](docs/vercel-edition.md): what this edition preserves and changes, with the measured retrieval limitation.
+- [docs/architecture.md](docs/architecture.md), [docs/deployment.md](docs/deployment.md), [docs/setup-guide.md](docs/setup-guide.md), [docs/analysis-api.md](docs/analysis-api.md), [docs/openapi.json](docs/openapi.json).
+- [docs/dataset-and-model.md](docs/dataset-and-model.md), [docs/quality-evaluation.md](docs/quality-evaluation.md), [docs/technical-report.md](docs/technical-report.md), [docs/acceptance-report.md](docs/acceptance-report.md), [docs/security-review.md](docs/security-review.md): written for the full edition (each carries an edition note).
+- [docs/demo-script.md](docs/demo-script.md) and [docs/samples/](docs/samples/): demonstration script and sample inputs.
 
 ## Repository structure
-
 ```
-frontend/   React app, tests, Dockerfile + nginx template
-backend/    FastAPI app (api, core, database, models, repositories, schemas, services, ml), alembic, tests, Dockerfile
-database/   PostgreSQL init scripts
-data/       Dataset provenance (raw CSV is git-ignored)
+frontend/   React app, tests, vercel.json (rewrites)
+backend/    FastAPI app (api, core, schemas, services, ml), ml_artifacts (committed, hash-pinned), data, tests, vercel.json
+data/       Dataset provenance (the raw CSV is git-ignored)
 docs/       Documentation
 .github/    CI workflow
-scripts/    setup-ml.ps1 (creates the git-ignored ML files)
-docker-compose.yml, .env.example
 ```

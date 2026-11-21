@@ -47,7 +47,11 @@ pnpm-debug.log*
 # Database data (local)
 pgdata/
 
-# ML data and artifacts (Phase 2)
+# Training data stays out of Git. The classifier files in backend/ml_artifacts ARE committed in this edition
+# (they are small: about 4.9 MB) because the serverless function ships them; MANIFEST.sha256 pins them.
 data/raw/
-backend/ml_artifacts/*.joblib
+# Not used by this edition: the embedding model of the full edition and the unused baseline classifier variant.
 /models/
+backend/ml_artifacts/baseline_*.joblib
+# Vercel CLI link metadata
+.vercel

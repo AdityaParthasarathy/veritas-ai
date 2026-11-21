@@ -1,0 +1,9 @@
+# SHA-256 of the original VERITAS AI classifier artefacts and the reference collection (git main @ 1cf0b88).
+# These files must never change in the Vercel edition. tests/test_original_parity.py verifies them.
+# Format: <sha256>  <path relative to backend/>
+ca26bd84f503c408f3155cfc7f8f60fae556fc7f6e21828f4967267a477e3bd6  ml_artifacts/source_masked_tfidf_vectorizer.joblib
+4cc204adc4544c8e61d6518ffeda2b7316c8fc5527a90847509b3893386d8226  ml_artifacts/source_masked_logreg_model.joblib
+8b2ca7d1a7bcc115990f0f21df6efed194019d058395b32f32933d04be195559  ml_artifacts/source_masked_domain_profile.joblib
+663495f171aa359cbf63aeda3c0a10bfbc0864fb03d91b25d23b0e538b0b5295  ml_artifacts/metrics.json
+757129fa389b10ec6b3bbe863dd9439298d64b973ba05b4eeaca9964f125a814  ml_artifacts/domain_check.json
+ba83ea219b61ee5e98c9865f52d4b8d53124e73cb5782cb95a8e051f615a02ec  data/evidence/reference_passages.json

@@ -13,7 +13,8 @@ export default defineConfig({
     port: 5173,
     host: 'localhost',
     // The app calls /api/v1 on its own origin; in development the backend on :8000 answers it.
-    proxy: { '/api': 'http://localhost:8000' },
+    // Override with VITE_DEV_API_TARGET to point the dev server at a deployed API (for example the Vercel backend).
+    proxy: { '/api': { target: process.env.VITE_DEV_API_TARGET || 'http://localhost:8000', changeOrigin: true } },
   },
   preview: {
     port: 5173,

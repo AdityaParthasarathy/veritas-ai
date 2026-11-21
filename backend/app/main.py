@@ -4,7 +4,6 @@ Configures application lifespan, CORS, middleware, custom error handling,
 and mounts versioned API routers.
 """
 
-import threading
 from contextlib import asynccontextmanager
 import logging
 from typing import AsyncGenerator
@@ -30,10 +29,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting up %s (Version: %s)...", settings.PROJECT_NAME, settings.VERSION)
     logger.info("Allowed CORS origins: %s", settings.cors_origins)
     if settings.PRELOAD_MODELS:
-        # Background thread: the API accepts requests immediately; analysis requests wait on the same lock.
+        # Blocking on purpose: on a serverless host an instance can be paused once requests finish, which would freeze
+        # a background loader half way. By default the components load on the first analysis request instead.
         from app.services.analysis_service import get_analysis_service
 
-        threading.Thread(target=get_analysis_service().preload, name="ml-preload", daemon=True).start()
+        get_analysis_service().preload()
     yield
     logger.info("Shutting down %s...", settings.PROJECT_NAME)
 
@@ -42,8 +42,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description=(
-        "Production-grade AI-powered misinformation intelligence platform. "
-        "Provides linguistic analysis, semantic retrieval, and uncertainty assessment."
+        "A statistical text-analysis instrument. Provides a writing-style classification, linguistic indicators, "
+        "lexical (TF-IDF) retrieval of related reference passages, and an uncertainty assessment. "
+        "It does not verify whether content is true or false."
     ),
     version=settings.VERSION,
     docs_url="/docs",

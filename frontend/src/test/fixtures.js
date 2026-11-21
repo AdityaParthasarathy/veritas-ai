@@ -20,7 +20,7 @@ export const analysisResult = {
     kind: 'retrieved_reference_passages',
     collection_name: 'VERITAS AI demo reference collection',
     collection_size: 34,
-    relevance_threshold: 0.4,
+    relevance_threshold: 0.25,
     hits: [
       {
         id: 'climate-co2', score: 0.74, relevant: true, topic: 'Climate',
@@ -29,7 +29,7 @@ export const analysisResult = {
         matched_text: 'Carbon dioxide concentrations measured at Mauna Loa remain far above pre-industrial levels.',
       },
     ],
-    disclaimer: 'Passages are retrieved by semantic similarity. They show related reference material only.',
+    disclaimer: 'Passages are retrieved by lexical (TF-IDF) similarity. They show related reference material only.',
   },
   uncertainty: {
     level: 'moderate',

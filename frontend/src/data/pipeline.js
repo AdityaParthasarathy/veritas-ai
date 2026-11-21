@@ -23,16 +23,16 @@ export const PIPELINE = [
     not: 'Turn counts into a conclusion. The classifier does not use them.',
   },
   {
-    title: 'Semantic evidence retrieval',
-    does: 'Finds passages in a curated 70-passage collection that are close in meaning, with source links and scores.',
-    tech: 'Sentence Transformer embeddings (all-MiniLM-L6-v2) and a FAISS similarity index.',
+    title: 'Lexical evidence retrieval',
+    does: 'Finds passages in a curated 70-passage collection that share vocabulary with the text, with source links and scores.',
+    tech: 'TF-IDF vectors (character 3 to 5-grams, fitted on the 70 passages) and cosine similarity.',
     produces: 'Related reference passages with a similarity score against a fixed cut-off.',
-    not: 'Judge whether a passage supports or contradicts the text.',
+    not: 'Judge whether a passage supports or contradicts the text, or find a passage that covers the same subject in different words.',
   },
   {
     title: 'Uncertainty assessment',
     does: 'Checks length, domain fit, model decisiveness and evidence coverage, and states how far to trust the analysis.',
-    tech: 'Rule-based checks, including an out-of-domain test on the text embedding.',
+    tech: 'Rule-based checks, including an out-of-domain test on the TF-IDF vector of the text.',
     produces: 'A caution level (moderate, high or very high) with the reasons.',
     not: 'Let a confident model lower the caution.',
   },
@@ -49,7 +49,7 @@ export const PIPELINE = [
 export const NOT_INTERCHANGEABLE = [
   { term: 'Agreement with dataset labels', body: 'How often the classifier matches the labels in a held-out slice of its training dataset. It measures fit to that dataset, not to the real world.' },
   { term: 'Real-world factual accuracy', body: 'Whether claims are actually true. VERITAS does not measure this at all.' },
-  { term: 'Evidence relevance', body: 'How close in meaning a reference passage is to the text. A related passage is not a supporting passage.' },
+  { term: 'Evidence relevance', body: 'How much vocabulary a reference passage shares with the text. A related passage is not a supporting passage, and a passage on the same subject in different words can be missed.' },
   { term: 'Model confidence', body: 'How strongly the text matches patterns in the training labels. A model can be confident and wrong.' },
   { term: 'Trust in the overall analysis', body: 'How far to rely on the readings, given length, domain fit and evidence coverage. It is about the analysis, not the article.' },
 ]

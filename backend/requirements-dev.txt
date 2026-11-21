@@ -1,0 +1,6 @@
+# Local development, tests, CI and retraining. Not installed on Vercel (it reads requirements.txt only).
+-r requirements.txt
+pytest==9.2.0
+uvicorn[standard]==0.54.0
+# Only the training scripts (app.ml.data, train, domain_profile) need pandas; the app and the tests of the app do not.
+pandas==3.1.1

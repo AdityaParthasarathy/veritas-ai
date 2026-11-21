@@ -1,9 +1,8 @@
 """VERITAS AI - Health Check Test Suite.
 
-Verifies liveness, readiness, and failure-path handling.
+Verifies liveness and readiness (there is no database), CORS, and that the account routes are gone.
 """
 
-from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 
@@ -16,36 +15,17 @@ def test_live_health_check_returns_200(client: TestClient):
     assert data["application"] == "VERITAS AI"
 
 
-def test_ready_health_check_with_active_database(client: TestClient):
-    """GET /api/v1/health/ready returns 200 against the real PostgreSQL database."""
+def test_ready_health_check_needs_no_database(client: TestClient):
+    """This edition has no database: readiness only means the process answers, and says so."""
     response = client.get("/api/v1/health/ready")
     assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "ready"
-    assert data["database"] == "connected"
+    assert response.json() == {"status": "ready", "database": "not_used"}
 
 
-def test_ready_health_check_handles_database_unavailability(client: TestClient):
-    """Test that GET /api/v1/health/ready returns HTTP 503 when database is disconnected.
-
-    As required by specifications, mock is used exclusively for the explicit failure-path test.
-    """
-    with patch("app.services.health_service.check_db_connectivity", return_value=False):
-        response = client.get("/api/v1/health/ready")
-        assert response.status_code == 503
-        data = response.json()
-        assert data["status"] == "not_ready"
-        assert data["database"] == "disconnected"
-        assert "detail" in data
-
-
-def test_ready_failure_does_not_leak_internals(client: TestClient):
-    """The 503 body must not contain credentials or driver errors."""
-    with patch("app.services.health_service.check_db_connectivity", return_value=False):
-        text = client.get("/api/v1/health/ready").text.lower()
-    assert "password" not in text
-    assert "postgresql" not in text
-    assert "traceback" not in text
+def test_removed_account_and_history_routes_are_gone(client: TestClient):
+    """There are no accounts and no saved analyses in this edition."""
+    for method, path in (("post", "/api/v1/auth/login"), ("post", "/api/v1/auth/register"), ("get", "/api/v1/auth/me"), ("get", "/api/v1/analyses")):
+        assert getattr(client, method)(path).status_code == 404, path
 
 
 def test_cors_allows_local_frontend_only(client: TestClient):

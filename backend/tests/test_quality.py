@@ -11,6 +11,9 @@ import pytest
 from app.ml.classifier import ClassifierResult
 from app.ml.paths import BACKEND_DIR
 from app.ml.uncertainty import MEANING, RELEVANCE_THRESHOLD, assess
+
+# A score below RELEVANCE_THRESHOLD is "not related"; half of it is safely "no related evidence" for the rule tests below.
+WEAK_EVIDENCE = RELEVANCE_THRESHOLD / 2
 from tests.ml_support import needs_models
 
 SAMPLES = BACKEND_DIR.parent / "docs" / "samples"
@@ -44,7 +47,7 @@ def test_out_of_domain_raises_uncertainty_even_when_the_model_is_confident():
 
 
 def test_out_of_domain_without_related_evidence_is_very_high():
-    assert assess(300, 0.99, 0.2, domain_similarity=0.03, domain_threshold=0.06).level == "very_high"
+    assert assess(300, 0.99, WEAK_EVIDENCE, domain_similarity=0.03, domain_threshold=0.06).level == "very_high"
 
 
 def test_in_domain_or_unavailable_profile_adds_no_domain_reason():
@@ -57,7 +60,7 @@ def test_low_confidence_is_flagged_as_undecided():
     result = assess(300, 0.52, 0.8)
     assert result.level == "moderate" and result.points == 1
     assert any("effectively undecided" in r for r in result.reasons)
-    assert assess(300, 0.52, 0.2).level == "high"  # undecided and no related evidence
+    assert assess(300, 0.52, WEAK_EVIDENCE).level == "high"  # undecided and no related evidence
 
 
 def test_evidence_threshold_boundary():
@@ -99,6 +102,7 @@ def test_unavailable_evidence_is_reported_without_inventing_matches(client):
     assert not any(h["relevant"] for h in body["evidence"]["hits"])
     assert any("No passage in the reference collection is clearly related" in r for r in body["uncertainty"]["reasons"])
     assert all(h["score"] < RELEVANCE_THRESHOLD for h in body["evidence"]["hits"])
+    assert body["evidence"]["retrieval_method"] == "tfidf_lexical"
 
 
 @needs_models

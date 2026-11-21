@@ -1,1 +1,997 @@
-{"recorded_on":"2026-11-21","results":{"01-normal-news":{"source":null,"analysis_id":null,"word_count":196,"classification":{"kind":"machine_learning_classification","label":"resembles_reliable_sources","probability_unreliable_style":0.0064,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":196.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":28.0,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":0.0,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.0,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":5.1,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":5.1,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":30.61,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":2.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":56.12,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":30.61,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":5.1,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"health-measles","score":0.817,"relevant":true,"topic":"Health","passage":"Measles is a highly contagious viral disease that spreads through the air. It can be prevented with two doses of a safe and effective vaccine.","source_org":"WHO","source_title":"Measles fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/measles","matched_text":"\"Measles spreads very easily through the air, and the best protection we have is two doses of the vaccine,\" said Dr. Helen Marsh, the department's director of public health."},{"id":"health-immunization","score":0.6212,"relevant":true,"topic":"Health","passage":"Vaccination protects against serious diseases such as measles, polio, diphtheria, tetanus and whooping cough. Immunization programmes prevent millions of deaths worldwide every year.","source_org":"WHO","source_title":"Immunization coverage fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/immunization-coverage","matched_text":"\"Measles spreads very easily through the air, and the best protection we have is two doses of the vaccine,\" said Dr. Helen Marsh, the department's director of public health."},{"id":"health-rabies","score":0.3748,"relevant":false,"topic":"Health","passage":"Rabies is a vaccine-preventable viral disease passed to people through bites or scratches from infected animals, most often dogs. It is almost always fatal once symptoms appear, but prompt vaccination after an exposure can prevent the disease.","source_org":"WHO","source_title":"Rabies fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/rabies","matched_text":"\"Measles spreads very easily through the air, and the best protection we have is two doses of the vaccine,\" said Dr. Helen Marsh, the department's director of public health."}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"moderate","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":[],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":true,"similarity":0.0838,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."},"02-misleading-sensational":{"source":null,"analysis_id":null,"word_count":110,"classification":{"kind":"machine_learning_classification","label":"resembles_unreliable_sources","probability_unreliable_style":1.0,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":110.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":10.0,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":127.27,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.1545,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":54.55,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":9.09,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":0.0,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":0.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":45.45,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":9.09,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":63.64,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"health-antibiotics","score":0.618,"relevant":true,"topic":"Health","passage":"Antibiotics are medicines that treat bacterial infections. They are not effective against viral infections such as colds and influenza, and taking them unnecessarily contributes to resistance.","source_org":"WHO","source_title":"Antimicrobial resistance fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance","matched_text":"Doctors are SILENCED while millions suffer through the flu every winter, when a simple antibiotic pill could END it overnight."},{"id":"health-influenza","score":0.5324,"relevant":true,"topic":"Health","passage":"Seasonal influenza is an acute respiratory infection caused by influenza viruses. Annual vaccination is the most effective way to prevent severe illness, and antibiotics do not treat it.","source_org":"WHO","source_title":"Influenza (seasonal) fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)","matched_text":"Doctors are SILENCED while millions suffer through the flu every winter, when a simple antibiotic pill could END it overnight."},{"id":"health-amr","score":0.4272,"relevant":true,"topic":"Health","passage":"Antimicrobial resistance happens when bacteria, viruses, fungi and parasites change over time and stop responding to medicines. Misuse and overuse of antimicrobials are the main drivers, which makes infections harder to treat.","source_org":"WHO","source_title":"Antimicrobial resistance fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance","matched_text":"Doctors are SILENCED while millions suffer through the flu every winter, when a simple antibiotic pill could END it overnight."}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"moderate","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":["The text is shorter (110 words) than most training articles, which reduces reliability."],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":true,"similarity":0.0705,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."},"03-misleading-sober":{"source":null,"analysis_id":null,"word_count":183,"classification":{"kind":"machine_learning_classification","label":"resembles_reliable_sources","probability_unreliable_style":0.213,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":183.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":26.1,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":0.0,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.0,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":0.0,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":0.0,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":32.79,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":2.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":43.72,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":16.39,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":10.93,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"health-immunization","score":0.5384,"relevant":true,"topic":"Health","passage":"Vaccination protects against serious diseases such as measles, polio, diphtheria, tetanus and whooping cough. Immunization programmes prevent millions of deaths worldwide every year.","source_org":"WHO","source_title":"Immunization coverage fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/immunization-coverage","matched_text":"\"Our results show a clear and rapid recovery, and we believe that annual flu vaccines are no longer necessary for healthy adults,\" said the study's lead author, who works at the institute."},{"id":"health-influenza","score":0.4956,"relevant":true,"topic":"Health","passage":"Seasonal influenza is an acute respiratory infection caused by influenza viruses. Annual vaccination is the most effective way to prevent severe illness, and antibiotics do not treat it.","source_org":"WHO","source_title":"Influenza (seasonal) fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)","matched_text":"\"Our results show a clear and rapid recovery, and we believe that annual flu vaccines are no longer necessary for healthy adults,\" said the study's lead author, who works at the institute."},{"id":"health-covid","score":0.4143,"relevant":true,"topic":"Health","passage":"COVID-19 is an infectious disease caused by the SARS-CoV-2 virus. Most infected people have mild to moderate illness, and vaccines lower the risk of severe disease and death.","source_org":"WHO","source_title":"Coronavirus disease (COVID-19) health topic","source_url":"https://www.who.int/health-topics/coronavirus","matched_text":"\"Our results show a clear and rapid recovery, and we believe that annual flu vaccines are no longer necessary for healthy adults,\" said the study's lead author, who works at the institute."}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"moderate","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":[],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":true,"similarity":0.0783,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."},"04-out-of-domain":{"source":null,"analysis_id":null,"word_count":190,"classification":{"kind":"machine_learning_classification","label":"resembles_reliable_sources","probability_unreliable_style":0.3903,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":190.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":21.1,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":0.0,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.0,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":0.0,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":0.0,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":0.0,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":0.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":73.68,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":57.89,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":0.0,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"health-breastfeeding","score":0.3106,"relevant":false,"topic":"Health","passage":"WHO recommends exclusive breastfeeding for the first six months of life, followed by continued breastfeeding alongside nutritious complementary foods. Breast milk supplies the nutrients infants need and helps protect them against common childhood illnesses.","source_org":"WHO","source_title":"Breastfeeding fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/breastfeeding","matched_text":"When the starter doubles in size within a few hours of feeding, it is ready to use."},{"id":"biology-genome","score":0.215,"relevant":false,"topic":"Biology","passage":"The Human Genome Project produced the first reference sequence of human DNA, which contains about three billion base pairs. The project was declared complete in 2003.","source_org":"NIH NHGRI","source_title":"Human Genome Project","source_url":"https://www.genome.gov/human-genome-project","matched_text":"Sourdough bread is made by fermenting dough with a culture of wild yeast and lactic acid bacteria, known as a starter, rather than with commercial yeast."},{"id":"health-amr","score":0.1789,"relevant":false,"topic":"Health","passage":"Antimicrobial resistance happens when bacteria, viruses, fungi and parasites change over time and stop responding to medicines. Misuse and overuse of antimicrobials are the main drivers, which makes infections harder to treat.","source_org":"WHO","source_title":"Antimicrobial resistance fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/antimicrobial-resistance","matched_text":"Sourdough bread is made by fermenting dough with a culture of wild yeast and lactic acid bacteria, known as a starter, rather than with commercial yeast."}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"very_high","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":["This text looks unlike the articles the classifier was trained on (different vocabulary or genre; similarity 0.044 is below the 0.059 cut-off). The classification is outside its training domain and should not be relied on, however confident it appears.","The classifier probability is close to 0.5, so the model is effectively undecided.","No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":false,"similarity":0.0442,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."},"05-insufficient-evidence":{"source":null,"analysis_id":null,"word_count":179,"classification":{"kind":"machine_learning_classification","label":"resembles_reliable_sources","probability_unreliable_style":0.0642,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":179.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":25.6,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":0.0,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.0,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":0.0,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":5.59,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":22.35,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":0.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":55.87,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":39.11,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":0.0,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"biology-genome","score":0.2615,"relevant":false,"topic":"Biology","passage":"The Human Genome Project produced the first reference sequence of human DNA, which contains about three billion base pairs. The project was declared complete in 2003.","source_org":"NIH NHGRI","source_title":"Human Genome Project","source_url":"https://www.genome.gov/human-genome-project","matched_text":"The developer said the project would include 96 apartments, a small ground-floor cafe and underground parking, and that construction could begin next spring if permits are granted."},{"id":"space-iss","score":0.26,"relevant":false,"topic":"Space","passage":"The International Space Station is a research laboratory that orbits Earth about 400 kilometres up. Built by an international partnership, it has been continuously occupied by crews since November 2000.","source_org":"NASA","source_title":"International Space Station","source_url":"https://www.nasa.gov/international-space-station/","matched_text":"The developer said the project would include 96 apartments, a small ground-floor cafe and underground parking, and that construction could begin next spring if permits are granted."},{"id":"health-road-traffic","score":0.2298,"relevant":false,"topic":"Health","passage":"Road traffic crashes are a leading cause of death and injury, especially among children and young adults. Seat belts, helmets, sensible speed limits and avoiding drink-driving all reduce deaths and serious injuries.","source_org":"WHO","source_title":"Road traffic injuries fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries","matched_text":"The mayor said a traffic study would be carried out before final approval, and that the council would review the results in the autumn."}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"moderate","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":["No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":true,"similarity":0.0783,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."},"06-short-headline":{"source":null,"analysis_id":null,"word_count":8,"classification":{"kind":"machine_learning_classification","label":"resembles_unreliable_sources","probability_unreliable_style":0.8658,"confidence_note":"Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.","model":{"name":"TF-IDF + Logistic Regression (source_masked)","trained_on":"WELFake (about 62k de-duplicated articles)","test_accuracy_on_dataset_labels":0.9636984838778561},"disclaimer":"Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."},"linguistic_signals":[{"key":"word_count","label":"Words","value":8.0,"unit":"words","description":"Length of the submitted text (title included)."},{"key":"avg_sentence_length","label":"Average sentence length","value":8.0,"unit":"words","description":"Mean words per sentence."},{"key":"exclamation_marks","label":"Exclamation marks","value":0.0,"unit":"per 1,000 words","description":"Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."},{"key":"question_marks","label":"Question marks","value":0.0,"unit":"per 1,000 words","description":"Rhetorical or headline questions."},{"key":"all_caps_ratio","label":"ALL-CAPS words","value":0.0,"unit":"share of words","description":"Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."},{"key":"sensational_terms","label":"Sensational wording","value":0.0,"unit":"per 1,000 words","description":"Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."},{"key":"hedging_terms","label":"Hedging wording","value":0.0,"unit":"per 1,000 words","description":"Words such as 'allegedly', 'may', 'could' that signal uncertainty."},{"key":"attribution_markers","label":"Attribution markers","value":0.0,"unit":"per 1,000 words","description":"Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."},{"key":"quotation_marks","label":"Quotation marks","value":0.0,"unit":"count","description":"Quotation characters, a rough proxy for quoted speech."},{"key":"named_entities","label":"Named entities","value":125.0,"unit":"per 1,000 words","description":"People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."},{"key":"numeric_mentions","label":"Numeric mentions","value":0.0,"unit":"per 1,000 words","description":"Numbers and number words."},{"key":"first_second_person","label":"First/second-person pronouns","value":0.0,"unit":"per 1,000 words","description":"I, we, you and related forms, which indicate direct address or opinion."}],"evidence":{"kind":"retrieved_reference_passages","collection_name":"VERITAS AI demo reference collection","collection_size":70,"relevance_threshold":0.4,"hits":[{"id":"health-cancer","score":0.3897,"relevant":false,"topic":"Health","passage":"Cancer is a leading cause of death worldwide. Many cancers can be cured if they are detected early and treated properly, and tobacco use is the single largest risk factor.","source_org":"WHO","source_title":"Cancer fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/cancer","matched_text":"Scientists reveal fruit that cures all diseases overnight"},{"id":"health-healthy-diet","score":0.358,"relevant":false,"topic":"Health","passage":"A healthy diet includes plenty of fruit, vegetables, legumes, nuts and whole grains, and limits free sugars, salt and saturated fats. Eating well throughout life helps protect against malnutrition and noncommunicable diseases such as diabetes and heart disease.","source_org":"WHO","source_title":"Healthy diet fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/healthy-diet","matched_text":"Scientists reveal fruit that cures all diseases overnight"},{"id":"health-ebola","score":0.2766,"relevant":false,"topic":"Health","passage":"Ebola virus disease is a severe and often fatal illness spread through direct contact with the blood or body fluids of infected people or animals. Vaccines and treatments are available for infections caused by the Zaire ebolavirus.","source_org":"WHO","source_title":"Ebola disease fact sheet","source_url":"https://www.who.int/news-room/fact-sheets/detail/ebola-virus-disease","matched_text":"Scientists reveal fruit that cures all diseases overnight"}],"disclaimer":"Passages are retrieved by semantic similarity from a small curated collection. They show related reference material only; the system does not determine whether they support or contradict the text."},"uncertainty":{"level":"very_high","meaning":"This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.","reasons":["The text is very short (8 words). The classifier was trained on full articles, so short inputs such as headlines are far outside its training range.","This text looks unlike the articles the classifier was trained on (different vocabulary or genre; similarity 0.008 is below the 0.059 cut-off). The classification is outside its training domain and should not be relied on, however confident it appears.","No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."],"standing_caveats":["The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.","The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.","Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."],"domain_check":{"available":true,"in_domain":false,"similarity":0.008,"threshold":0.0589}},"disclaimer":"This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."}}}
+{
+  "recorded_on": "2026-11-21",
+  "edition": "vercel (lexical TF-IDF evidence retrieval; no accounts or saved analyses)",
+  "results": {
+    "01-normal-news": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 196,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_reliable_sources",
+        "probability_unreliable_style": 0.0064,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 196.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 28.0,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.0,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 5.1,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 5.1,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 30.61,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 2.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 56.12,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 30.61,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 5.1,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "health-measles",
+            "score": 0.4101,
+            "relevant": true,
+            "topic": "Health",
+            "passage": "Measles is a highly contagious viral disease that spreads through the air. It can be prevented with two doses of a safe and effective vaccine.",
+            "source_org": "WHO",
+            "source_title": "Measles fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/measles",
+            "matched_text": "\"Measles spreads very easily through the air, and the best protection we have is two doses of the vaccine,\" said Dr. Helen Marsh, the department's director of public health."
+          },
+          {
+            "id": "health-rabies",
+            "score": 0.2351,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Rabies is a vaccine-preventable viral disease passed to people through bites or scratches from infected animals, most often dogs. It is almost always fatal once symptoms appear, but prompt vaccination after an exposure can prevent the disease.",
+            "source_org": "WHO",
+            "source_title": "Rabies fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/rabies",
+            "matched_text": "She said staff were contacting schools and nurseries to identify children who may have been exposed and to advise families on what to do if symptoms appear, including fever, cough and a rash."
+          },
+          {
+            "id": "health-polio",
+            "score": 0.2178,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Polio is a highly infectious viral disease that mainly affects young children and can cause paralysis. There is no cure, but it is preventable with vaccination, and cases have fallen by more than 99 percent since 1988.",
+            "source_org": "WHO",
+            "source_title": "Poliomyelitis fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/poliomyelitis",
+            "matched_text": "Local schools will keep open as planned, but unvaccinated children who have been in contact with a confirmed case will be asked to stay at home for up to three weeks."
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "moderate",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": true,
+          "similarity": 0.0838,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    },
+    "02-misleading-sensational": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 110,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_unreliable_sources",
+        "probability_unreliable_style": 1.0,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 110.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 10.0,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 127.27,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.1545,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 54.55,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 9.09,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 0.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 45.45,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 9.09,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 63.64,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "health-tuberculosis",
+            "score": 0.1991,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Tuberculosis is caused by the bacterium Mycobacterium tuberculosis and spreads through the air when people with active lung disease cough or sneeze. It is treatable and curable with a course of antibiotics.",
+            "source_org": "WHO",
+            "source_title": "Tuberculosis fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/tuberculosis",
+            "matched_text": "Doctors are SILENCED while millions suffer through the flu every winter, when a simple antibiotic pill could END it overnight."
+          },
+          {
+            "id": "health-stroke",
+            "score": 0.1989,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "A stroke happens when the blood supply to part of the brain is blocked or a blood vessel in the brain bursts. High blood pressure is the most important modifiable risk factor, and fast medical treatment improves the chance of recovery.",
+            "source_org": "WHO",
+            "source_title": "Stroke (cerebrovascular accident) fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/stroke-cerebrovascular-accident",
+            "matched_text": "A brave whistleblower has EXPOSED the biggest medical cover-up in history."
+          },
+          {
+            "id": "health-influenza",
+            "score": 0.1805,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Seasonal influenza is an acute respiratory infection caused by influenza viruses. Annual vaccination is the most effective way to prevent severe illness, and antibiotics do not treat it.",
+            "source_org": "WHO",
+            "source_title": "Influenza (seasonal) fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)",
+            "matched_text": "Antibiotics CURE the flu in just 24 HOURS and Big Pharma has been HIDING it from you for DECADES!!!"
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "high",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [
+          "The text is shorter (110 words) than most training articles, which reduces reliability.",
+          "No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."
+        ],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": true,
+          "similarity": 0.0705,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    },
+    "03-misleading-sober": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 183,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_reliable_sources",
+        "probability_unreliable_style": 0.213,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 183.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 26.1,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.0,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 32.79,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 2.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 43.72,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 16.39,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 10.93,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "health-influenza",
+            "score": 0.2516,
+            "relevant": true,
+            "topic": "Health",
+            "passage": "Seasonal influenza is an acute respiratory infection caused by influenza viruses. Annual vaccination is the most effective way to prevent severe illness, and antibiotics do not treat it.",
+            "source_org": "WHO",
+            "source_title": "Influenza (seasonal) fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/influenza-(seasonal)",
+            "matched_text": "Several pharmacies in the area have already begun promoting the drink to customers as an alternative to seasonal vaccination."
+          },
+          {
+            "id": "health-hpv",
+            "score": 0.1886,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Persistent infection with certain types of human papillomavirus causes almost all cases of cervical cancer. Vaccination against HPV, together with regular screening and treatment, can prevent most cervical cancer.",
+            "source_org": "WHO",
+            "source_title": "Human papillomavirus and cervical cancer fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/human-papillomavirus-(hpv)-and-cervical-cancer",
+            "matched_text": "The researchers said that patients who drank the mixture three times daily recovered faster than those who took no treatment, and that the drink removed the need for vaccination against the virus."
+          },
+          {
+            "id": "health-mental-disorders",
+            "score": 0.1869,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Mental disorders are common and affect people of every age and background. Effective prevention and treatment exist, but many people do not receive care, and stigma and discrimination are often barriers.",
+            "source_org": "WHO",
+            "source_title": "Mental disorders fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/mental-disorders",
+            "matched_text": "The study has not yet been reviewed by outside experts, and the institute did not say how the volunteers were selected or whether the symptoms of the group that received no treatment were compared over the same period."
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "moderate",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": true,
+          "similarity": 0.0783,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    },
+    "04-out-of-domain": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 190,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_reliable_sources",
+        "probability_unreliable_style": 0.3903,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 190.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 21.1,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.0,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 0.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 73.68,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 57.89,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "health-salt",
+            "score": 0.22,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Eating too much sodium raises blood pressure and the risk of heart disease and stroke. WHO recommends that adults consume less than 5 grams of salt per day.",
+            "source_org": "WHO",
+            "source_title": "Salt reduction fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/salt-reduction",
+            "matched_text": "For a simple loaf, combine five hundred grams of strong white flour, three hundred and fifty grams of water, one hundred grams of active starter and ten grams of salt."
+          },
+          {
+            "id": "health-tuberculosis",
+            "score": 0.206,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Tuberculosis is caused by the bacterium Mycobacterium tuberculosis and spreads through the air when people with active lung disease cough or sneeze. It is treatable and curable with a course of antibiotics.",
+            "source_org": "WHO",
+            "source_title": "Tuberculosis fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/tuberculosis",
+            "matched_text": "Sourdough bread is made by fermenting dough with a culture of wild yeast and lactic acid bacteria, known as a starter, rather than with commercial yeast."
+          },
+          {
+            "id": "climate-sealevel",
+            "score": 0.2047,
+            "relevant": false,
+            "topic": "Climate",
+            "passage": "Global mean sea level is rising because ocean water expands as it warms and because ice sheets and glaciers on land are melting and adding water to the ocean.",
+            "source_org": "NASA",
+            "source_title": "Sea Level Change portal",
+            "source_url": "https://sealevel.nasa.gov/",
+            "matched_text": "To make a starter, mix equal weights of flour and water in a clean jar and leave it at room temperature, adding a little fresh flour and water each day."
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "very_high",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [
+          "This text looks unlike the articles the classifier was trained on (different vocabulary or genre; similarity 0.044 is below the 0.059 cut-off). The classification is outside its training domain and should not be relied on, however confident it appears.",
+          "The classifier probability is close to 0.5, so the model is effectively undecided.",
+          "No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."
+        ],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": false,
+          "similarity": 0.0442,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    },
+    "05-insufficient-evidence": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 179,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_reliable_sources",
+        "probability_unreliable_style": 0.0642,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 179.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 25.6,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.0,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 5.59,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 22.35,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 0.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 55.87,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 39.11,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "earth-facts",
+            "score": 0.2243,
+            "relevant": false,
+            "topic": "Earth science",
+            "passage": "Earth is the third planet from the Sun, and about 70 percent of its surface is covered by water. It is the only planet known to support life.",
+            "source_org": "NASA",
+            "source_title": "Earth facts",
+            "source_url": "https://science.nasa.gov/earth/facts/",
+            "matched_text": "Councillor David Ortiz, who supported the proposal, said the city needs more housing and that the developer had agreed to set aside ten percent of the units at reduced rents."
+          },
+          {
+            "id": "earth-ocean-fraction",
+            "score": 0.1796,
+            "relevant": false,
+            "topic": "Earth science",
+            "passage": "The ocean covers about 71 percent of Earth's surface and holds roughly 97 percent of the planet's water.",
+            "source_org": "NOAA",
+            "source_title": "How much of the Earth is covered by ocean?",
+            "source_url": "https://oceanservice.noaa.gov/facts/oceanfraction.html",
+            "matched_text": "Councillor David Ortiz, who supported the proposal, said the city needs more housing and that the developer had agreed to set aside ten percent of the units at reduced rents."
+          },
+          {
+            "id": "biology-genome",
+            "score": 0.157,
+            "relevant": false,
+            "topic": "Biology",
+            "passage": "The Human Genome Project produced the first reference sequence of human DNA, which contains about three billion base pairs. The project was declared complete in 2003.",
+            "source_org": "NIH NHGRI",
+            "source_title": "Human Genome Project",
+            "source_url": "https://www.genome.gov/human-genome-project",
+            "matched_text": "The developer said the project would include 96 apartments, a small ground-floor cafe and underground parking, and that construction could begin next spring if permits are granted."
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "moderate",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [
+          "No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."
+        ],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": true,
+          "similarity": 0.0783,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    },
+    "06-short-headline": {
+      "source": null,
+      "analysis_id": null,
+      "word_count": 8,
+      "classification": {
+        "kind": "machine_learning_classification",
+        "label": "resembles_unreliable_sources",
+        "probability_unreliable_style": 0.8658,
+        "confidence_note": "Model confidence describes how strongly the text matches patterns in the training labels. It is not the probability that the content is true or false.",
+        "model": {
+          "name": "TF-IDF + Logistic Regression (source_masked)",
+          "trained_on": "WELFake (about 62k de-duplicated articles)",
+          "test_accuracy_on_dataset_labels": 0.9636984838778561
+        },
+        "disclaimer": "Describes how closely the writing resembles articles from sources labelled unreliable or reliable in the training data. It is not a fact-check."
+      },
+      "linguistic_signals": [
+        {
+          "key": "word_count",
+          "label": "Words",
+          "value": 8.0,
+          "unit": "words",
+          "description": "Length of the submitted text (title included)."
+        },
+        {
+          "key": "avg_sentence_length",
+          "label": "Average sentence length",
+          "value": 8.0,
+          "unit": "words",
+          "description": "Mean words per sentence."
+        },
+        {
+          "key": "exclamation_marks",
+          "label": "Exclamation marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Frequent exclamation is a common emphasis pattern; it also occurs in quotes and opinion writing."
+        },
+        {
+          "key": "question_marks",
+          "label": "Question marks",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Rhetorical or headline questions."
+        },
+        {
+          "key": "all_caps_ratio",
+          "label": "ALL-CAPS words",
+          "value": 0.0,
+          "unit": "share of words",
+          "description": "Words of 3+ letters written entirely in capitals. Acronyms such as NASA are included."
+        },
+        {
+          "key": "sensational_terms",
+          "label": "Sensational wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Hits from a small hand-picked list (e.g. 'shocking', 'bombshell'). Not validated."
+        },
+        {
+          "key": "hedging_terms",
+          "label": "Hedging wording",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Words such as 'allegedly', 'may', 'could' that signal uncertainty."
+        },
+        {
+          "key": "attribution_markers",
+          "label": "Attribution markers",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Phrases such as 'according to' and 'said' that tie statements to a speaker or source. Their presence does not show the source is reliable."
+        },
+        {
+          "key": "quotation_marks",
+          "label": "Quotation marks",
+          "value": 0.0,
+          "unit": "count",
+          "description": "Quotation characters, a rough proxy for quoted speech."
+        },
+        {
+          "key": "named_entities",
+          "label": "Named entities",
+          "value": 125.0,
+          "unit": "per 1,000 words",
+          "description": "People, organisations, places and similar entities found by spaCy (en_core_web_sm); automatic and imperfect."
+        },
+        {
+          "key": "numeric_mentions",
+          "label": "Numeric mentions",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "Numbers and number words."
+        },
+        {
+          "key": "first_second_person",
+          "label": "First/second-person pronouns",
+          "value": 0.0,
+          "unit": "per 1,000 words",
+          "description": "I, we, you and related forms, which indicate direct address or opinion."
+        }
+      ],
+      "evidence": {
+        "kind": "retrieved_reference_passages",
+        "retrieval_method": "tfidf_lexical",
+        "collection_name": "VERITAS AI demo reference collection",
+        "collection_size": 70,
+        "relevance_threshold": 0.25,
+        "hits": [
+          {
+            "id": "climate-causes",
+            "score": 0.1465,
+            "relevant": false,
+            "topic": "Climate",
+            "passage": "Human activities, mainly the burning of coal, oil and gas, have increased the concentration of greenhouse gases in the atmosphere. Scientific assessments conclude that this is the dominant cause of warming observed since the mid-20th century.",
+            "source_org": "NASA",
+            "source_title": "Causes of climate change",
+            "source_url": "https://science.nasa.gov/climate-change/causes/",
+            "matched_text": "Scientists reveal fruit that cures all diseases overnight"
+          },
+          {
+            "id": "health-healthy-diet",
+            "score": 0.129,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "A healthy diet includes plenty of fruit, vegetables, legumes, nuts and whole grains, and limits free sugars, salt and saturated fats. Eating well throughout life helps protect against malnutrition and noncommunicable diseases such as diabetes and heart disease.",
+            "source_org": "WHO",
+            "source_title": "Healthy diet fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+            "matched_text": "Scientists reveal fruit that cures all diseases overnight"
+          },
+          {
+            "id": "health-polio",
+            "score": 0.1289,
+            "relevant": false,
+            "topic": "Health",
+            "passage": "Polio is a highly infectious viral disease that mainly affects young children and can cause paralysis. There is no cure, but it is preventable with vaccination, and cases have fallen by more than 99 percent since 1988.",
+            "source_org": "WHO",
+            "source_title": "Poliomyelitis fact sheet",
+            "source_url": "https://www.who.int/news-room/fact-sheets/detail/poliomyelitis",
+            "matched_text": "Scientists reveal fruit that cures all diseases overnight"
+          }
+        ],
+        "disclaimer": "Passages are retrieved by lexical (TF-IDF) similarity from a small curated collection: a passage is found when it shares words with the text, so a passage on the same subject written in different words can be missed. They show related reference material only; the system does not determine whether they support or contradict the text."
+      },
+      "uncertainty": {
+        "level": "very_high",
+        "meaning": "This level describes how far the analysis itself can be trusted. It says nothing about whether the content is true or false, and a confident model result does not reduce it.",
+        "reasons": [
+          "The text is very short (8 words). The classifier was trained on full articles, so short inputs such as headlines are far outside its training range.",
+          "This text looks unlike the articles the classifier was trained on (different vocabulary or genre; similarity 0.008 is below the 0.059 cut-off). The classification is outside its training domain and should not be relied on, however confident it appears.",
+          "No passage in the reference collection is clearly related to this text. The collection is small, so this says nothing about whether the content is accurate."
+        ],
+        "standing_caveats": [
+          "The classifier was trained on WELFake, a 2016-2017 era collection of mostly US political news whose labels come from source reliability, not article-by-article fact-checking.",
+          "The classifier's probability measures how strongly the text matches patterns in the training labels. A high probability does not mean the content is false, and a low probability does not mean it is true. It is not factual certainty.",
+          "Retrieved passages come from a small curated collection and show topical relevance only; the system does not check whether a passage supports or contradicts the text."
+        ],
+        "domain_check": {
+          "available": true,
+          "in_domain": false,
+          "similarity": 0.008,
+          "threshold": 0.0589
+        }
+      },
+      "disclaimer": "This output is an automated statistical and similarity analysis. It does not verify that any claim is true or false."
+    }
+  }
+}

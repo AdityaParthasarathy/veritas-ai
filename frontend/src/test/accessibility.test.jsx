@@ -7,10 +7,8 @@ import ErrorBoundary from '../components/common/ErrorBoundary'
 import CommandPalette from '../components/layout/CommandPalette'
 import Report from '../components/report/Report'
 import { ToastProvider } from '../components/ui/Toast'
-import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../layouts/AppLayout'
 import AnalyzePage from '../pages/AnalyzePage'
-import AuthPage from '../pages/AuthPage'
 import CaseDetailPage from '../pages/CaseDetailPage'
 import CasebookPage from '../pages/CasebookPage'
 import EvidenceExplorerPage from '../pages/EvidenceExplorerPage'
@@ -59,7 +57,6 @@ describe('automated accessibility checks (axe)', () => {
   it('application shell: skip link, landmarks, navigation, readout', async () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/']}>
-        <AuthProvider>
           <ToastProvider>
             <Routes>
               <Route element={<AppLayout />}>
@@ -67,7 +64,6 @@ describe('automated accessibility checks (axe)', () => {
               </Route>
             </Routes>
           </ToastProvider>
-        </AuthProvider>
       </MemoryRouter>,
     )
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main')
@@ -80,8 +76,6 @@ describe('automated accessibility checks (axe)', () => {
   })
 
   it.each([
-    ['sign in', <AuthPage key="a" mode="login" />],
-    ['create account', <AuthPage key="b" mode="register" />],
     ['investigation workspace (text)', <AnalyzePage key="c" />],
     ['casebook', <CasebookPage key="d" />],
     ['not found', <NotFoundPage key="e" />],
@@ -93,13 +87,11 @@ describe('automated accessibility checks (axe)', () => {
   it('a casebook case with its recorded report has no violations', async () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/casebook/03-misleading-sober']}>
-        <AuthProvider>
           <ToastProvider>
             <Routes>
               <Route path="/casebook/:id" element={<CaseDetailPage />} />
             </Routes>
           </ToastProvider>
-        </AuthProvider>
       </MemoryRouter>,
     )
     expect(await screen.findByRole('heading', { name: 'Three separate readings' })).toBeInTheDocument()
@@ -142,7 +134,7 @@ describe('automated accessibility checks (axe)', () => {
     const options = screen.getAllByRole('option').map((o) => o.textContent)
     expect(options.join(' ')).toMatch(/Start an investigation/)
     expect(options.join(' ')).toMatch(/Casebook/)
-    expect(options.join(' ')).not.toMatch(/Saved investigations/) // signed-out users have none
+    expect(options.join(' ')).not.toMatch(/Saved investigations|Sign in|Create an account/) // this edition has no accounts
   })
 
   it('error boundary fallback is announced as an alert and hides internals', async () => {
