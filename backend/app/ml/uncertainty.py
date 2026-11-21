@@ -45,10 +45,15 @@ def assess(
     top_evidence_score: float | None,
     domain_similarity: float | None = None,
     domain_threshold: float | None = None,
+    extraction_warning: str | None = None,
 ) -> UncertaintyAssessment:
     """Combine simple, explainable checks into an uncertainty level."""
     points = 0
     reasons: list[str] = []
+
+    if extraction_warning:  # the text is not an article (menu, feed or index page); see services/extraction_quality.py
+        points += 2
+        reasons.append(extraction_warning)
 
     if word_count < SHORT_TEXT_WORDS:
         points += 2

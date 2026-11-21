@@ -889,6 +889,18 @@
             "title": "Extracted Chars",
             "type": "integer"
           },
+          "extraction_warning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set when the extracted text looks like a menu, feed or index page instead of one article.",
+            "title": "Extraction Warning"
+          },
           "final_url": {
             "title": "Final Url",
             "type": "string"

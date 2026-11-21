@@ -34,11 +34,60 @@ export function buildReading(result) {
     : 'No reference passage is clearly related. The collection is small, so this says nothing about accuracy.'
   const trust = LEVEL_TEXT[uncertainty.level] ?? LEVEL_TEXT.moderate
   const outOfDomain = Boolean(check?.available && !check.in_domain)
-  // Out of domain: the model still emits a label, but it must be presented as not meaningful, not as a finding.
-  const styleNote = outOfDomain
+  const notArticle = Boolean(result.source?.extraction_warning)
+  // Out of domain, or not an article at all: the model still emits a label, but it must be presented as not meaningful,
+  // not as a finding. The probability itself is never altered.
+  const notMeaningful = outOfDomain || notArticle
+  const styleNote = notMeaningful
     ? `The model still produced a style label (${unreliable ? 'unreliable' : 'reliable'}), but it carries no meaning for this text.`
     : null
-  return { style, styleNote, domain, evidence: evidenceLine, trust, outOfDomain, relatedCount: related.length }
+  return { style, styleNote, domain, evidence: evidenceLine, trust, outOfDomain, notArticle, notMeaningful, relatedCount: related.length }
+}
+
+/**
+ * Things to read before the result: each one is a reason the classifier reading may not mean what it appears to.
+ * Assembled only from fields the API returned. Never contains a verdict about the text.
+ */
+export function buildWarnings(result) {
+  const reading = buildReading(result)
+  const { classification, word_count: words, source } = result
+  const p = classification.probability_unreliable_style
+  const warnings = []
+  if (reading.notArticle) {
+    warnings.push({
+      id: 'not-an-article',
+      title: 'This page does not look like a single article',
+      body: source.extraction_warning,
+    })
+  }
+  if (reading.outOfDomain) {
+    warnings.push({
+      id: 'out-of-domain',
+      title: 'This text is unlike the articles the classifier was trained on',
+      body: 'Its vocabulary and style are far from the training articles, so the style reading is not meaningful here, however confident it looks.',
+    })
+  }
+  if (words < 50) {
+    warnings.push({
+      id: 'very-short',
+      title: `Very short input (${words} words)`,
+      body: 'The classifier was trained on full articles. A headline or a few sentences is far outside that range, so the reading is unreliable.',
+    })
+  } else if (words < 150) {
+    warnings.push({
+      id: 'short',
+      title: `Shorter than most training articles (${words} words)`,
+      body: 'Short texts give less stable readings. Treat the result as weak.',
+    })
+  }
+  if (Math.abs(p - 0.5) < 0.15) {
+    warnings.push({
+      id: 'undecided',
+      title: 'The classifier is close to undecided',
+      body: `A probability near 50% (${percent(p)}) means the writing matches neither label strongly. Do not read it as a lean in either direction.`,
+    })
+  }
+  return warnings
 }
 
 /** A readable title when none was supplied: the first sentence, trimmed. */
@@ -108,7 +157,8 @@ export function buildPrimary(result) {
   const unreliable = classification.label === 'resembles_unreliable_sources'
   return {
     outOfDomain: reading.outOfDomain,
-    headline: reading.outOfDomain
+    notMeaningful: reading.notMeaningful,
+    headline: reading.notMeaningful
       ? 'The writing-style reading is not meaningful for this text.'
       : unreliable
         ? 'Writing style resembles examples labelled unreliable.'
@@ -132,9 +182,11 @@ export function buildTakeaway(result) {
   const related = evidence.hits.filter((h) => h.relevant)
   const orgs = [...new Set(related.map((h) => h.source_org))]
 
-  const observed = reading.outOfDomain
-    ? 'The text is unlike the news articles the classifier was trained on, so the style label it produced carries no meaning here.'
-    : unreliable
+  const observed = reading.notArticle
+    ? 'The fetched page looks like a menu, feed or index page rather than one article, so the style label the classifier produced carries no meaning here. Its probability reflects interface wording as much as writing style.'
+    : reading.outOfDomain
+      ? 'The text is unlike the news articles the classifier was trained on, so the style label it produced carries no meaning here.'
+      : unreliable
       ? 'The classifier found writing patterns associated with unreliable-labelled training examples. That describes style, such as emphasis and wording habits. It does not mean the claims are false.'
       : 'The classifier found writing patterns associated with reliable-labelled training examples. That describes style. It does not mean the claims are true.'
 

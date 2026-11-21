@@ -18,6 +18,7 @@ from app.schemas.analysis import (
     EvidenceSearchResponse,
 )
 from app.services import url_ingest
+from app.services.extraction_quality import assess_extraction
 from app.services.analysis_service import AnalysisService, get_analysis_service
 
 analysis_router = APIRouter(prefix="/analysis", tags=["Analysis"])
@@ -61,8 +62,9 @@ def analyze_url(payload: UrlAnalysisRequest, request: Request, service: Service,
     """Fetch a public article URL safely, extract its text, then run the standard analysis."""
     url_rate_limiter.hit(request.client.host if request.client else "unknown")
     article = url_ingest.ingest_url(payload.url)
-    result = service.analyze(AnalysisRequest(title=article.title, text=article.text))
-    result.source = SourceInfo(**{k: v for k, v in asdict(article).items() if k != "text"})
+    warning = assess_extraction(article.text).warning
+    result = service.analyze(AnalysisRequest(title=article.title, text=article.text), extraction_warning=warning)
+    result.source = SourceInfo(**{k: v for k, v in asdict(article).items() if k != "text"}, extraction_warning=warning)
     if user is not None:
         result.analysis_id = history_service.save(db, user, AnalysisRequest(title=article.title, text=article.text), result)
     return result

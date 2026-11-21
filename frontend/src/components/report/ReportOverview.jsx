@@ -33,7 +33,7 @@ export default function ReportOverview({ result }) {
       </h2>
       {primary.styleNote && <p className="mt-3 max-w-3xl text-[0.9375rem] text-steel">{primary.styleNote}</p>}
 
-      <div className={`mt-6 max-w-2xl ${primary.outOfDomain ? 'opacity-60' : ''}`}>
+      <div className={`mt-6 max-w-2xl ${primary.notMeaningful ? 'opacity-60' : ''}`}>
         <p className="t-data text-[0.8125rem]">{primary.measurement}</p>
         <div role="presentation" className="relative mt-2.5 h-1.5 rounded-full bg-line">
           <span className="absolute inset-y-0 left-0 rounded-full bg-signal-gradient" style={{ width: `${Math.max(1, p * 100)}%` }} />
@@ -46,7 +46,7 @@ export default function ReportOverview({ result }) {
       </div>
 
       <dl className="mt-7 grid gap-3 md:grid-cols-3">
-        <Reading step="01" question="Observed" value={reading.outOfDomain ? 'Not meaningful here' : classification.label === 'resembles_unreliable_sources' ? 'Unreliable-like style' : 'Reliable-like style'} detail="Writing style, from the classifier" />
+        <Reading step="01" question="Observed" value={reading.notMeaningful ? 'Not meaningful here' : classification.label === 'resembles_unreliable_sources' ? 'Unreliable-like style' : 'Reliable-like style'} detail="Writing style, from the classifier" />
         <Reading step="02" question="Retrieved" value={reading.relatedCount === 0 ? 'No related passage' : `${reading.relatedCount} related passage${reading.relatedCount === 1 ? '' : 's'}`} detail={`of ${evidence.collection_size} in the reference collection`} />
         <Reading step="03" question="Trust" value={reading.trust.name} detail={reading.trust.advice} />
       </dl>

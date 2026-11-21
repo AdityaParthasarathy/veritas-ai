@@ -7,6 +7,7 @@ import InstrumentCards from './InstrumentCards'
 import ReportHeader from './ReportHeader'
 import ReportNav from './ReportNav'
 import ReportOverview from './ReportOverview'
+import ResultWarnings from './ResultWarnings'
 import SignalsTable from './SignalsTable'
 import Takeaway from './Takeaway'
 import { buildReading, deriveTitle, notableSignals, percent } from './reportModel'
@@ -46,6 +47,7 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
         <ReportNav />
         <div className="min-w-0 space-y-14">
           <section id="overview" className="scroll-mt-28 space-y-6">
+            <ResultWarnings result={result} />
             <ReportOverview result={result} />
             <Takeaway result={result} />
             <p className="t-caption max-w-4xl">{result.disclaimer}</p>
@@ -70,6 +72,9 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
                       </div>
                     ))}
                 </dl>
+                {source.extraction_warning && (
+                  <p className="mt-4 rounded-lg border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] leading-relaxed text-paper">{source.extraction_warning}</p>
+                )}
                 <p className="t-caption mt-3 flex items-start gap-2 break-all">
                   <Globe className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   {source.final_url}. The domain says nothing by itself about reliability.

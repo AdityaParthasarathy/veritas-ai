@@ -102,6 +102,10 @@ class SourceInfo(BaseModel):
     published: str | None
     extracted_chars: int
     truncated: bool
+    extraction_warning: str | None = Field(
+        default=None,
+        description="Set when the extracted text looks like a menu, feed or index page instead of one article.",
+    )
 
 
 class AnalysisResponse(BaseModel):

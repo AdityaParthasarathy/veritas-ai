@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analysisResult } from '../../test/fixtures'
-import { buildFullReportText, buildPrimary, buildProof, buildReading, buildSummaryText, buildTakeaway, notableSignals } from './reportModel'
+import { buildFullReportText, buildPrimary, buildProof, buildReading, buildSummaryText, buildTakeaway, buildWarnings, notableSignals } from './reportModel'
 
 const withHits = (hits) => ({ ...analysisResult, evidence: { ...analysisResult.evidence, hits } })
 
@@ -33,6 +33,53 @@ describe('buildReading', () => {
     const legacy = structuredClone(analysisResult)
     delete legacy.uncertainty.domain_check
     expect(buildReading(legacy).domain).toMatch(/not available/)
+  })
+})
+
+const hubWarning = 'The extracted text looks like a menu, feed or index page rather than a single article: 6 lines are cut off with an ellipsis, as feed teasers are. The classifier was trained on whole articles, so its reading of this text is not meaningful.'
+const hubResult = {
+  ...analysisResult,
+  word_count: 615,
+  source: { url: 'https://h.example/', final_url: 'https://h.example/', domain: 'h.example', title: 'Hub', author: null, published: null, extracted_chars: 3824, truncated: false, extraction_warning: hubWarning },
+  classification: { ...analysisResult.classification, label: 'resembles_unreliable_sources', probability_unreliable_style: 0.9855 },
+  uncertainty: { ...analysisResult.uncertainty, level: 'high', reasons: [hubWarning] },
+}
+
+describe('buildWarnings (regression: hub page scored 98.5% unreliable)', () => {
+  it('raises a not-an-article warning and marks the style reading not meaningful, without touching the probability', () => {
+    const warnings = buildWarnings(hubResult)
+    expect(warnings.map((w) => w.id)).toEqual(['not-an-article'])
+    expect(warnings[0].body).toBe(hubWarning)
+    expect(buildReading(hubResult).notMeaningful).toBe(true)
+    expect(buildPrimary(hubResult).headline).toMatch(/not meaningful/)
+    expect(buildPrimary(hubResult).measurement).toMatch(/99%/) // the number is still shown, as a measurement
+    expect(buildTakeaway(hubResult).observed).toMatch(/menu, feed or index page/)
+  })
+
+  it('does not call a high probability a probability of falsehood, and never a verdict', () => {
+    const prose = [buildPrimary(hubResult).note, buildTakeaway(hubResult).observed, buildTakeaway(hubResult).bottomLine].join(' ')
+    expect(prose).toMatch(/not a 99% probability that the article is fake/)
+    expect(prose.toLowerCase()).not.toMatch(/\b(is true|is false|verified|debunked|proves?)\b/)
+  })
+
+  it('warns separately about short input, out-of-domain text and an undecided model', () => {
+    const short = buildWarnings({ ...analysisResult, word_count: 9 })
+    expect(short.map((w) => w.id)).toEqual(['very-short'])
+    expect(buildWarnings({ ...analysisResult, word_count: 100 }).map((w) => w.id)).toEqual(['short'])
+    const ood = { ...analysisResult, word_count: 400, uncertainty: { ...analysisResult.uncertainty, domain_check: { available: true, in_domain: false, similarity: 0.04, threshold: 0.06 } } }
+    expect(buildWarnings(ood).map((w) => w.id)).toEqual(['out-of-domain'])
+    const undecided = { ...analysisResult, word_count: 400, classification: { ...analysisResult.classification, probability_unreliable_style: 0.52 } }
+    expect(buildWarnings(undecided).map((w) => w.id)).toEqual(['undecided'])
+  })
+
+  it('has no warnings for a long, in-domain, decided text from pasted input', () => {
+    expect(buildWarnings({ ...analysisResult, word_count: 400 })).toEqual([])
+  })
+
+  it('a strong evidence match never removes or softens a warning', () => {
+    const strong = { ...hubResult, evidence: { ...hubResult.evidence, hits: [{ ...hubResult.evidence.hits[0], score: 0.95, relevant: true }] } }
+    expect(buildWarnings(strong).map((w) => w.id)).toEqual(['not-an-article'])
+    expect(buildReading(strong).notMeaningful).toBe(true)
   })
 })
 

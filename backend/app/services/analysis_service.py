@@ -109,8 +109,12 @@ class AnalysisService:
         self._load()
         return self._evidence
 
-    def analyze(self, request: AnalysisRequest) -> AnalysisResponse:
-        """Run classification, signals, evidence retrieval and the uncertainty assessment."""
+    def analyze(self, request: AnalysisRequest, extraction_warning: str | None = None) -> AnalysisResponse:
+        """Run classification, signals, evidence retrieval and the uncertainty assessment.
+
+        ``extraction_warning`` is set by the URL flow when the fetched page does not look like an article; it only raises
+        the uncertainty level and never changes the classifier output.
+        """
         from app.ml.signals import compute_signals
 
         self._load()
@@ -124,7 +128,7 @@ class AnalysisService:
         doc = self._nlp(text[:5000])
         hits = self._evidence.retrieve_for_article(title, [s.text.strip() for s in doc.sents])
         top_score = hits[0].score if hits else None
-        uncertainty = assess(word_count, result.probability_unreliable, top_score, result.domain_similarity, result.domain_threshold)
+        uncertainty = assess(word_count, result.probability_unreliable, top_score, result.domain_similarity, result.domain_threshold, extraction_warning)
         has_domain = result.domain_similarity is not None
 
         return AnalysisResponse(
