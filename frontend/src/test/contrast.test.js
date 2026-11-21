@@ -12,7 +12,7 @@ const ratio = (a, b) => {
 
 describe('design tokens meet WCAG AA (4.5:1 for normal text)', () => {
   const grounds = { 'ink-0': colors.ink[0], 'ink-1': colors.ink[1], 'ink-2': colors.ink[2], 'ink-3': colors.ink[3] }
-  const text = { paper: colors.paper, steel: colors.steel, dim: colors.dim, signal: colors.signal.DEFAULT, 'signal-strong': colors.signal.strong, caution: colors.caution, support: colors.support, contra: colors.contra }
+  const text = { paper: colors.paper, steel: colors.steel, dim: colors.dim, violet: colors.violet, signal: colors.signal.DEFAULT, 'signal-strong': colors.signal.strong, caution: colors.caution, support: colors.support, contra: colors.contra }
 
   for (const [groundName, ground] of Object.entries(grounds)) {
     for (const [name, value] of Object.entries(text)) {
@@ -22,7 +22,13 @@ describe('design tokens meet WCAG AA (4.5:1 for normal text)', () => {
     }
   }
 
-  it('dark text on filled controls (primary button, danger hover)', () => {
+  it('white text on the primary button gradient (both ends)', () => {
+    expect(ratio('#FFFFFF', '#6847F0')).toBeGreaterThanOrEqual(4.5)
+    expect(ratio('#FFFFFF', '#7A58F7')).toBeGreaterThanOrEqual(4.5)
+    expect(ratio('#FFFFFF', colors.brand.DEFAULT)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('dark text on filled controls (skip link, danger hover)', () => {
     expect(ratio(colors.ink[0], colors.signal.DEFAULT)).toBeGreaterThanOrEqual(4.5)
     expect(ratio(colors.ink[0], colors.signal.strong)).toBeGreaterThanOrEqual(4.5)
     expect(ratio(colors.ink[0], colors.contra)).toBeGreaterThanOrEqual(4.5)

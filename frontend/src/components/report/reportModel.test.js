@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { analysisResult } from '../../test/fixtures'
-import { buildProof, buildReading, buildSummaryText, notableSignals } from './reportModel'
+import { buildAssessment, buildProof, buildReading, buildSummaryText, notableSignals } from './reportModel'
 
 const withHits = (hits) => ({ ...analysisResult, evidence: { ...analysisResult.evidence, hits } })
 
@@ -77,5 +77,34 @@ describe('notableSignals', () => {
       { key: 'all_caps_ratio', value: 0.1 },
     ]
     expect(notableSignals(signals).map((s) => s.key)).toEqual(['all_caps_ratio'])
+  })
+})
+
+describe('buildAssessment', () => {
+  const base = analysisResult
+  const withHits = (hits) => ({ ...base, evidence: { ...base.evidence, hits } })
+
+  it('reports insufficient evidence for a reliable-like reading with no related passage, without calling it a verdict', () => {
+    const a = buildAssessment({ ...withHits([]), classification: { ...base.classification, label: 'resembles_reliable_sources', probability_unreliable_style: 0.12 }, uncertainty: { ...base.uncertainty, level: 'moderate' } })
+    expect(a.key).toBe('insufficient')
+    expect(a.title).toBe('Insufficient evidence')
+    expect(a.summary).toMatch(/remain unverified/)
+  })
+
+  it('never presents an out-of-domain label as a finding', () => {
+    const a = buildAssessment({ ...base, uncertainty: { ...base.uncertainty, level: 'very_high', domain_check: { available: true, in_domain: false, similarity: 0.03, threshold: 0.06 } } })
+    expect(a.key).toBe('ood')
+    expect(a.summary).toMatch(/not meaningful here/)
+  })
+
+  it('calls an unreliable-like reading a style description, not a verdict', () => {
+    const a = buildAssessment({ ...base, classification: { ...base.classification, label: 'resembles_unreliable_sources', probability_unreliable_style: 0.93 }, uncertainty: { ...base.uncertainty, level: 'high' } })
+    expect(a.key).toBe('unreliable')
+    expect(a.summary).toMatch(/not a verdict that the claims are false/)
+  })
+
+  it('is inconclusive when the model sits near its decision boundary', () => {
+    const a = buildAssessment({ ...base, classification: { ...base.classification, probability_unreliable_style: 0.52 }, uncertainty: { ...base.uncertainty, level: 'moderate', reasons: [] } })
+    expect(a.key).toBe('inconclusive')
   })
 })

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
-import SignalField from '../components/signal/SignalField'
+import HeroVisual from '../components/landing/HeroVisual'
 import Button from '../components/ui/Button'
 import { Input } from '../components/ui/Field'
 import { useAuth } from '../context/AuthContext'
@@ -47,20 +47,20 @@ export default function AuthPage({ mode }) {
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-3.5rem)] lg:grid-cols-2">
-      <aside className="flex flex-col border-b border-line bg-ink-1 lg:border-b-0 lg:border-r">
-        {/* The instrument and the statement share the panel without overlapping. */}
-        <SignalField variant="quiet" className="relative h-44 w-full lg:h-auto lg:flex-1" />
-        <div className="border-t border-line px-6 py-6 sm:px-10 sm:py-8">
-          <p className="font-display text-[clamp(1.75rem,3vw,2.75rem)] leading-[1.08] tracking-[-0.02em] text-paper" style={{ fontVariationSettings: "'opsz' 60" }}>
-            Confidence is not truth.
-          </p>
-          <p className="t-caption mt-3 max-w-sm">A model can be certain and wrong. Veritas reports how sure the model is separately from how far the analysis can be trusted.</p>
+    <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
+      <aside className="relative hidden overflow-hidden border-r border-line bg-ink-1/60 lg:flex lg:flex-col lg:justify-between">
+        <div className="flex flex-1 items-center px-10 pt-10">
+          <HeroVisual className="max-w-sm" />
+        </div>
+        <div className="border-t border-line/70 px-10 py-8">
+          <p className="font-display text-[clamp(1.5rem,2.4vw,2.25rem)] font-semibold leading-[1.12] tracking-[-0.03em] text-paper">Confidence is not truth.</p>
+          <p className="t-caption mt-3 max-w-sm">A model can be certain and wrong. VERITAS AI reports how sure the model is separately from how far the analysis can be trusted.</p>
         </div>
       </aside>
 
       <div className="flex items-center px-4 py-12 sm:px-10 lg:px-16">
-        <div key={mode} className="page-enter w-full max-w-md">
+        <div key={mode} className="page-enter glass w-full max-w-md rounded-xl p-6 sm:p-8">
+          <p className="t-eyebrow mb-3">{isRegister ? 'Create account' : 'Welcome back'}</p>
           <h1 className="t-h1">{isRegister ? 'Create an account' : 'Sign in'}</h1>
           <p className="t-body mt-3">{isRegister ? 'Keep your investigations in a private Casebook. Anonymous use stays available.' : 'Return to your Casebook of saved investigations.'}</p>
 

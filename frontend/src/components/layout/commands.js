@@ -1,11 +1,12 @@
 import { FileText, LogIn, LogOut } from 'lucide-react'
 import { EXAMPLES } from '../../data/examples'
-import { NAV_ITEMS } from './navigation'
+import { DASHBOARD_ITEM, NAV_ITEMS } from './navigation'
 
 /** Entries reachable from the command palette. Exported separately so tests can check what the keyboard can reach. */
 export function buildCommands({ user }) {
   const items = [
-    { id: 'home', group: 'Go to', label: 'Overview', to: '/' },
+    { id: 'home', group: 'Go to', label: 'Home', to: '/' },
+    ...(user ? [{ id: 'dashboard', group: 'Go to', label: DASHBOARD_ITEM.label, hint: DASHBOARD_ITEM.hint, to: DASHBOARD_ITEM.to, icon: DASHBOARD_ITEM.icon }] : []),
     ...NAV_ITEMS.map((n) => ({ id: n.to, group: 'Go to', label: n.label, hint: n.hint, to: n.to, icon: n.icon })),
   ]
   if (user) items.push({ id: 'settings', group: 'Go to', label: 'Settings', hint: 'Account, password, deletion', to: '/settings' })

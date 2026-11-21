@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 const BASE =
-  'w-full rounded-md border border-line bg-ink-1 px-3.5 text-paper transition-[border-color,background-color] duration-fast ease-out hover:border-line-strong focus:border-signal focus:bg-ink-2 focus:outline-none disabled:opacity-50'
+  'w-full rounded-md border border-line bg-ink-1/80 px-3.5 text-paper transition-[border-color,background-color] duration-fast ease-out hover:border-line-strong focus:border-signal focus:bg-ink-2 focus:outline-none disabled:opacity-50'
 
 function Shell({ id, label, hint, error, optional, children }) {
   return (

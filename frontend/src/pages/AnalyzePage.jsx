@@ -10,11 +10,9 @@ import Tabs from '../components/ui/Tabs'
 import { useAuth } from '../context/AuthContext'
 import { EXAMPLES } from '../data/examples'
 import { useHotkey } from '../hooks/useHotkey'
+import { MAX_CHARS, MIN_CHARS, validateInput } from '../data/limits'
 import { analyzeText, analyzeUrl, describeError } from '../services/analysisService'
 
-const MAX_CHARS = 20000
-const MIN_CHARS = 20
-const URL_PATTERN = /^https?:\/\/\S+$/i
 const MODES = [
   { id: 'text', label: 'Paste text' },
   { id: 'url', label: 'Article URL' },
@@ -39,8 +37,7 @@ export default function AnalyzePage() {
   const headingRef = useRef(null)
   const textRef = useRef(null)
 
-  const trimmedLength = text.trim().length
-  const problem = mode === 'text' ? (trimmedLength < MIN_CHARS ? `Add at least ${MIN_CHARS} characters. ${Math.max(0, MIN_CHARS - trimmedLength)} to go.` : null) : URL_PATTERN.test(url.trim()) ? null : 'Enter a full address starting with http:// or https://.'
+  const problem = validateInput(mode, { text, url })
   const showProblem = touched && problem
 
   const loadExample = useCallback((example) => {
@@ -61,6 +58,21 @@ export default function AnalyzePage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (example) loadExample(example)
   }, [requested, loadExample])
+
+  // A draft handed over by the landing-page composer: fill the form, then submit it once the state has settled.
+  const draft = location.state?.draft
+  const [autoSubmit, setAutoSubmit] = useState(false)
+  useEffect(() => {
+    if (!draft) return
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setMode(draft.mode)
+    setTitle('')
+    setText(draft.text ?? '')
+    setUrl(draft.url ?? '')
+    setTouched(true)
+    setAutoSubmit(true)
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [draft])
 
   const submit = async () => {
     setTouched(true)
@@ -98,6 +110,14 @@ export default function AnalyzePage() {
     requestAnimationFrame(() => (mode === 'text' ? textRef.current : document.getElementById('url'))?.focus())
   }
 
+  useEffect(() => {
+    if (!autoSubmit) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAutoSubmit(false)
+    submit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSubmit])
+
   useHotkey('mod+enter', submit, { allowInInputs: true, enabled: phase !== 'running' })
   useEffect(() => () => controller.current?.abort(), [])
 
@@ -109,6 +129,7 @@ export default function AnalyzePage() {
         <h1 className="sr-only">Investigation report</h1>
       ) : (
         <div className="mb-10 max-w-3xl">
+          <p className="t-eyebrow mb-3">Investigation workspace</p>
           <h1 className="t-h1">Open an investigation</h1>
           <p className="t-lead mt-4">Submit text or an article address. You get four separate readings and an honest account of how far to trust them. None of them says whether the text is true.</p>
         </div>
@@ -126,7 +147,7 @@ export default function AnalyzePage() {
             noValidate
             className="lg:col-span-8"
           >
-            <div className="overflow-hidden rounded-lg border border-line bg-ink-1">
+            <div className="panel overflow-hidden shadow-panel">
               <Tabs tabs={MODES} value={mode} onChange={setMode} label="Input type" idPrefix="mode" className="px-2" />
               <div id="mode-panel" role="tabpanel" aria-labelledby={`mode-tab-${mode}`} className="p-5 sm:p-7">
                 {mode === 'text' ? (
@@ -141,8 +162,7 @@ export default function AnalyzePage() {
                       maxLength={300}
                       disabled={sheetDisabled}
                       placeholder="Headline (optional)"
-                      className="font-display w-full border-b border-line bg-transparent pb-3 text-[1.625rem] leading-tight tracking-[-0.01em] text-paper outline-none transition-colors duration-base placeholder:text-dim focus:border-signal"
-                      style={{ fontVariationSettings: "'opsz' 36" }}
+                      className="font-display w-full border-b border-line bg-transparent pb-3 text-[1.375rem] font-semibold leading-tight tracking-[-0.02em] text-paper outline-none transition-colors duration-base placeholder:text-dim focus:border-violet"
                     />
                     <div key={flash} className="animate-fade-in mt-5">
                       <label htmlFor="text" className="sr-only">
@@ -169,7 +189,7 @@ export default function AnalyzePage() {
                       </p>
                       <p className="t-meta flex items-center gap-3">
                         <span className="hidden h-px w-24 bg-line sm:block" aria-hidden="true">
-                          <span className="block h-px bg-signal transition-[width] duration-base ease-out" style={{ width: `${Math.min(100, (text.length / MAX_CHARS) * 100)}%` }} />
+                          <span className="block h-px bg-signal-gradient transition-[width] duration-base ease-out" style={{ width: `${Math.min(100, (text.length / MAX_CHARS) * 100)}%` }} />
                         </span>
                         {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
                       </p>
@@ -254,7 +274,7 @@ export default function AnalyzePage() {
               <ul className="mt-4 divide-y divide-line border-y border-line">
                 {EXAMPLES.map((example) => (
                   <li key={example.id}>
-                    <button type="button" onClick={() => loadExample(example)} className="press group flex w-full items-start gap-3 py-3 text-left hover:bg-ink-1">
+                    <button type="button" onClick={() => loadExample(example)} className="press group flex w-full items-start gap-3 px-2 py-3 text-left hover:bg-ink-2/70">
                       <FileText className="mt-0.5 h-4 w-4 shrink-0 text-dim transition-colors group-hover:text-signal" aria-hidden="true" />
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-paper">

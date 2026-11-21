@@ -29,7 +29,7 @@ export default function AnalysisScan({ mode, title, text, url, onCancel }) {
   const steps = PIPELINE.filter((step) => !step.only || step.only === mode)
   return (
     <div className="animate-fade-in grid gap-8 lg:grid-cols-12" role="status" aria-live="polite" aria-label="Analysis in progress">
-      <div className="relative overflow-hidden rounded-lg border border-line bg-ink-1 lg:col-span-8">
+      <div className="panel relative overflow-hidden lg:col-span-8">
         <div className="relative max-h-[28rem] min-h-64 overflow-hidden p-6 sm:p-8">
           {title && <p className="font-display mb-4 text-2xl leading-tight text-paper/80">{title}</p>}
           {mode === 'text' ? (
@@ -39,8 +39,8 @@ export default function AnalysisScan({ mode, title, text, url, onCancel }) {
           )}
           {/* The sweep. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-            <div className="animate-scan absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-signal/[0.08] to-transparent">
-              <div className="absolute inset-x-0 bottom-1/2 h-px bg-signal/70" />
+            <div className="animate-scan absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-violet/[0.14] to-transparent">
+              <div className="absolute inset-x-0 bottom-1/2 h-px bg-signal" />
             </div>
           </div>
         </div>

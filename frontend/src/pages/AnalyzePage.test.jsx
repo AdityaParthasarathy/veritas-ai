@@ -56,9 +56,13 @@ describe('Investigation workspace', () => {
 
     pending.resolve(analysisResult)
     expect(await screen.findByRole('heading', { name: 'Three separate instruments' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Style reading' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Reference passages' })).toBeInTheDocument()
+    expect(screen.getByText('Overall assessment')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Writing-style analysis' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Evidence retrieval' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Trust in this analysis' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Claim breakdown' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Evidence explorer' })).toBeInTheDocument()
+    expect(screen.getByText(/Claim-level verification is not available/)).toBeInTheDocument()
     expect(screen.getAllByText(/does not verify that any claim is true or false/).length).toBeGreaterThan(0)
     expect(screen.getByText(/It is not the probability that the content is true or false/)).toBeInTheDocument()
     expect(screen.getByText('Moderate caution', { selector: 'p' })).toBeInTheDocument()
@@ -191,6 +195,23 @@ describe('Investigation workspace', () => {
     await fillAndSubmit()
     expect(await screen.findByRole('heading', { name: 'Three separate instruments' })).toBeInTheDocument()
     expect(screen.queryByText(/^domain check:/)).not.toBeInTheDocument()
+  })
+
+  it('names the state "Insufficient evidence" when the style looks reliable but nothing related was retrieved', async () => {
+    analyzeText.mockResolvedValue({ ...analysisResult, evidence: { ...analysisResult.evidence, hits: [] } })
+    renderWithProviders(<AnalyzePage />)
+    await fillAndSubmit()
+    expect(await screen.findByRole('heading', { name: 'Insufficient evidence' })).toBeInTheDocument()
+    expect(screen.getByText(/Its factual claims remain unverified/)).toBeInTheDocument()
+    expect(screen.getByText(/not a verdict on whether it is true/)).toBeInTheDocument()
+  })
+
+  it('submits a draft handed over from the landing page', async () => {
+    analyzeText.mockResolvedValue(analysisResult)
+    renderWithProviders(<AnalyzePage />, { route: { pathname: '/analyze', state: { draft: { mode: 'text', text: LONG, url: '' } } } })
+    await waitFor(() => expect(analyzeText).toHaveBeenCalledTimes(1))
+    expect(analyzeText).toHaveBeenCalledWith({ title: null, text: LONG }, expect.any(Object))
+    expect(await screen.findByText('Overall assessment')).toBeInTheDocument()
   })
 
   it('copies a summary that carries the limitations', async () => {

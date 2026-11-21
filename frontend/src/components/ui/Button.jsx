@@ -4,8 +4,8 @@ import { Loader2 } from 'lucide-react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 
 const VARIANTS = {
-  primary: 'bg-signal text-ink-0 hover:bg-signal-strong disabled:bg-line disabled:text-dim',
-  secondary: 'border border-line-strong text-paper hover:border-signal hover:text-signal-strong disabled:border-line disabled:text-dim',
+  primary: 'bg-brand-gradient text-white shadow-glow hover:brightness-110 disabled:bg-none disabled:bg-line disabled:text-dim disabled:shadow-none',
+  secondary: 'border border-line-strong bg-ink-2/50 text-paper hover:border-violet hover:bg-ink-3 disabled:border-line disabled:text-dim',
   ghost: 'text-steel hover:bg-ink-3 hover:text-paper disabled:text-dim',
   danger: 'border border-contra/50 text-contra hover:bg-contra hover:text-ink-0 disabled:border-line disabled:text-dim',
 }

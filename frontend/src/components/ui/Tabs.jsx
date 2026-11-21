@@ -52,7 +52,7 @@ export default function Tabs({ tabs, value, onChange, label, idPrefix = 'tabs', 
       })}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 h-px bg-signal transition-[transform,width] duration-slow ease-out"
+        className="pointer-events-none absolute bottom-0 h-0.5 rounded-full bg-signal-gradient transition-[transform,width] duration-slow ease-out"
         style={{ width: indicator.width, transform: `translateX(${indicator.left}px)`, opacity: indicator.ready ? 1 : 0 }}
       />
     </div>

@@ -99,3 +99,50 @@ export function buildProof(text, hits) {
 export function notableSignals(signals) {
   return signals.filter((s) => !['word_count', 'avg_sentence_length'].includes(s.key) && s.value > 0)
 }
+
+/**
+ * The headline state of a report. These are descriptive states of the analysis, never verdicts about the text:
+ * - ood: the domain check says the text is unlike the training articles, so the style label means nothing here.
+ * - inconclusive: the backend rates caution "very high", or the model is within 10 points of its decision boundary.
+ * - unreliable / reliable: the style label, with a plain statement that claims stay unverified.
+ * - insufficient: a reliable-like style reading with no related reference passage to point at.
+ * Every sentence is assembled from fields the API returned.
+ */
+export function buildAssessment(result) {
+  const { classification, uncertainty, evidence } = result
+  const reading = buildReading(result)
+  const p = classification.probability_unreliable_style
+  const unreliable = classification.label === 'resembles_unreliable_sources'
+  const related = reading.relatedCount
+  const evidenceSentence =
+    related === 0
+      ? `The reference collection (${evidence.collection_size} passages) contains no clearly related passage, so its factual claims remain unverified.`
+      : `${related} reference passage${related === 1 ? ' is' : 's are'} topically related, but whether ${related === 1 ? 'it supports' : 'they support'} or ${related === 1 ? 'contradicts' : 'contradict'} the text is not assessed, so its factual claims remain unverified.`
+
+  if (reading.outOfDomain) {
+    return { key: 'ood', title: 'Out of domain', tone: 'caution', icon: 'ShieldAlert', summary: `This text is unlike the articles the classifier was trained on, so its style reading is not meaningful here. ${evidenceSentence}` }
+  }
+  if (uncertainty.level === 'very_high' || Math.abs(p - 0.5) < 0.1) {
+    const why = uncertainty.reasons[0] ?? 'The model is close to its decision boundary.'
+    return { key: 'inconclusive', title: 'Analysis inconclusive', tone: 'caution', icon: 'CircleHelp', summary: `${why} ${evidenceSentence}` }
+  }
+  if (unreliable) {
+    return {
+      key: 'unreliable',
+      title: 'Unreliable-like writing style',
+      tone: 'contra',
+      icon: 'PenLine',
+      summary: `The writing resembles content from sources labelled unreliable in the training data. This describes style only; it is not a verdict that the claims are false. ${evidenceSentence}`,
+    }
+  }
+  if (related === 0) {
+    return {
+      key: 'insufficient',
+      title: 'Insufficient evidence',
+      tone: 'caution',
+      icon: 'ShieldQuestion',
+      summary: `The article resembles writing labelled reliable in the training data, but the reference collection contains no clearly related passages. Its factual claims remain unverified.`,
+    }
+  }
+  return { key: 'reliable', title: 'Reliable-like writing style', tone: 'support', icon: 'PenLine', summary: `The writing resembles content from sources labelled reliable in the training data. ${evidenceSentence}` }
+}

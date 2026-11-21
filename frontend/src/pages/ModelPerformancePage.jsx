@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { X } from 'lucide-react'
 import Skeleton from '../components/ui/Skeleton'
 import Tabs from '../components/ui/Tabs'
+import { PIPELINE } from '../data/pipeline'
 import { colors } from '../design/tokens'
 import { describeError } from '../services/analysisService'
 import { getPerformance } from '../services/performanceService'
@@ -32,7 +34,7 @@ function ConfusionMatrix({ matrix }) {
               True {labels[i]}
             </th>
             {row.map((value, j) => (
-              <td key={j} className="rounded-sm py-5 text-center font-mono text-paper" style={{ background: `rgba(87, 216, 230, ${(0.07 + 0.38 * (value / max)).toFixed(2)})` }}>
+              <td key={j} className="rounded-sm py-5 text-center font-mono text-paper" style={{ background: `rgba(118, 84, 246, ${(0.1 + 0.55 * (value / max)).toFixed(2)})` }}>
                 {value.toLocaleString()}
               </td>
             ))}
@@ -40,6 +42,33 @@ function ConfusionMatrix({ matrix }) {
         ))}
       </tbody>
     </table>
+  )
+}
+
+function Pipeline() {
+  return (
+    <section aria-labelledby="h-pipeline" className="mb-14">
+      <h2 id="h-pipeline" className="t-h2">
+        How an analysis is made
+      </h2>
+      <p className="t-caption mb-6 mt-1">The same six steps the server runs. Each one states what it does not do.</p>
+      <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {PIPELINE.map((step, i) => (
+          <li key={step.title} className="panel panel-hover p-5">
+            <span className="font-mono text-[0.75rem] text-violet">{String(i + 1).padStart(2, '0')}</span>
+            <h3 className="t-h3 mt-2">{step.title}</h3>
+            <p className="t-body mt-1.5 text-[0.875rem]">{step.does}</p>
+            <p className="t-caption mt-3 flex gap-2 border-t border-line pt-3">
+              <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-contra" aria-hidden="true" />
+              <span>
+                <span className="sr-only">Does not: </span>
+                {step.not}
+              </span>
+            </p>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
 
@@ -64,6 +93,7 @@ export default function ModelPerformancePage() {
     return shell(
       <>
         <h1 className="t-h1">Method</h1>
+        <div className="mt-8"><Pipeline /></div>
         <div role="alert" className="mt-6 rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
           {error}
         </div>
@@ -93,18 +123,19 @@ export default function ModelPerformancePage() {
   return shell(
     <>
       <div className="mb-12 max-w-4xl">
+        <p className="t-eyebrow mb-2">Method</p>
         <h1 className="t-h1">Method, measured and limited</h1>
-        <p className="font-display mt-6 text-[clamp(1.375rem,2.2vw,1.75rem)] leading-snug text-paper" style={{ fontVariationSettings: "'opsz' 40" }}>
-          {data.interpretation}
-        </p>
+        <p className="mt-5 text-[1.25rem] leading-snug tracking-[-0.01em] text-steel">{data.interpretation}</p>
       </div>
+
+      <Pipeline />
 
       <Tabs tabs={tabs} value={variant.variant} onChange={setVariantKey} label="Model variant" idPrefix="variant" />
       <div id="variant-panel" role="tabpanel" aria-labelledby={`variant-tab-${variant.variant}`}>
         <p className="t-body mb-10 mt-4">{variant.description}</p>
 
-        <div className="grid gap-x-16 gap-y-12 lg:grid-cols-12">
-          <section aria-labelledby="h-test" className="lg:col-span-4">
+        <div className="grid gap-6 lg:grid-cols-12">
+          <section aria-labelledby="h-test" className="panel p-6 lg:col-span-4">
             <h2 id="h-test" className="t-h2">
               Held-out test set
             </h2>
@@ -127,7 +158,7 @@ export default function ModelPerformancePage() {
             </p>
           </section>
 
-          <section aria-labelledby="h-chart" className="lg:col-span-8">
+          <section aria-labelledby="h-chart" className="panel p-6 lg:col-span-8">
             <h2 id="h-chart" className="t-h2">
               Precision, recall and F1 by class
             </h2>
@@ -140,21 +171,21 @@ export default function ModelPerformancePage() {
                   <YAxis domain={[0.9, 1]} stroke={colors.dim} tick={{ fontSize: 12, fill: colors.steel }} tickFormatter={(v) => v.toFixed(2)} />
                   <Tooltip formatter={(v) => v.toFixed(4)} contentStyle={{ background: colors.ink[3], border: `1px solid ${colors.line.strong}`, borderRadius: 8, fontSize: 12, color: colors.paper }} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
                   <Legend wrapperStyle={{ fontSize: 12, color: colors.steel }} />
-                  <Bar dataKey="Real" fill={colors.dim} radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Fake" fill={colors.signal.DEFAULT} radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Real" fill={colors.violet} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="Fake" fill={colors.signal.DEFAULT} radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
 
-          <section aria-labelledby="h-matrix" className="lg:col-span-5">
+          <section aria-labelledby="h-matrix" className="panel p-6 lg:col-span-5">
             <h2 id="h-matrix" className="t-h2 mb-4">
               Confusion matrix
             </h2>
             <ConfusionMatrix matrix={test.confusion_matrix} />
           </section>
 
-          <section aria-labelledby="h-features" className="lg:col-span-7">
+          <section aria-labelledby="h-features" className="panel p-6 lg:col-span-7">
             <h2 id="h-features" className="t-h2">
               What the model leans on
             </h2>

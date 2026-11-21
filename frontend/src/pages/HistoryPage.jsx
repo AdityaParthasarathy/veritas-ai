@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Search, Trash2 } from 'lucide-react'
 import { deriveTitle, LEVEL_TEXT, percent } from '../components/report/reportModel'
+import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import Modal from '../components/ui/Modal'
@@ -23,10 +24,10 @@ const FILTERS = [
 function MiniScale({ probability, label }) {
   return (
     <span className="flex flex-col items-end gap-1">
-      <span role="img" aria-label={`${percent(probability)} for the unreliable-source label`} className="relative block h-3 w-28">
+      <span role="img" aria-label={`${percent(probability)} for the unreliable-source label`} className="relative block h-3 w-24">
         <span className="absolute inset-x-0 top-1/2 h-px bg-line-strong" />
         <span className="absolute left-1/2 top-0 h-3 w-px bg-dim" />
-        <span className="absolute top-0 h-3 w-0.5 -translate-x-1/2 bg-signal" style={{ left: `${probability * 100}%` }} />
+        <span className="absolute top-0 h-3 w-0.5 -translate-x-1/2 bg-signal-gradient" style={{ left: `${probability * 100}%` }} />
       </span>
       <span className="t-meta">{label}</span>
     </span>
@@ -47,26 +48,31 @@ function Pips({ level }) {
   )
 }
 
-function Row({ item, onDelete }) {
+function Card({ item, onDelete, featured }) {
   const when = new Date(item.created_at)
+  const unreliable = item.classifier_label === 'resembles_unreliable_sources'
   return (
-    <li className="group grid items-start gap-x-6 gap-y-2 border-t border-line py-5 transition-colors duration-base hover:bg-ink-1 sm:grid-cols-[8.5rem_1fr_auto] sm:px-3">
-      <time dateTime={item.created_at} className="t-meta pt-1">
-        {when.toLocaleDateString()} <span className="text-dim/80">{when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-      </time>
-      <div className="min-w-0">
-        <Link to={`/history/${item.id}`} className="font-display block truncate text-xl leading-snug text-paper decoration-signal/50 underline-offset-4 hover:underline" style={{ fontVariationSettings: "'opsz' 24" }}>
-          {item.title || deriveTitle(item.preview)}
-        </Link>
-        <p className="t-caption mt-1 line-clamp-2 max-w-2xl">{item.preview}</p>
-        <p className="t-meta mt-2">{item.word_count} words</p>
+    <li className={`panel panel-hover group relative flex flex-col gap-4 p-5 sm:p-6 ${featured ? 'sm:col-span-2' : ''}`}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge tone={item.uncertainty_level === 'very_high' ? 'neutral' : unreliable ? 'contra' : 'support'}>{unreliable ? 'Unreliable-like style' : 'Reliable-like style'}</Badge>
+        <time dateTime={item.created_at} className="t-meta ml-auto">
+          {when.toLocaleDateString()} {when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </time>
       </div>
-      <div className="flex items-center gap-5 sm:flex-col sm:items-end sm:gap-3">
+      <div className="min-w-0 flex-1">
+        <h2 className={`font-display font-semibold leading-snug tracking-[-0.02em] text-paper ${featured ? 'text-[1.625rem]' : 'text-[1.125rem]'}`}>
+          <Link to={`/history/${item.id}`} className="decoration-violet/60 underline-offset-4 after:absolute after:inset-0 hover:underline">
+            {item.title || deriveTitle(item.preview)}
+          </Link>
+        </h2>
+        <p className={`t-caption mt-2 ${featured ? 'line-clamp-3 max-w-2xl' : 'line-clamp-2'}`}>{item.preview}</p>
+      </div>
+      <div className="flex items-end justify-between gap-4 border-t border-line pt-4">
         <div className="flex items-start gap-5">
-          <MiniScale probability={item.probability_unreliable} label={item.classifier_label === 'resembles_unreliable_sources' ? 'resembles unreliable' : 'resembles reliable'} />
+          <MiniScale probability={item.probability_unreliable} label={`${item.word_count} words`} />
           <Pips level={item.uncertainty_level} />
         </div>
-        <button type="button" onClick={() => onDelete(item)} aria-label={`Delete investigation ${item.title || 'untitled'}`} className="press rounded-md p-2 text-dim hover:bg-contra/10 hover:text-contra">
+        <button type="button" onClick={() => onDelete(item)} aria-label={`Delete investigation ${item.title || 'untitled'}`} className="press relative z-10 rounded-md p-2 text-dim hover:bg-contra/10 hover:text-contra">
           <Trash2 className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
@@ -135,6 +141,7 @@ export default function HistoryPage() {
     <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <div className="max-w-2xl">
+          <p className="t-eyebrow mb-2">Investigation archive</p>
           <h1 className="t-h1">Casebook</h1>
           <p className="t-lead mt-4">
             {page && page.total > 0
@@ -188,16 +195,16 @@ export default function HistoryPage() {
               <Tabs tabs={FILTERS} value={filter} onChange={setFilter} label="Filter investigations" idPrefix="filter" className="min-w-0 flex-1" />
               <div className="relative w-full sm:w-64">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" aria-hidden="true" />
-                <input value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search this page of investigations" placeholder="Search this page" className="h-10 w-full rounded-md border border-line bg-ink-1 pl-9 pr-3 text-sm text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-signal" />
+                <input value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search this page of investigations" placeholder="Search this page" className="h-10 w-full rounded-full border border-line bg-ink-1/80 pl-9 pr-3 text-sm text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-signal" />
               </div>
             </div>
-            <div id="filter-panel" role="tabpanel" aria-labelledby={`filter-tab-${filter}`}>
+            <div id="filter-panel" role="tabpanel" aria-labelledby={`filter-tab-${filter}`} className="pt-5">
               {items.length === 0 ? (
-                <p className="t-body border-t border-line py-10">Nothing on this page matches. Try another filter or search term.</p>
+                <p className="t-body py-10">Nothing on this page matches. Try another filter or search term.</p>
               ) : (
-                <ul>
-                  {items.map((item) => (
-                    <Row key={item.id} item={item} onDelete={setPending} />
+                <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {items.map((item, i) => (
+                    <Card key={item.id} item={item} onDelete={setPending} featured={i === 0 && offset === 0 && filter === 'all' && !query} />
                   ))}
                 </ul>
               )}

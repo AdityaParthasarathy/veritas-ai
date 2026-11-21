@@ -4,12 +4,12 @@
 
 **Before you start (2 minutes, off camera)**
 1. `docker compose up -d --build` (or the local dev servers) and wait until `docker compose ps` shows `healthy`.
-2. Open http://localhost:5173 and check the Overview shows API Online and database Connected. Check `GET /api/v1/health/models` returns `ready` (models finish loading about 15 seconds after start).
+2. Open http://localhost:5173 and check the landing page readout shows API online and database connected. Check `GET /api/v1/health/models` returns `ready` (models finish loading about 15 seconds after start).
 3. Have the files in `docs/samples/` ready to paste. Open Swagger at http://localhost:8000/docs in a second tab.
 
 ## 1. Framing and system status (0:00 to 1:00)
 - Say: "VERITAS AI analyses news text. It separates a machine-learning classification from independently retrieved reference passages, and it tells you how much to trust the analysis. It does not decide whether something is true."
-- Show **Overview**: live API and database status (real health calls), the list of what is built and not built.
+- Show the **landing page**: the live system readout (real health calls), the strike-through story, and the limits section.
 
 ## 2. A normal article (1:00 to 2:30)
 - **Analyze Content** > paste `01-normal-news.txt` > Analyze.

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ExternalLink, Search } from 'lucide-react'
+import { ExternalLink, Info, Search } from 'lucide-react'
 import EvidenceItem from '../components/report/EvidenceItem'
+import Badge from '../components/ui/Badge'
 import Kbd from '../components/ui/Kbd'
 import Skeleton from '../components/ui/Skeleton'
 import Tabs from '../components/ui/Tabs'
@@ -59,6 +60,7 @@ export default function EvidenceExplorerPage() {
   return (
     <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
       <div className="mb-10 max-w-3xl">
+        <p className="t-eyebrow mb-2">Research repository</p>
         <h1 className="t-h1">Reference library</h1>
         <p className="t-lead mt-4">The passages Veritas retrieves from. Each is a short paraphrase of an institutional source, written for this project; the link is the authority. Search matches meaning, not just words.</p>
         {collection && (
@@ -66,6 +68,13 @@ export default function EvidenceExplorerPage() {
             {collection.name} · {collection.size} passages · source links checked {collection.url_checked_on}
           </p>
         )}
+      </div>
+
+      <div role="note" className="mb-8 flex max-w-3xl gap-3 rounded-lg border border-caution/30 bg-caution/10 px-4 py-3 text-[0.875rem] text-steel">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-caution" aria-hidden="true" />
+        <p>
+          This is a small, curated collection{collection ? ` of ${collection.size} passages` : ''}. It covers a narrow set of institutional topics, so most texts will not match anything in it. A search that finds nothing says nothing about a claim.
+        </p>
       </div>
 
       <form onSubmit={handleSearch} role="search" className="max-w-2xl">
@@ -83,7 +92,7 @@ export default function EvidenceExplorerPage() {
               if (!e.target.value) setResults(null)
             }}
             placeholder="Try: why do we have seasons?"
-            className="h-12 w-full rounded-md border border-line bg-ink-1 pl-11 pr-24 text-[0.9375rem] text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-signal"
+            className="h-12 w-full rounded-full border border-line bg-ink-1/80 pl-11 pr-28 text-[0.9375rem] text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-violet"
           />
           <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
             <Kbd>/</Kbd>
@@ -104,7 +113,7 @@ export default function EvidenceExplorerPage() {
         <section aria-label="Search results" className="mt-10">
           <h2 className="t-h2 mb-1">Closest passages to “{results.query}”</h2>
           <p className="t-caption mb-2">Ranked by similarity. The tick marks the cut-off Veritas uses to call a passage related.</p>
-          <ol>
+          <ol className="mt-4 grid gap-4 md:grid-cols-2">
             {results.hits.map((hit) => (
               <EvidenceItem key={hit.id} hit={hit} threshold={results.relevance_threshold} muted={!hit.relevant} />
             ))}
@@ -123,22 +132,21 @@ export default function EvidenceExplorerPage() {
         ) : (
           <>
             <Tabs tabs={topics} value={topic} onChange={setTopic} label="Filter by topic" idPrefix="topic" />
-            <div id="topic-panel" role="tabpanel" aria-labelledby={`topic-tab-${topic}`}>
-            <ol>
+            <div id="topic-panel" role="tabpanel" aria-labelledby={`topic-tab-${topic}`} className="pt-5">
+            <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visible.map((p) => (
-                <li key={p.id} className="grid gap-x-8 gap-y-2 border-b border-line py-5 sm:grid-cols-[13rem_1fr]">
-                  <div>
-                    <p className="t-meta">{p.id}</p>
-                    <p className="t-caption mt-1">{p.topic}</p>
+                <li key={p.id} className="panel panel-hover flex flex-col gap-3 p-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone="brand">{p.source_org}</Badge>
+                    <Badge>{p.topic}</Badge>
+                    <span className="t-meta ml-auto">{p.id}</span>
                   </div>
-                  <div>
-                    <p className="max-w-3xl text-[0.9375rem] leading-relaxed text-paper">{p.passage}</p>
-                    <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-[0.8125rem] text-signal underline decoration-signal/30 hover:decoration-signal">
-                      {p.source_org}: {p.source_title}
-                      <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                      <span className="sr-only">(opens in a new tab)</span>
-                    </a>
-                  </div>
+                  <p className="flex-1 text-[0.9375rem] leading-relaxed text-paper">{p.passage}</p>
+                  <a href={p.source_url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1.5 border-t border-line pt-3 text-[0.8125rem] text-signal underline decoration-signal/30 hover:decoration-signal">
+                    <span className="min-w-0 truncate">{p.source_title}</span>
+                    <ExternalLink className="h-3 w-3 shrink-0" aria-hidden="true" />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </a>
                 </li>
               ))}
             </ol>

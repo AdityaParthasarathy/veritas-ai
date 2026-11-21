@@ -1,26 +1,29 @@
 // Single source of truth for the VERITAS visual system.
-// Consumed by tailwind.config.js (classes + CSS variables), canvas drawing code and the contrast test.
+// Consumed by tailwind.config.js (classes + CSS variables), canvas/SVG drawing code and the contrast test.
 //
-// Scene: an investigator at a desk late in the evening, reading long text on a dim screen.
-// The ground is obsidian; colour is reserved for meaning (signal cyan = the instrument at work,
-// amber = caution, green/red = semantic states, never "true"/"false").
+// World: a night-time intelligence console. Deep midnight indigo ground, glass panels layered on it, violet for
+// action, cyan for analysis (the instrument at work), amber for caution. Green and red are reserved for system
+// state and the descriptive style reading; they never mean "true" or "false".
 
 export const colors = {
-  ink: { 0: '#07080A', 1: '#0C0E11', 2: '#121519', 3: '#191D22' }, // page, raised, panel, elevated
-  line: { DEFAULT: '#262C34', strong: '#3A424D' },
-  paper: '#EBE7DD', // primary text, warm off-white
-  steel: '#A3ACB7', // secondary text
-  dim: '#8691A0', // tertiary text and metadata
-  signal: { DEFAULT: '#57D8E6', strong: '#86E7F1', deep: '#103B42' },
-  caution: '#E5A93E',
-  support: '#6FBD92',
-  contra: '#E4695F',
+  ink: { 0: '#080A18', 1: '#0D1124', 2: '#141A32', 3: '#1C2344' }, // page, raised, elevated, hover
+  line: { DEFAULT: '#262E57', strong: '#3B4580' },
+  paper: '#F5F4FF', // primary text
+  steel: '#A8B0CB', // secondary text
+  dim: '#8791B3', // tertiary text and metadata (lifted from the brief's #737E9D to hold AA on raised surfaces)
+  brand: { DEFAULT: '#7654F6', strong: '#8F72FF', deep: '#2A2073' }, // primary action
+  violet: '#A78BFA', // highlights on action surfaces
+  signal: { DEFAULT: '#45D9E8', strong: '#86EAF3', deep: '#0F3E52' }, // analysis and data
+  caution: '#F5B84B',
+  support: '#35D6A0',
+  contra: '#F06A79',
 }
 
 export const fonts = {
-  display: ['"Bodoni Moda"', 'Georgia', 'serif'],
-  sans: ['"Hanken Grotesk"', 'system-ui', 'sans-serif'],
-  mono: ['"Azeret Mono"', 'ui-monospace', 'Consolas', 'monospace'],
+  display: ['Sora', 'Inter', 'system-ui', 'sans-serif'], // landing headlines and page titles
+  sans: ['Inter', 'system-ui', 'sans-serif'], // application interface
+  mono: ['"JetBrains Mono"', 'ui-monospace', 'Consolas', 'monospace'], // ids, timestamps, measurements
+  serif: ['"Instrument Serif"', 'Georgia', 'serif'], // editorial accent: replacement words only
 }
 
 // Motion: durations in ms, easings as CSS values.
@@ -33,7 +36,7 @@ export const motion = {
   easeInOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
 }
 
-export const radius = { sm: '4px', md: '8px', lg: '12px', xl: '16px' }
+export const radius = { sm: '6px', md: '10px', lg: '14px', xl: '20px', '2xl': '28px' }
 
 // Flatten the colour map to CSS custom properties (--c-ink-0, --c-paper ...).
 export function cssVariables() {
@@ -49,5 +52,7 @@ export function cssVariables() {
   vars['--dur-cinematic'] = `${motion.cinematic}ms`
   vars['--ease-out'] = motion.easeOut
   vars['--ease-in-out'] = motion.easeInOut
+  vars['--glass'] = 'rgba(30, 35, 75, 0.55)'
+  vars['--glass-border'] = 'rgba(167, 139, 250, 0.16)'
   return vars
 }

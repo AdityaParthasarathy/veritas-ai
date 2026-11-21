@@ -97,7 +97,7 @@ function DeleteAccount() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input ref={passwordRef} id="delete-password" label="Confirm with your password" type="password" required autoComplete="current-password" maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} />
           <label className="flex items-start gap-3 text-sm text-steel">
-            <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} className="mt-1 h-4 w-4 accent-[#57D8E6]" />
+            <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} className="mt-1 h-4 w-4 accent-[#7654F6]" />
             I understand that my account and all saved investigations will be permanently deleted.
           </label>
           {error && (
@@ -125,9 +125,10 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-[88rem] px-4 py-10 sm:px-8 lg:py-14">
-      <h1 className="t-h1 mb-12">Settings</h1>
-      <div className="divide-y divide-line border-y border-line">
-        <section aria-labelledby="s-profile" className="grid gap-x-16 gap-y-6 py-10 lg:grid-cols-12">
+      <p className="t-eyebrow mb-2">Account</p>
+      <h1 className="t-h1 mb-10">Settings</h1>
+      <div className="space-y-5">
+        <section aria-labelledby="s-profile" className="panel grid gap-x-16 gap-y-6 p-6 sm:p-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <h2 id="s-profile" className="t-h2">
               Profile
@@ -159,7 +160,7 @@ export default function SettingsPage() {
             </Button>
           </div>
         </section>
-        <section aria-labelledby="s-password" className="grid gap-x-16 gap-y-6 py-10 lg:grid-cols-12">
+        <section aria-labelledby="s-password" className="panel grid gap-x-16 gap-y-6 p-6 sm:p-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <h2 id="s-password" className="t-h2">
               Password
@@ -170,7 +171,7 @@ export default function SettingsPage() {
             <ChangePasswordForm />
           </div>
         </section>
-        <section aria-labelledby="s-delete" className="grid gap-x-16 gap-y-6 py-10 lg:grid-cols-12">
+        <section aria-labelledby="s-delete" className="panel grid gap-x-16 gap-y-6 p-6 sm:p-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <h2 id="s-delete" className="t-h2">
               Delete account

@@ -8,16 +8,23 @@ export default function MobileNav({ open, onClose }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const link = 'press flex items-baseline justify-between rounded-md px-1 py-3 font-display text-2xl text-paper hover:text-signal-strong'
+  const link = 'press flex items-baseline justify-between rounded-md px-1 py-3 font-display text-xl font-semibold tracking-tight text-paper hover:text-violet'
   return (
     <Modal open={open} onClose={onClose} title="Navigate">
       <nav aria-label="Mobile">
         <ul className="divide-y divide-line">
           <li>
             <Link to="/" onClick={onClose} className={link}>
-              Overview
+              Home
             </Link>
           </li>
+          {user && (
+            <li>
+              <Link to="/dashboard" onClick={onClose} className={link}>
+                Dashboard
+              </Link>
+            </li>
+          )}
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <Link to={item.to} onClick={onClose} className={link}>
@@ -53,7 +60,7 @@ export default function MobileNav({ open, onClose }) {
             <Link to="/login" onClick={onClose} className="press flex h-11 flex-1 items-center justify-center rounded-md border border-line-strong text-sm text-steel hover:text-paper">
               Sign in
             </Link>
-            <Link to="/register" onClick={onClose} className="press flex h-11 flex-1 items-center justify-center rounded-md bg-signal text-sm font-medium text-ink-0 hover:bg-signal-strong">
+            <Link to="/register" onClick={onClose} className="press flex h-11 flex-1 items-center justify-center rounded-md bg-brand-gradient text-sm font-medium text-white shadow-glow hover:brightness-110">
               Create account
             </Link>
           </>

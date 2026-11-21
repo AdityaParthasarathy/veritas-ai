@@ -11,18 +11,23 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Atmosphere: two fixed, static radial lights on the indigo ground. No animation, no blur cost. */
   body {
     @apply bg-ink-0 font-sans text-paper antialiased;
     font-size: 0.9375rem;
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
-    font-feature-settings: 'ss01', 'cv11';
+    font-feature-settings: 'cv11', 'ss03';
     text-rendering: optimizeLegibility;
+    background-image: radial-gradient(60rem 36rem at 12% -8%, rgb(118 84 246 / 0.16), transparent 62%),
+      radial-gradient(46rem 30rem at 100% 8%, rgb(69 217 232 / 0.07), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 
   ::selection {
-    background: rgb(87 216 230 / 0.28);
+    background: rgb(118 84 246 / 0.4);
     color: var(--c-paper);
   }
 
@@ -89,22 +94,29 @@
 
 /* ---------- Type scale ---------- */
 @layer components {
-  /* Display: editorial serif, used sparingly for headings that carry the voice. */
+  /* Display: Sora, for landing headlines and page titles. The serif is an accent only (.t-accent). */
   .t-display {
-    @apply font-display font-normal text-paper;
-    font-size: clamp(2.6rem, 6.2vw, 5.25rem);
-    line-height: 1.01;
-    letter-spacing: -0.025em;
+    @apply font-display font-semibold text-paper;
+    font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
     text-wrap: balance;
-    font-variation-settings: 'opsz' 96;
   }
   .t-h1 {
-    @apply font-display font-normal text-paper;
-    font-size: clamp(2rem, 3.6vw, 3rem);
-    line-height: 1.08;
-    letter-spacing: -0.02em;
+    @apply font-display font-semibold text-paper;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
     text-wrap: balance;
-    font-variation-settings: 'opsz' 72;
+  }
+  .t-accent {
+    @apply font-serif italic;
+    letter-spacing: -0.01em;
+  }
+  .t-eyebrow {
+    @apply font-mono uppercase text-violet;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
   }
   .t-h2 {
     @apply font-sans font-semibold text-paper;
@@ -148,16 +160,45 @@
   }
   /* Galley text: the submitted document, set like a proof. */
   .t-galley {
-    @apply font-display text-paper;
-    font-size: 1.0625rem;
+    @apply font-sans text-paper;
+    font-size: 1rem;
     line-height: 1.75;
-    font-variation-settings: 'opsz' 14;
     text-wrap: pretty;
     max-width: 68ch;
   }
 
   .hairline {
     border-color: var(--c-line);
+  }
+
+  /* Surfaces. Glass is for floating or hero panels; everything else uses the flat .panel. */
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 20px 40px -24px rgb(4 5 20 / 0.9);
+  }
+  .panel {
+    background: linear-gradient(180deg, rgb(28 35 68 / 0.55), rgb(20 26 50 / 0.55));
+    border: 1px solid var(--c-line);
+    border-radius: 14px;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset;
+  }
+  /* Border illumination on hover for interactive panels. */
+  .panel-hover {
+    transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+  }
+  .panel-hover:hover {
+    border-color: rgb(167 139 250 / 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px -22px rgb(118 84 246 / 0.6);
+  }
+  .text-gradient {
+    background-image: linear-gradient(95deg, #a78bfa 0%, #45d9e8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 

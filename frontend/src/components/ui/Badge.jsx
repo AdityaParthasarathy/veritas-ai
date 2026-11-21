@@ -1,9 +1,10 @@
 const TONES = {
-  neutral: 'border-line-strong text-steel',
-  signal: 'border-signal/40 text-signal',
-  caution: 'border-caution/45 text-caution',
-  support: 'border-support/45 text-support',
-  contra: 'border-contra/45 text-contra',
+  neutral: 'border-line-strong bg-ink-2/60 text-steel',
+  brand: 'border-violet/40 bg-brand/15 text-violet',
+  signal: 'border-signal/40 bg-signal/10 text-signal',
+  caution: 'border-caution/45 bg-caution/10 text-caution',
+  support: 'border-support/45 bg-support/10 text-support',
+  contra: 'border-contra/45 bg-contra/10 text-contra',
 }
 
 /** Small outlined status label. Colour carries state, never truth. */
