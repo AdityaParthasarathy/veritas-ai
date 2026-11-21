@@ -236,7 +236,7 @@ export default function LandingPage() {
         <Reveal className="glass relative overflow-hidden rounded-2xl px-6 py-14 text-center sm:px-14">
           <div aria-hidden="true" className="pointer-events-none absolute -top-24 left-1/2 h-48 w-[36rem] -translate-x-1/2 rounded-full bg-brand/30 blur-3xl" />
           <h2 className="t-h1 relative mx-auto max-w-2xl">Start with a case.</h2>
-          <p className="t-lead relative mx-auto mt-4 max-w-xl">Paste your own text or load one of six invented demo inputs. Nothing is saved unless you are signed in.</p>
+          <p className="t-lead relative mx-auto mt-4 max-w-xl">Paste your own text or load one of six invented demo inputs. Nothing is saved.</p>
           <div className="relative mt-8 flex flex-wrap justify-center gap-3">
             <Button to="/analyze" size="lg" magnetic>
               Open an investigation

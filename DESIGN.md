@@ -30,8 +30,8 @@ A night-time intelligence console. Layered glass panels on a midnight indigo gro
 Tokens `--dur-*`, `--ease-out`. Strike-through story (CSS transitions triggered once on scroll, Replay button), floating document sheets, slow orbit, sliding nav and tab indicators, magnetic primary buttons (fine pointers only). Reduced motion: final states shown at once, durations near zero, no transforms.
 
 ## Application shell
-- Marketing shell (`/`, `/login`, `/register`): top bar, footer.
-- App shell (everything else): fixed sidebar (large screens), top bar with search and account menu, mobile navigation sheet.
+- Marketing shell (`/`): top bar, footer. There is no sign-in or account in the web UI.
+- App shell (everything else): fixed sidebar (large screens), top bar with search, mobile navigation sheet.
 - Pages after the landing page are lazy-loaded; the charting library only loads with the Method page.
 
 ## Report (the key screen)

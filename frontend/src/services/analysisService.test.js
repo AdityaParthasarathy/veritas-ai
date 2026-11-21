@@ -18,11 +18,6 @@ describe('describeError', () => {
     expect(describeError(httpError(429, { code: 'TOO_MANY_REQUESTS', message: 'Too many attempts. Please try again later.' }))).toMatch(/Too many/)
   })
 
-  it('distinguishes wrong credentials from an expired session', () => {
-    expect(describeError(httpError(401, { code: 'UNAUTHORIZED', message: 'Incorrect email or password' }))).toBe('Incorrect email or password')
-    expect(describeError(httpError(401, { code: 'UNAUTHORIZED', message: 'Could not validate credentials' }))).toMatch(/session has expired/)
-  })
-
   it('never exposes unknown server messages', () => {
     expect(describeError(httpError(500, { code: 'INTERNAL_SERVER_ERROR', message: 'SELECT * FROM secrets' }))).toBe('The server could not complete the request.')
   })

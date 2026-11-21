@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { ToastProvider } from '../components/ui/Toast'
-import { AuthProvider } from '../context/AuthContext'
 import LandingPage from './LandingPage'
 
 function Where() {
@@ -14,14 +13,12 @@ function Where() {
 function renderLanding() {
   return render(
     <MemoryRouter initialEntries={['/']}>
-      <AuthProvider>
-        <ToastProvider>
-          <Routes>
-            <Route index element={<LandingPage />} />
-            <Route path="analyze" element={<Where />} />
-          </Routes>
-        </ToastProvider>
-      </AuthProvider>
+      <ToastProvider>
+        <Routes>
+          <Route index element={<LandingPage />} />
+          <Route path="analyze" element={<Where />} />
+        </Routes>
+      </ToastProvider>
     </MemoryRouter>,
   )
 }

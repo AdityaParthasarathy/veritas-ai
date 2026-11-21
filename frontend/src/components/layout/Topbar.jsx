@@ -1,60 +1,13 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { FolderClock, LayoutDashboard, LogOut, Menu as MenuIcon, Search, Settings } from 'lucide-react'
-import { useAuth } from '../../context/AuthContext'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Menu as MenuIcon, Search } from 'lucide-react'
 import Button from '../ui/Button'
 import Kbd from '../ui/Kbd'
 import Logo from '../ui/Logo'
-import Menu from '../ui/Menu'
 import { NAV_ITEMS } from './navigation'
 import ReadoutPip from './ReadoutPip'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
-
-function Account({ compact = false }) {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
-  if (!user) {
-    return (
-      <div className="hidden items-center gap-2 sm:flex">
-        <Link to="/login" className="press rounded-md px-3 py-1.5 text-sm text-steel hover:text-paper">
-          Sign in
-        </Link>
-        <Button to="/register" size="sm">
-          Get started
-        </Button>
-      </div>
-    )
-  }
-  const items = [
-    { label: 'Dashboard', to: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> },
-    { label: 'Casebook', to: '/history', icon: <FolderClock className="h-4 w-4" aria-hidden="true" /> },
-    { label: 'Settings', to: '/settings', icon: <Settings className="h-4 w-4" aria-hidden="true" /> },
-    {
-      label: 'Sign out',
-      icon: <LogOut className="h-4 w-4" aria-hidden="true" />,
-      onSelect: () => {
-        logout()
-        navigate('/login')
-      },
-    },
-  ]
-  return (
-    <Menu
-      label="Account menu"
-      items={items}
-      triggerClassName="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-ink-2/60 pl-1 pr-3 text-[0.8125rem] text-steel hover:border-violet hover:text-paper"
-      trigger={
-        <>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-gradient font-mono text-[0.6875rem] font-medium text-white" aria-hidden="true">
-            {(user.full_name || user.email).slice(0, 1).toUpperCase()}
-          </span>
-          <span className={`${compact ? 'hidden' : 'hidden sm:inline'} max-w-32 truncate`}>{user.full_name || user.email}</span>
-        </>
-      }
-    />
-  )
-}
 
 function SearchButton({ onOpenPalette, wide = false }) {
   return (
@@ -116,7 +69,6 @@ export default function Topbar({ readout, onOpenPalette, onOpenMobileNav, varian
             <span className="md:hidden">
               <ReadoutPip readout={readout} />
             </span>
-            <Account />
             {burger}
           </div>
         </div>
@@ -159,7 +111,9 @@ export default function Topbar({ readout, onOpenPalette, onOpenMobileNav, varian
             <ReadoutPip readout={readout} />
           </span>
           <SearchButton onOpenPalette={onOpenPalette} />
-          <Account />
+          <Button to="/analyze" size="sm" className="hidden sm:inline-flex">
+            Start investigating
+          </Button>
           {burger}
         </div>
       </div>

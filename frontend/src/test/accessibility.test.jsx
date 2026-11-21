@@ -7,10 +7,8 @@ import ErrorBoundary from '../components/common/ErrorBoundary'
 import CommandPalette from '../components/layout/CommandPalette'
 import Report from '../components/report/Report'
 import { ToastProvider } from '../components/ui/Toast'
-import { AuthProvider } from '../context/AuthContext'
 import AppLayout from '../layouts/AppLayout'
 import AnalyzePage from '../pages/AnalyzePage'
-import AuthPage from '../pages/AuthPage'
 import EvidenceExplorerPage from '../pages/EvidenceExplorerPage'
 import LandingPage from '../pages/LandingPage'
 import ModelPerformancePage from '../pages/ModelPerformancePage'
@@ -57,15 +55,13 @@ describe('automated accessibility checks (axe)', () => {
   it('application shell: skip link, landmarks, navigation, readout', async () => {
     const { container } = render(
       <MemoryRouter initialEntries={['/']}>
-        <AuthProvider>
-          <ToastProvider>
-            <Routes>
-              <Route element={<AppLayout />}>
-                <Route index element={<LandingPage />} />
-              </Route>
-            </Routes>
-          </ToastProvider>
-        </AuthProvider>
+        <ToastProvider>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route index element={<LandingPage />} />
+            </Route>
+          </Routes>
+        </ToastProvider>
       </MemoryRouter>,
     )
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main')
@@ -78,8 +74,6 @@ describe('automated accessibility checks (axe)', () => {
   })
 
   it.each([
-    ['sign in', <AuthPage key="a" mode="login" />],
-    ['create account', <AuthPage key="b" mode="register" />],
     ['investigation workspace (text)', <AnalyzePage key="c" />],
     ['not found', <NotFoundPage key="d" />],
   ])('%s has no violations', async (_name, ui) => {

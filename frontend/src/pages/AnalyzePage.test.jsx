@@ -66,7 +66,7 @@ describe('Investigation workspace', () => {
     expect(screen.getAllByText(/does not verify that any claim is true or false/).length).toBeGreaterThan(0)
     expect(screen.getByText(/It is not the probability that the content is true or false/)).toBeInTheDocument()
     expect(screen.getByText('Moderate caution', { selector: 'p' })).toBeInTheDocument()
-    expect(screen.getByText(/Not saved\. Sign in before analysing/)).toBeInTheDocument()
+    expect(screen.getByText(/Not saved\. Use Copy summary, JSON or Print/)).toBeInTheDocument()
   })
 
   it('moves focus to the report heading when results arrive', async () => {

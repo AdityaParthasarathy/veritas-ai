@@ -89,7 +89,7 @@ export default function HeroComposer() {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 px-3 pb-1 pt-3">
           <p id="hero-status" role={touched && problem ? 'alert' : undefined} className={`text-[0.8125rem] ${touched && problem ? 'text-contra' : 'text-dim'}`}>
-            {touched && problem ? problem : mode === 'text' ? 'The analysis runs on the server. Nothing is saved unless you are signed in.' : 'A public web page. The server fetches and analyses it.'}
+            {touched && problem ? problem : mode === 'text' ? 'The analysis runs on the server. Nothing is saved.' : 'A public web page. The server fetches and analyses it.'}
           </p>
           <Button type="submit" size="md" magnetic>
             Analyze

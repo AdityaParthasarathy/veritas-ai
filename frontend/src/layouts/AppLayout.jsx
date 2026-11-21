@@ -39,7 +39,6 @@ function Footer() {
           <p className="t-eyebrow mb-3">Product</p>
           <ul className={column}>
             <li><Link to="/analyze" className={link}>Investigate</Link></li>
-            <li><Link to="/history" className={link}>Casebook</Link></li>
             <li><Link to="/evidence" className={link}>Library</Link></li>
           </ul>
         </nav>
@@ -48,13 +47,6 @@ function Footer() {
           <ul className={column}>
             <li><Link to="/performance" className={link}>How it is measured</Link></li>
             <li><Link to="/#limits" className={link}>Limitations</Link></li>
-          </ul>
-        </nav>
-        <nav aria-label="Footer account" className="lg:col-span-2">
-          <p className="t-eyebrow mb-3">Account</p>
-          <ul className={column}>
-            <li><Link to="/login" className={link}>Sign in</Link></li>
-            <li><Link to="/register" className={link}>Create an account</Link></li>
           </ul>
         </nav>
       </div>

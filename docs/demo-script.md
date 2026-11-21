@@ -29,9 +29,8 @@
 - **Article URL** tab: paste a public news article URL. Show the **Source page** card (domain, extracted title, author and date, with the warning that metadata may be wrong).
 - Then paste `http://169.254.169.254/latest/meta-data/` and show the blocked message. Explain briefly: the server only fetches public addresses on ports 80/443, checks every redirect, and pins the connection to the vetted address. (If a news site answers HTTP 403 the app reports that plainly; some sites, including Wikipedia, refuse automated requests.)
 
-## 6. Accounts, history and the evidence tools (7:00 to 8:00)
-- Register, run `01-normal-news.txt` again, open **Analysis History**, open the saved result, delete it.
-- **Settings**: mention password change (revokes other sessions) and account deletion (removes saved analyses).
+## 6. Evidence tools (7:00 to 8:00)
+- Open the **Library**, search by meaning, and show the limited collection notice. There is no sign-in in the web app; nothing is saved.
 - **Evidence Explorer**: semantic search "why do we have seasons" returns the seasons passage even though the wording differs. State: 70 passages, every source link checked.
 
 ## 7. Model performance and honesty (8:00 to 9:00)

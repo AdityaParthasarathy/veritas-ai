@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { ArrowRight, FileText } from 'lucide-react'
 import AnalysisScan from '../components/analysis/AnalysisScan'
 import Report from '../components/report/Report'
@@ -7,7 +7,6 @@ import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Kbd from '../components/ui/Kbd'
 import Tabs from '../components/ui/Tabs'
-import { useAuth } from '../context/AuthContext'
 import { EXAMPLES } from '../data/examples'
 import { useHotkey } from '../hooks/useHotkey'
 import { MAX_CHARS, MIN_CHARS, validateInput } from '../data/limits'
@@ -20,7 +19,6 @@ const MODES = [
 const isCancel = (error) => error?.code === 'ERR_CANCELED' || error?.name === 'CanceledError'
 
 export default function AnalyzePage() {
-  const { user } = useAuth()
   const location = useLocation()
   const [mode, setMode] = useState('text')
   const [title, setTitle] = useState('')
@@ -250,16 +248,7 @@ export default function AnalyzePage() {
               </div>
             </div>
 
-            <p className="t-caption mt-3">
-              {user ? 'Signed in: this investigation will be saved to your Casebook.' : (
-                <>
-                  Not signed in: this investigation will not be saved.{' '}
-                  <Link to="/login" state={{ from: '/analyze' }} className="text-signal underline decoration-signal/30 hover:decoration-signal">
-                    Sign in to keep it.
-                  </Link>
-                </>
-              )}
-            </p>
+            <p className="t-caption mt-3">Nothing you submit is saved. The analysis runs on the server and the report lives only in this page.</p>
             {error && (
               <div role="alert" className="mt-5 rounded-md border border-contra/40 bg-contra/10 px-4 py-3 text-sm text-contra">
                 {error}
@@ -295,19 +284,7 @@ export default function AnalyzePage() {
       {phase === 'done' && result && (
         <div>
           <div className="no-print mb-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-line pb-5">
-            <p className="t-caption max-w-2xl">
-              {result.analysis_id ? (
-                <>
-                  Saved to your{' '}
-                  <Link to={`/history/${result.analysis_id}`} className="text-signal underline decoration-signal/30 hover:decoration-signal">
-                    Casebook
-                  </Link>
-                  .
-                </>
-              ) : (
-                'Not saved. Sign in before analysing to keep an investigation.'
-              )}
-            </p>
+            <p className="t-caption max-w-2xl">Not saved. Use Copy summary, JSON or Print in the report to keep a copy.</p>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={reset}>
                 Edit and re-run

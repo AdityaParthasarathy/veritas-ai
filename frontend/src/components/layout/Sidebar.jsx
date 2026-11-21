@@ -1,7 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import Logo from '../ui/Logo'
-import { DASHBOARD_ITEM, NAV_ITEMS, SETTINGS_ITEM } from './navigation'
+import { NAV_ITEMS } from './navigation'
 import ReadoutPip from './ReadoutPip'
 
 function Item({ item }) {
@@ -28,7 +27,6 @@ function Item({ item }) {
 
 /** Application sidebar (large screens). One navigation landmark; the same destinations live in the mobile sheet. */
 export default function Sidebar({ readout }) {
-  const { user } = useAuth()
   return (
     <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-line bg-ink-1/80 px-3 py-5 lg:flex">
       <Link to="/" aria-label="VERITAS AI home" className="mb-8 rounded px-3">
@@ -36,33 +34,15 @@ export default function Sidebar({ readout }) {
       </Link>
       <nav aria-label="Primary" className="flex-1">
         <ul className="space-y-1">
-          {user && (
-            <li>
-              <Item item={DASHBOARD_ITEM} />
-            </li>
-          )}
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <Item item={item} />
             </li>
           ))}
-          {user && (
-            <li className="pt-3">
-              <Item item={SETTINGS_ITEM} />
-            </li>
-          )}
         </ul>
       </nav>
       <div className="panel space-y-3 p-3">
         <ReadoutPip readout={readout} withLabel />
-        {!user && (
-          <p className="t-caption">
-            <Link to="/login" className="text-signal underline decoration-signal/30 hover:decoration-signal">
-              Sign in
-            </Link>{' '}
-            to keep investigations in a private Casebook.
-          </p>
-        )}
       </div>
     </aside>
   )
