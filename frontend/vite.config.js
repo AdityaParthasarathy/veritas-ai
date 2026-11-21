@@ -12,6 +12,8 @@ export default defineConfig({
   server: {
     port: 5173,
     host: 'localhost',
+    // The app calls /api/v1 on its own origin; in development the backend on :8000 answers it.
+    proxy: { '/api': 'http://localhost:8000' },
   },
   preview: {
     port: 5173,

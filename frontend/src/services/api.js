@@ -1,7 +1,9 @@
 import axios from 'axios'
 import { getToken } from './tokenStore'
 
-const baseURL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
+// Same-origin by default: the browser calls /api/v1 on the host that served the app (nginx proxies it to the backend in
+// Docker; the Vite dev server proxies it in development). VITE_API_BASE_URL is an optional override for a split deployment.
+const baseURL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 
 /** Single Axios instance used by every service module. */
 export const apiClient = axios.create({

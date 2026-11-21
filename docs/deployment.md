@@ -35,7 +35,7 @@ Model status: `Invoke-RestMethod http://localhost:8000/api/v1/health/models` (`l
 | `SECRET_KEY` | Signs JWTs; at least 32 random characters (the backend refuses to start otherwise). |
 | `POSTGRES_*`, `DATABASE_URL` | Database credentials (see `.env.example`). |
 | `FRONTEND_URL` | The single browser origin allowed by CORS. Must match the address users open. |
-| `BACKEND_URL` | Address the browser uses for the API; compiled into the frontend image and used in its CSP. **Changing it requires rebuilding the frontend image.** |
+| `BACKEND_URL` | Informational only. The browser calls `/api/v1` on the frontend's own address and nginx proxies it to the backend, so no API address is compiled into the frontend image. |
 | `BACKEND_PORT`, `FRONTEND_PORT`, `POSTGRES_PORT` | Host ports. |
 | `PRELOAD_MODELS` | Load ML components in a background thread at startup (default true). |
 | `MODELS_DIR`, `ARTIFACTS_DIR` | Where the embedding model and classifier files live. |
@@ -54,7 +54,7 @@ docker cp veritas_postgres:/tmp/veritas.dump .\veritas.dump
 
 This stack is production-*ready* in structure but has not been deployed or load-tested. Required steps:
 
-1. **TLS.** Put a TLS-terminating reverse proxy (or platform load balancer) in front of both services; the compose file serves plain HTTP. Set `FRONTEND_URL` and `BACKEND_URL` to the `https://` addresses and rebuild the frontend.
+1. **TLS.** Put a TLS-terminating reverse proxy (or platform load balancer) in front of both services; the compose file serves plain HTTP. Expose only the frontend port: nginx forwards `/api/` to the backend, so the browser needs one `https://` address and the API needs no CORS entry for it. (`FRONTEND_URL` is needed only when a browser on a different origin calls the API directly.)
 2. **Do not publish the database port.** Remove the `ports` entry of the `db` service (it exists for local convenience).
 3. **Strong, unique secrets** in the environment of the deployment platform, not in a committed file.
 4. **Rate limiting is per process and in memory** (login attempts and URL fetches). With several backend workers or replicas, move it to a shared store or the gateway.

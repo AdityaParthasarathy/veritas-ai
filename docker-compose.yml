@@ -59,15 +59,11 @@ services:
   frontend:
     build:
       context: ./frontend
-      args:
-        # Address the browser uses to reach the API (compiled into the bundle).
-        VITE_API_BASE_URL: ${BACKEND_URL:-http://localhost:8000}
     container_name: veritas_frontend
     restart: unless-stopped
     depends_on:
       - backend
-    environment:
-      API_ORIGIN: ${BACKEND_URL:-http://localhost:8000}
+    # nginx serves the app and proxies /api/ to the backend service, so one public address is enough.
     ports:
       - "${FRONTEND_PORT:-5173}:8080"
     networks:
