@@ -96,7 +96,7 @@ export default function EvidenceExplorerPage() {
               if (!e.target.value) setResults(null)
             }}
             placeholder="Try: why do we have seasons?"
-            className="h-12 w-full rounded-full border border-line bg-ink-1/80 pl-11 pr-28 text-[0.9375rem] text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-violet"
+            className="h-12 w-full rounded-md border border-line bg-ink-1/80 pl-11 pr-28 text-[0.9375rem] text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-violet"
           />
           <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
             <Kbd>/</Kbd>
@@ -141,7 +141,7 @@ export default function EvidenceExplorerPage() {
                 <label htmlFor="publisher" className="t-meta">
                   Publisher
                 </label>
-                <select id="publisher" value={publisher} onChange={(e) => setPublisher(e.target.value)} className="h-9 rounded-full border border-line bg-ink-1/80 px-3 text-sm text-steel outline-none hover:border-line-strong focus:border-violet">
+                <select id="publisher" value={publisher} onChange={(e) => setPublisher(e.target.value)} className="h-9 rounded-md border border-line bg-ink-1/80 px-3 text-sm text-steel outline-none hover:border-line-strong focus:border-violet">
                   <option value="all">All publishers ({publishers.length})</option>
                   {publishers.map((org) => (
                     <option key={org} value={org}>
@@ -152,9 +152,9 @@ export default function EvidenceExplorerPage() {
               </div>
             </div>
             <div id="topic-panel" role="tabpanel" aria-labelledby={`topic-tab-${topic}`} className="pt-5">
-            <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {visible.map((p) => (
-                <li key={p.id} className="panel panel-hover flex flex-col gap-3 p-5">
+                <li key={p.id} className="panel panel-hover flex min-w-0 flex-col gap-3 p-5">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone="brand">{p.source_org}</Badge>
                     <Badge>{p.topic}</Badge>

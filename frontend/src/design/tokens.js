@@ -36,7 +36,7 @@ export const motion = {
   easeInOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
 }
 
-export const radius = { sm: '6px', md: '10px', lg: '14px', xl: '20px', '2xl': '28px' }
+export const radius = { sm: '2px', md: '4px', lg: '6px', xl: '8px', '2xl': '10px' } // restrained: instrument, not app-store
 
 // Flatten the colour map to CSS custom properties (--c-ink-0, --c-paper ...).
 export function cssVariables() {
@@ -52,7 +52,7 @@ export function cssVariables() {
   vars['--dur-cinematic'] = `${motion.cinematic}ms`
   vars['--ease-out'] = motion.easeOut
   vars['--ease-in-out'] = motion.easeInOut
-  vars['--glass'] = 'rgba(30, 35, 75, 0.55)'
-  vars['--glass-border'] = 'rgba(150, 130, 255, 0.18)'
+  vars['--glass'] = '#0D1224'
+  vars['--glass-border'] = '#2E376A'
   return vars
 }

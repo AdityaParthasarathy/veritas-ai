@@ -14,14 +14,8 @@ export default function SampleReport() {
   const item = getCase('03-misleading-sober')
   return (
     <figure className="relative mx-auto max-w-5xl">
-      <div aria-hidden="true" className="arc-glow" />
-      <div className="relative overflow-hidden rounded-t-2xl border border-b-0 border-line-strong bg-ink-1/90 shadow-[0_-30px_80px_-40px_rgb(128_96_255/0.7)]">
-        <div className="flex items-center gap-3 border-b border-line bg-ink-2/70 px-4 py-3">
-          <span aria-hidden="true" className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-            <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-            <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-          </span>
+      <div className="relative overflow-hidden rounded-t-lg border border-b-0 border-line-strong bg-ink-0">
+        <div className="flex items-center gap-3 border-b border-line bg-ink-2 px-4 py-3">
           <figcaption className="flex flex-wrap items-center gap-2">
             <Badge tone="brand">Sample report</Badge>
             <Badge>Invented input</Badge>
@@ -38,7 +32,7 @@ export default function SampleReport() {
           </div>
         </div>
       </div>
-      <Link to={`/casebook/${item.id}`} className="mt-5 flex items-center justify-center gap-1.5 text-[0.875rem] text-signal underline decoration-signal/30 hover:decoration-signal">
+      <Link to={`/casebook/${item.id}`} className="my-5 flex items-center justify-center gap-1.5 text-[0.875rem] text-signal underline decoration-signal/30 hover:decoration-signal">
         Open the full recorded report
         <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
       </Link>

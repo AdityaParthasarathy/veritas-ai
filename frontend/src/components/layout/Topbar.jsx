@@ -42,7 +42,7 @@ function Account() {
     <Menu
       label="Account menu"
       items={items}
-      triggerClassName="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-ink-2/60 pl-1 pr-3 text-[0.8125rem] text-steel hover:border-violet hover:text-paper"
+      triggerClassName="inline-flex h-9 items-center gap-2 rounded-md border border-line bg-ink-2/60 pl-1 pr-3 text-[0.8125rem] text-steel hover:border-violet hover:text-paper"
       trigger={
         <>
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-gradient font-mono text-[0.6875rem] font-medium text-white" aria-hidden="true">
@@ -118,7 +118,7 @@ export default function Topbar({ readout, onOpenPalette, onOpenMobileNav }) {
             type="button"
             onClick={onOpenPalette}
             aria-label="Open command palette"
-            className="press inline-flex items-center gap-2 rounded-full border border-line bg-ink-2/50 p-2 text-[0.8125rem] text-dim hover:border-violet hover:text-steel xl:px-3.5 xl:py-1.5"
+            className="press inline-flex items-center gap-2 rounded-md border border-line bg-ink-2/50 p-2 text-[0.8125rem] text-dim hover:border-violet hover:text-steel xl:px-3.5 xl:py-1.5"
           >
             <Search className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden xl:inline">Search</span>

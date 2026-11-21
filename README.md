@@ -1,6 +1,6 @@
 # VERITAS AI
 
-AI-powered misinformation intelligence platform. It analyzes pasted text or a public article URL with NLP and machine learning, shows the model's output **separately** from independently retrieved reference passages, and reports uncertainty. **A model result is never proof that content is true or false.**
+A statistical text-analysis instrument. It analyzes pasted text or a public article URL and gives **three separate readings**: how the writing resembles the labelled training data (style), which reference passages are related in meaning (evidence relevance), and how far to trust the analysis itself (uncertainty). **None of them establishes whether content is true or false.**
 
 > The classifier learns the writing style and sources of one dataset's labels. It does not fact-check. Read [docs/dataset-and-model.md](docs/dataset-and-model.md) and [docs/acceptance-report.md](docs/acceptance-report.md) for what the numbers do and do not mean.
 
@@ -12,7 +12,7 @@ AI-powered misinformation intelligence platform. It analyzes pasted text or a pu
 | Classification | TF-IDF + Logistic Regression trained on WELFake; reported as "resembles unreliable/reliable sources", not truth. |
 | Linguistic signals | Descriptive measurements (spaCy): emphasis, ALL-CAPS, sensational and hedging wording, attribution, entities, etc. |
 | Evidence retrieval | Semantic search (MiniLM + FAISS) over a small curated reference collection with verified source links. |
-| Uncertainty | Transparent rules: short text, undecided model, no related evidence. Never lower than "moderate". |
+| Uncertainty | Transparent rules: short text, text outside the training domain, a page that does not look like an article, an undecided model, no related evidence. Never lower than "moderate". |
 | Accounts and history | Registration, login, saved investigations (per-user, owner-only), password change, account deletion. Anonymous use stays available and is not saved. |
 | Model Performance page | Metrics, confusion matrices, dataset cleaning and limitations, served from the saved training run. |
 

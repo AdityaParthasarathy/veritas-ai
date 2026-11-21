@@ -10,7 +10,7 @@ export default function ResultWarnings({ result }) {
   const warnings = buildWarnings(result)
   if (warnings.length === 0) return null
   return (
-    <section aria-labelledby="warnings-title" className="rounded-xl border border-caution/50 bg-caution/10 p-5 sm:p-6">
+    <section aria-labelledby="warnings-title" className="rounded-md border border-caution/50 bg-caution/10 p-5 sm:p-6">
       <h2 id="warnings-title" className="flex items-center gap-2.5 text-[1rem] font-semibold text-paper">
         <TriangleAlert className="h-5 w-5 shrink-0 text-caution" aria-hidden="true" />
         Read this before the result

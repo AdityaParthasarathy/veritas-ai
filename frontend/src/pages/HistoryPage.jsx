@@ -48,27 +48,29 @@ function Pips({ level }) {
   )
 }
 
-function Card({ item, onDelete, featured }) {
+function Card({ item, onDelete }) {
   const when = new Date(item.created_at)
   const unreliable = item.classifier_label === 'resembles_unreliable_sources'
+  const caution = item.uncertainty_level !== 'moderate'
   return (
-    <li className={`panel panel-hover group relative flex flex-col gap-4 p-5 sm:p-6 ${featured ? 'sm:col-span-2' : ''}`}>
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge tone={item.uncertainty_level === 'very_high' ? 'neutral' : unreliable ? 'contra' : 'support'}>{unreliable ? 'Unreliable-like style' : 'Reliable-like style'}</Badge>
-        <time dateTime={item.created_at} className="t-meta ml-auto">
-          {when.toLocaleDateString()} {when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </time>
-      </div>
-      <div className="min-w-0 flex-1">
-        <h2 className={`font-display font-semibold leading-snug tracking-[-0.02em] text-paper ${featured ? 'text-[1.625rem]' : 'text-[1.125rem]'}`}>
+    <li className="panel panel-hover group relative grid gap-x-8 gap-y-4 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone={item.uncertainty_level === 'very_high' ? 'neutral' : unreliable ? 'contra' : 'support'}>{unreliable ? 'Unreliable-like style' : 'Reliable-like style'}</Badge>
+          {caution && <Badge tone="caution">{LEVEL_TEXT[item.uncertainty_level]?.short} caution</Badge>}
+          <time dateTime={item.created_at} className="t-meta">
+            {when.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}, {when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </time>
+        </div>
+        <h2 className="mt-2.5 font-display text-[1.125rem] font-semibold leading-snug tracking-[-0.02em] text-paper">
           <Link to={`/history/${item.id}`} className="decoration-violet/60 underline-offset-4 after:absolute after:inset-0 hover:underline">
             {item.title || deriveTitle(item.preview)}
           </Link>
         </h2>
-        <p className={`t-caption mt-2 ${featured ? 'line-clamp-3 max-w-2xl' : 'line-clamp-2'}`}>{item.preview}</p>
+        <p className="t-caption mt-1.5 line-clamp-2 max-w-3xl">{item.preview}</p>
       </div>
-      <div className="flex items-end justify-between gap-4 border-t border-line pt-4">
-        <div className="flex items-start gap-5">
+      <div className="flex items-end justify-between gap-6 border-t border-line pt-4 sm:border-t-0 sm:pt-0">
+        <div className="flex items-start gap-6">
           <MiniScale probability={item.probability_unreliable} label={`${item.word_count} words`} />
           <Pips level={item.uncertainty_level} />
         </div>
@@ -205,14 +207,14 @@ export default function HistoryPage() {
               <label htmlFor="sort" className="sr-only">
                 Sort investigations
               </label>
-              <select id="sort" value={sort} onChange={(e) => setSort(e.target.value)} className="h-10 rounded-full border border-line bg-ink-1/80 px-3 text-sm text-steel outline-none hover:border-line-strong focus:border-violet">
+              <select id="sort" value={sort} onChange={(e) => setSort(e.target.value)} className="h-10 rounded-md border border-line bg-ink-1/80 px-3 text-sm text-steel outline-none hover:border-line-strong focus:border-violet">
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
                 <option value="caution">Highest caution first</option>
               </select>
-              <div className="relative w-full sm:w-64">
+              <div className="relative w-full sm:w-72">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" aria-hidden="true" />
-                <input ref={searchRef} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search this page of investigations" placeholder="Search this page" className="h-10 w-full rounded-full border border-line bg-ink-1/80 pl-9 pr-3 text-sm text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-signal" />
+                <input ref={searchRef} value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search this page of investigations by title or text" placeholder="Search title or text on this page" className="h-10 w-full rounded-md border border-line bg-ink-1/80 pl-9 pr-3 text-sm text-paper outline-none transition-colors duration-fast hover:border-line-strong focus:border-signal" />
               </div>
             </div>
             </div>
@@ -220,9 +222,9 @@ export default function HistoryPage() {
               {items.length === 0 ? (
                 <p className="t-body py-10">Nothing on this page matches. Try another filter or search term.</p>
               ) : (
-                <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {items.map((item, i) => (
-                    <Card key={item.id} item={item} onDelete={setPending} featured={i === 0 && offset === 0 && filter === 'all' && !query} />
+                <ul className="space-y-3">
+                  {items.map((item) => (
+                    <Card key={item.id} item={item} onDelete={setPending} />
                   ))}
                 </ul>
               )}

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
-import HeroVisual from '../components/landing/HeroVisual'
 import Button from '../components/ui/Button'
 import { Input } from '../components/ui/Field'
 import { useAuth } from '../context/AuthContext'
@@ -48,9 +47,23 @@ export default function AuthPage({ mode }) {
 
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
-      <aside className="relative hidden overflow-hidden border-r border-line bg-ink-1/60 lg:flex lg:flex-col lg:justify-between">
+      <aside className="relative hidden overflow-hidden border-r border-line bg-ink-1 lg:flex lg:flex-col lg:justify-between">
         <div className="flex flex-1 items-center px-10 pt-10">
-          <HeroVisual className="max-w-sm" />
+          <ol className="max-w-sm divide-y divide-line border-y border-line">
+            {[
+              ['01', 'Writing style', 'Which labelled group the wording resembles.'],
+              ['02', 'Evidence relevance', 'Which reference passages are close in meaning.'],
+              ['03', 'Trust in the analysis', 'How far to rely on the two readings above.'],
+            ].map(([n, title, body]) => (
+              <li key={n} className="flex gap-4 py-4">
+                <span className="font-mono text-[0.75rem] text-violet">{n}</span>
+                <div>
+                  <p className="text-[0.9375rem] font-semibold text-paper">{title}</p>
+                  <p className="t-caption mt-0.5">{body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
         <div className="border-t border-line/70 px-10 py-8">
           <p className="font-display text-[clamp(1.5rem,2.4vw,2.25rem)] font-semibold leading-[1.12] tracking-[-0.03em] text-paper">Confidence is not truth.</p>

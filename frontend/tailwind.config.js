@@ -15,12 +15,12 @@ export default {
         // One elevation system: a soft, offset shadow for floating layers only (menus, modals, palette).
         float: '0 18px 48px -12px rgba(4, 5, 20, 0.75), 0 2px 6px rgba(4, 5, 20, 0.5)',
         // Soft violet lift for the one primary action per view.
-        glow: '0 8px 28px -8px rgba(128, 96, 255, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.18)',
-        panel: '0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px -16px rgba(4, 5, 20, 0.8)',
+        glow: 'inset 0 1px 0 rgba(255, 255, 255, 0.14)',
+        panel: 'none',
       },
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #6847F0 0%, #7A58F7 100%)',
-        'signal-gradient': 'linear-gradient(90deg, #48D9ED 0%, #8060FF 100%)',
+        'brand-gradient': 'linear-gradient(#6847F0, #6847F0)', // flat on purpose
+        'signal-gradient': 'linear-gradient(#48D9ED, #48D9ED)', // flat on purpose
       },
       keyframes: {
         'page-enter': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },

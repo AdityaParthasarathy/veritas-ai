@@ -26,7 +26,7 @@ export default function ReportOverview({ result }) {
   const { classification, evidence } = result
   const p = classification.probability_unreliable_style
   return (
-    <section aria-labelledby="primary-title" className="glass rounded-xl p-6 sm:p-8">
+    <section aria-labelledby="primary-title" className="glass rounded-lg p-6 sm:p-8">
       <p className="t-eyebrow">What did the classifier observe?</p>
       <h2 id="primary-title" className="mt-3 max-w-3xl text-[clamp(1.5rem,2.8vw,2.25rem)] font-semibold leading-[1.15] tracking-[-0.03em] text-paper">
         {primary.headline}

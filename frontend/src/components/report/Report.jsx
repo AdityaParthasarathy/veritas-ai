@@ -3,6 +3,7 @@ import { Globe } from 'lucide-react'
 import Reveal from '../ui/Reveal'
 import ArticlePanel from './ArticlePanel'
 import EvidenceExplorer from './EvidenceExplorer'
+import Glossary from './Glossary'
 import InstrumentCards from './InstrumentCards'
 import ReportHeader from './ReportHeader'
 import ReportNav from './ReportNav'
@@ -73,7 +74,7 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
                     ))}
                 </dl>
                 {source.extraction_warning && (
-                  <p className="mt-4 rounded-lg border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] leading-relaxed text-paper">{source.extraction_warning}</p>
+                  <p className="mt-4 rounded-md border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] leading-relaxed text-paper">{source.extraction_warning}</p>
                 )}
                 <p className="t-caption mt-3 flex items-start gap-2 break-all">
                   <Globe className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -101,6 +102,7 @@ export default function Report({ result, text, title, stamp, headingRef, onRerun
 
           <Section id="method" title="Method and limitations" aside="Descriptive counts and provenance. Not used by the classifier and not a measure of truth.">
             <div className="space-y-6">
+              <Glossary evidence={evidence} />
               <div className="panel p-5 sm:p-6">
                 <h3 className="t-h3 mb-3">Linguistic indicators</h3>
                 <SignalsTable signals={signals} />

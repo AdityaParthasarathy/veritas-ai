@@ -41,3 +41,13 @@ describe('result warnings on the report (hub-page regression)', () => {
     expect(within(region).getByText('Very short input (12 words)')).toBeInTheDocument()
   })
 })
+
+describe('report glossary', () => {
+  it('defines the terms in plain language, with the relevance threshold from the result', () => {
+    renderWithProviders(<Report result={{ ...analysisResult, word_count: 400 }} title="Terms" />)
+    expect(screen.getByText('Terms used in this report')).toBeInTheDocument()
+    expect(screen.getByText('Model probability')).toBeInTheDocument()
+    expect(screen.getByText(/It is not the probability that the text is false/)).toBeInTheDocument()
+    expect(screen.getByText(/It does not show support or contradiction/)).toBeInTheDocument()
+  })
+})

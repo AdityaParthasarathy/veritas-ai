@@ -155,7 +155,7 @@ export default function InvestigationPanel({ value, onChange, onSubmit, touched,
                   onChange({ mode: 'text', title: '', text: example.text })
                   onTouch(false)
                 }}
-                className="press rounded-full border border-line bg-ink-2/50 px-3 py-1 text-[0.8125rem] text-steel hover:border-violet hover:text-paper disabled:opacity-50"
+                className="press rounded-md border border-line bg-ink-2/50 px-3 py-1 text-[0.8125rem] text-steel hover:border-violet hover:text-paper disabled:opacity-50"
               >
                 {example.title}
               </button>
